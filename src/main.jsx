@@ -24,7 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 						colorInfo: '#106a2e',
 						fontSize: remToPx(1.5),
 						sizeUnit: remToPx(0.5),
-						borderRadius: remToPx(1),
+						borderRadius: remToPx(1)
 					}
 				}}
 			>
