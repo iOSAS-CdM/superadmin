@@ -14,14 +14,23 @@ const remToPx = (rem) => {
 	const htmlFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
 	return rem * htmlFontSize;
 };
+const rootToHex = (root) => {
+	if (root.startsWith('#')) return root;
+	if (root.startsWith('var(--')) {
+		const varName = root.slice(4, -1);
+		const computedStyle = getComputedStyle(document.documentElement);
+		return computedStyle.getPropertyValue(varName).trim();
+	};
+	return root;
+};
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 	<React.StrictMode>
 			<ConfigProvider
 				theme={{
 					token: {
-						colorPrimary: '#106a2e',
-						colorInfo: '#106a2e',
+						colorPrimary: rootToHex('var(--primary-6-light)'),
+						colorInfo: rootToHex('var(--primary-6-light)'),
 						fontSize: remToPx(1.5),
 						sizeUnit: remToPx(0.5),
 						borderRadius: remToPx(1)

@@ -1,4 +1,4 @@
-#signIn {
+#sign-in {
 	height: 100vh;
 	width: 100vw;
 	max-width: calc((var(--space-M) * 10) * 5.2);
@@ -13,7 +13,7 @@
 	justify-content: center;
 }
 
-#signIn > main {
+#sign-in > main {
 	width: 100%;
 	height: 100%;
 
@@ -24,8 +24,8 @@
 	justify-content: center;
 }
 
-#signIn > main > #greetings,
-#signIn > main > #form {
+#sign-in > main > #greetings,
+#sign-in > main > #form {
 	width: 100%;
 
 	display: flex;
@@ -33,13 +33,13 @@
 	align-items: center;
 	justify-content: center;
 }
-#signIn > main > #greetings {
+#sign-in > main > #greetings {
 	text-align: center;
 }
-#signIn > main > #form {
+#sign-in > main > #form {
 	gap: var(--space-XL);
 }
-#signIn > main > #form > #footer {
+#sign-in > main > #form > #footer {
 	width: 100%;
 
 	display: flex;

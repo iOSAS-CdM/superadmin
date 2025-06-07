@@ -18,7 +18,7 @@ export default class SignIn extends React.Component {
 			<>
 				<div id='auth-background'></div>
 
-				<section id='signIn' className='scrollable-content'>
+				<section id='sign-in' className='scrollable-content'>
 					<main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 						<Image
 							src='/CdM-OSAS Banner.png'
@@ -33,7 +33,7 @@ export default class SignIn extends React.Component {
 
 						<div id='greetings'>
 							<Text>Welcome,</Text>
-							<Title level={1} style={{ color: '#106a2e', fontWeight: 'bold' }}>Admin</Title>
+							<Title level={1} style={{ color: 'var(--primary-6-light)', fontWeight: 'bold' }}>Admin</Title>
 						</div>
 
 						<form id='form'>
