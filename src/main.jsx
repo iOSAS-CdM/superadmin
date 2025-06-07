@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
 
 import { ConfigProvider } from 'antd';
 
@@ -15,18 +16,20 @@ const remToPx = (rem) => {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 	<React.StrictMode>
-		<ConfigProvider
-			theme={{
-				token: {
-					colorPrimary: '#106a2e',
-					colorInfo: '#106a2e',
-					fontSize: remToPx(1.5),
-					sizeUnit: remToPx(0.5),
-					borderRadius: remToPx(1),
-				}
-			}}
-		>
-			<SignIn />
-		</ConfigProvider>
+		<BrowserRouter>
+			<ConfigProvider
+				theme={{
+					token: {
+						colorPrimary: '#106a2e',
+						colorInfo: '#106a2e',
+						fontSize: remToPx(1.5),
+						sizeUnit: remToPx(0.5),
+						borderRadius: remToPx(1),
+					}
+				}}
+			>
+				<SignIn />
+			</ConfigProvider>
+		</BrowserRouter>
 	</React.StrictMode>
 );
