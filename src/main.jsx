@@ -5,6 +5,14 @@ import { ConfigProvider } from 'antd';
 
 import SignIn from './pages/SignIn';
 
+import 'antd/dist/reset.css';
+import './styles/index.css';
+
+const remToPx = (rem) => {
+	const htmlFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+	return rem * htmlFontSize;
+};
+
 ReactDOM.createRoot(document.getElementById('root')).render(
 	<React.StrictMode>
 		<ConfigProvider
@@ -12,9 +20,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 				token: {
 					colorPrimary: '#106a2e',
 					colorInfo: '#106a2e',
-					fontSize: 15,
-					sizeUnit: 5,
-					borderRadius: 10
+					fontSize: remToPx(1.5),
+					sizeUnit: remToPx(0.5),
+					borderRadius: remToPx(1),
 				}
 			}}
 		>

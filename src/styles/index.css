@@ -1,0 +1,85 @@
+:root {
+	--space-2XS: 0.125rem;
+	--space-XS: 0.25rem;
+	--space-S: 0.5rem;
+	--space-M: 1rem;
+	--space-L: 1.5rem;
+	--space-XL: 2rem;
+	--space-2XL: 3rem;
+	--space-3XL: 4rem;
+
+	--primary-1-light: #A1ABA2;
+	--primary-2-light: #7D9E84;
+	--primary-3-light: #5C9168;
+	--primary-4-light: #388551;
+	--primary-5-light: #25783E;
+	--primary-6-light: #106A2E;
+	--primary-7-light: #07451E;
+	--primary-8-light: #25783E;
+	--primary-9-light: #106A2E;
+	--primary-10-light: #07451E;
+
+	--primary-1-dark: #111613;
+	--primary-2-dark: #112017;
+	--primary-3-dark: #132E1C;
+	--primary-4-dark: #123B20;
+	--primary-5-dark: #236E3A;
+	--primary-6-dark: #106A2E;
+	--primary-7-dark: #114C25;
+	--primary-8-dark: #236E3A;
+	--primary-9-dark: #115D2A;
+	--primary-10-dark: #114C25;
+
+	--neutral-1: #FFFFFF;
+	--neutral-2: #FAFAFA;
+	--neutral-3: #F5F5F5;
+	--neutral-4: #F0F0F0;
+	--neutral-5: #D9D9D9;
+	--neutral-6: #BFBFCF;
+	--neutral-7: #8C8C8C;
+	--neutral-8: #595959;
+	--neutral-9: #434343;
+	--neutral-10: #262626;
+	--neutral-11: #1F1F1F;
+	--neutral-12: #141414;
+	--neutral-13: #000000;
+}
+
+html {
+	font-size: calc(62.5% / 1);
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+h1.ant-typography,
+h2.ant-typography,
+h3.ant-typography,
+h4.ant-typography,
+h5.ant-typography,
+h6.ant-typography,
+p.ant-typography,
+span.ant-typography {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.ant-divider {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+#auth-background {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: var(--neutral-3);
+	background-image: url('./Authentication Background.jpg');
+	background-position: center center;
+	background-size: cover;
+	z-index: -1;
+}
