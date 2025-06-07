@@ -9,6 +9,10 @@ const { Text, Title } = Typography;
 import '../styles/SignIn.css';
 
 export default class SignIn extends React.Component {
+	signIn = () => {
+		window.location.href = '/dashboard';
+	};
+
 	render() {
 		return (
 			<>
@@ -42,6 +46,7 @@ export default class SignIn extends React.Component {
 								<Button
 									type='primary'
 									icon={<LoginOutlined />}
+									onClick={this.signIn}
 								>
 									Sign In
 								</Button>

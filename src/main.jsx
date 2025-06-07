@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router';
+import { BrowserRouter, Routes, Route } from 'react-router';
 
 import { ConfigProvider } from 'antd';
 
 import SignIn from './pages/SignIn';
+import Dashboard from './pages/Dashboard';
 
 import 'antd/dist/reset.css';
 import './styles/index.css';
@@ -16,7 +17,6 @@ const remToPx = (rem) => {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 	<React.StrictMode>
-		<BrowserRouter>
 			<ConfigProvider
 				theme={{
 					token: {
@@ -28,8 +28,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 					}
 				}}
 			>
-				<SignIn />
-			</ConfigProvider>
-		</BrowserRouter>
+			<BrowserRouter>
+				<Routes>
+					<Route path='/' element={<SignIn />} />
+					<Route path='/dashboard' element={<Dashboard />} />
+				</Routes>
+			</BrowserRouter>
+		</ConfigProvider>
 	</React.StrictMode>
 );
