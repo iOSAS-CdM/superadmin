@@ -2,15 +2,27 @@ import React from 'react';
 
 import { Button, Divider, Input, Image, Typography, Checkbox } from 'antd';
 
-import { LoginOutlined, GoogleOutlined } from '@ant-design/icons';
+import { LoginOutlined, GoogleOutlined, LoadingOutlined } from '@ant-design/icons';
 
 const { Text, Title } = Typography;
 
 import '../styles/SignIn.css';
 
 export default class SignIn extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			signingIn: false
+		};
+	};
+
 	signIn = () => {
-		window.location.href = '/dashboard';
+		this.setState({ signingIn: true });
+
+		setTimeout(() => {
+			this.setState({ signingIn: false });
+			window.location.href = '/dashboard';
+		}, 2000);
 	};
 
 	render() {
@@ -45,7 +57,7 @@ export default class SignIn extends React.Component {
 								<Checkbox>Remember me</Checkbox>
 								<Button
 									type='primary'
-									icon={<LoginOutlined />}
+									icon={this.state.signingIn ? <LoadingOutlined /> : <LoginOutlined />}
 									onClick={this.signIn}
 								>
 									Sign In
