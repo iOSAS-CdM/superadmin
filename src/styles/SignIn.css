@@ -1,5 +1,5 @@
 #signIn {
-	height: 100vh;
+	min-height: 100vh;
 	max-width: calc((var(--space-M) * 10) * 5.2);
 	padding: var(--space-3XL) calc(var(--space-3XL) * 2);
 

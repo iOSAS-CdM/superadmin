@@ -17,7 +17,7 @@ export default class SignIn extends React.Component {
 				<section id='signIn'>
 					<main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 						<Image
-							src='./CdM-OSAS Banner.png'
+							src='/CdM-OSAS Banner.png'
 							alt='Logo Colegio de Montalban'
 							width='2'
 							height='1'
