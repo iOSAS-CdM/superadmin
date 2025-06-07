@@ -8,6 +8,8 @@
 	--space-2XL: 3rem;
 	--space-3XL: 4rem;
 
+	--transition: 0.2s ease-in-out;
+
 	--primary-1-light: #A1ABA2;
 	--primary-2-light: #7D9E84;
 	--primary-3-light: #5C9168;
@@ -75,22 +77,41 @@ span.ant-typography {
 
 /* Scrollbar styles */
 ::-webkit-scrollbar {
-	width: calc(var(--space-3XL) * 2);
-	height: calc(var(--space-3XL) * 2);
+	width: var(--space-S);
+	height: var(--space-S);
 }
 ::-webkit-scrollbar-track {
-	background: var(--neutral-4);
-	border-radius: var(--space-3XL);
-}
-::-webkit-scrollbar-thumb {
-	background: var(--neutral-7);
-	border-radius: var(--space-3XL);
-}
-::-webkit-scrollbar-thumb:hover {
-	background: var(--neutral-8);
+	background: transparent;
+	border-radius: var(--space-XS);
 }
 ::-webkit-scrollbar-corner {
-	background: var(--neutral-4);
+	background: transparent;
+}
+
+.scrollable-content {
+	overflow: auto;
+	padding: var(--space-M);
+	border: var(--space-2XS) solid var(--neutral-5);
+	position: relative;
+}
+.scrollable-content::-webkit-scrollbar-thumb {
+	background: transparent;
+	border-radius: var(--space-S);
+	transition: background var(--transition);
+}
+.scrollable-content:hover::-webkit-scrollbar-thumb {
+	background: var(--neutral-7);
+}
+.scrollable-content::-webkit-scrollbar-thumb:active {
+	background: var(--neutral-8);
+}
+.scrollable-content {
+	scrollbar-width: thin;
+	scrollbar-color: transparent transparent;
+	transition: scrollbar-color var(--transition);
+}
+.scrollable-content:hover {
+	scrollbar-color: var(--neutral-7) transparent;
 }
 
 #auth-background {

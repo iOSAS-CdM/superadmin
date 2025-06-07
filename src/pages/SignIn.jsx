@@ -18,7 +18,7 @@ export default class SignIn extends React.Component {
 			<>
 				<div id='auth-background'></div>
 
-				<section id='signIn'>
+				<section id='signIn' className='scrollable-content'>
 					<main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 						<Image
 							src='/CdM-OSAS Banner.png'
