@@ -10,7 +10,8 @@ import {
 	Input,
 	Segmented,
 	Avatar,
-	Modal
+	Modal,
+	Upload
 } from 'antd';
 
 import {
@@ -22,10 +23,11 @@ import {
 	SearchOutlined,
 	EditOutlined,
 	LockOutlined,
-	CaretRightOutlined
+	CaretRightOutlined,
+	PlusOutlined
 } from '@ant-design/icons';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 import remToPx from '../utils/remToPx';
 
@@ -207,7 +209,9 @@ export default class Dashboard extends React.Component {
 					middle: null,
 					last: null
 				},
-				position: null
+				category: null,
+				position: null,
+				profilePicture: null
 			}
 		};
 	};
@@ -226,156 +230,166 @@ export default class Dashboard extends React.Component {
 		}, remToPx(20));
 	};
 
-	addNew = () => {
+	addNew = async () => {
 		this.setState({ addingNew: true });
 
-		const modal = Modal.info({
-			title: 'Add New Staff',
-			centered: true,
-			width: {
-				xs: '75%',
-				sm: '50%',
-				md: '25%',
+		const newStaff = {
+			name: {
+				first: null,
+				middle: null,
+				last: null
 			},
-			open: this.state.addingNew,
-			content: (
-				<Flex vertical justify='flex-start' align='stretch' gap='small'>
-					<Input
-						placeholder='First Name *'
-						onChange={(e) => this.setState({
-							newStaffForm: {
-								...this.state.newStaffForm,
-								name: {
-									...this.state.newStaffForm.name,
-									first: e.target.value
-								}
-							}
-						})}
-					/>
-					<Input
-						placeholder='Middle Name'
-						onChange={(e) => this.setState({
-							newStaffForm: {
-								...this.state.newStaffForm,
-								name: {
-									...this.state.newStaffForm.name,
-									middle: e.target.value
-								}
-							}
-						})}
-					/>
-					<Input
-						placeholder='Last Name *'
-						onChange={(e) => this.setState({
-							newStaffForm: {
-								...this.state.newStaffForm,
-								name: {
-									...this.state.newStaffForm.name,
-									last: e.target.value
-								}
-							}
-						})}
-					/>
-					<Segmented
-						options={[
-							{ label: 'Guidance Officer', value: 'guidance' },
-							{ label: 'Prefect of Discipline Officer', value: 'prefect' },
-							{ label: 'Student Affairs Officer', value: 'student-affairs' }
-						]}
-						defaultValue='guidance'
-						onChange={(value) => this.setState({
-							newStaffForm: {
-								...this.state.newStaffForm,
-								position: value
-							}
-						})}
-					/>
-				</Flex>
-			),
+			position: null,
+			category: 'guidance',
+			profilePicture: null
+		};
 
-			onCancel: () => {
-				this.setState({ addingNew: false });
-				this.setState({
-					newStaffForm: {
-						name: {
-							first: null,
-							middle: null,
-							last: null
-						},
-						position: null
-					}
-				});
-				modal.destroy();
-			},
+		await new Promise((resolve, reject) => {
+			const infoModal = Modal.info({
+				title: 'Add New Staff',
+				centered: true,
+				width: {
+					xs: '75%',
+					sm: '50%',
+					md: '25%',
+				},
+				open: this.state.addingNew,
+				content: (
+					<Flex vertical justify='flex-start' align='stretch' gap='small'>
+						<Input
+							placeholder='First Name *'
+							onChange={(e) => newStaff.name.first = e.target.value}
+						/>
+						<Input
+							placeholder='Middle Name'
+							onChange={(e) => newStaff.name.middle = e.target.value}
+						/>
+						<Input
+							placeholder='Last Name *'
+							onChange={(e) => newStaff.name.last = e.target.value}
+						/>
+						<Segmented
+							options={[
+								{ label: 'Guidance Officer', value: 'guidance' },
+								{ label: 'Prefect of Discipline Officer', value: 'prefect' },
+								{ label: 'Student Affairs Officer', value: 'student-affairs' }
+							]}
+							defaultValue='guidance'
+							onChange={(value => {
+								newStaff.category = value;
+								newStaff.position = value === 'guidance' ? 'Guidance Officer' :
+									value === 'prefect' ? 'Prefect of Discipline Officer' :
+										'Student Affairs Officer';
+							})}
+						/>
+					</Flex>
+				),
 
-			footer: (_, { OkBtn, CancelBtn }) => (
-				<Flex justify='flex-end' align='center' gap='small'>
-					<Button
-						{...CancelBtn}
-						onClick={() => {
-							this.setState({ addingNew: false });
-							modal.destroy();
-						}}
-					>Cancel</Button>
-					<Button
-						{...OkBtn}
-						type='primary'
-						onClick={() => {
-							if (
-								!this.state.newStaffForm.name.first ||
-								!this.state.newStaffForm.name.last ||
-								!this.state.newStaffForm.position
-							) {
-								const errorModal = Modal.error({
-									title: 'Error',
-									content: 'Please fill in all fields * before saving.',
-									centered: true,
+				onCancel: () => {
+					this.setState({ addingNew: false });
+					this.setState({
+						newStaffForm: {
+							name: {
+								first: null,
+								middle: null,
+								last: null
+							},
+							position: null
+						}
+					});
+					infoModal.destroy();
+					reject();
+				},
 
-									onCancel: () => modal.destroy(),
-									footer: (
-										<Flex justify='flex-end' align='center' gap='small'>
-											<Button
-												type='primary'
-												onClick={() => {errorModal.destroy()}}
-											>OK</Button>
-										</Flex>
-									)
-								});
-								return;
-							};
+				footer: (_, { OkBtn, CancelBtn }) => (
+					<Flex justify='flex-end' align='center' gap='small'>
+						<Text type='secondary'>
+							Fields marked with * are required.
+						</Text>
+						<Button
+							{...CancelBtn}
+							onClick={() => {
+								this.setState({ addingNew: false });
+								infoModal.destroy();
+								reject();
+							}}
+						>Cancel</Button>
+						<Button
+							{...OkBtn}
+							type='primary'
+							onClick={() => {
+								if (
+									!newStaff.name.first ||
+									!newStaff.name.last
+								) {
+									const errorModal = Modal.error({
+										title: 'Error',
+										content: 'Please fill in all fields * before proceeding.',
+										centered: true,
 
-							const newStaff = {
-								id: `025-${Math.floor(Math.random() * 1000)}`,
-								name: {
-									first: this.state.newStaffForm.name.first,
-									middle: this.state.newStaffForm.name.middle || '',
-									last: this.state.newStaffForm.name.last
-								},
-								position: this.state.newStaffForm.position,
-								category: this.state.newStaffForm.position === 'guidance' ? 'Guidance Officer' :
-									this.state.newStaffForm.position === 'prefect' ? 'Prefect of Discipline Officer' :
-										'Student Affairs Officer',
-							};
+										onCancel: () => infoModal.destroy(),
+										footer: (
+											<Flex justify='flex-end' align='center' gap='small'>
+												<Button
+													type='primary'
+													onClick={() => {errorModal.destroy()}}
+												>OK</Button>
+											</Flex>
+										)
+									});
+									return;
+								};
+								
+								newStaff.position = newStaff.position || (newStaff.category === 'guidance' ? 'Guidance Officer' :
+									newStaff.category === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer');
+								newStaff.id = `025-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
 
-							this.setState((prevState) => ({
-								staffs: [...prevState.staffs, newStaff],
-								displayedStaffs: [...prevState.displayedStaffs, newStaff],
-								addingNew: false,
-								newStaffForm: {
-									name: {
-										first: null,
-										middle: null,
-										last: null
-									},
-									position: null
-								}
-							}));
-							modal.destroy();
-						}}
-					>Save</Button>
-				</Flex>
-			)
+								infoModal.destroy();
+								resolve(newStaff);
+							}}
+						>Next</Button>
+					</Flex>
+				)
+			});
 		});
+
+		console.log('New Staff Form:', newStaff);
+
+		await new Promise((resolve, reject) => {
+			const uploadModal = Modal.info({
+				title: 'Upload Profile Picture',
+				centered: true,
+				width: {
+					xs: '75%',
+					sm: '50%',
+					md: '25%',
+				},
+				open: this.state.addingNew,
+				content: () => (
+					<Flex vertical justify='flex-start' align='stretch' gap='small'></Flex>
+				),
+				onCancel: () => {
+					this.setState({ addingNew: false });
+					uploadModal.destroy();
+					reject();
+				},
+				footer: (_, { OkBtn, CancelBtn }) => (
+					<Flex justify='flex-end' align='center' gap='small'>
+						<Text type='secondary'>
+							Upload a profile picture for the new staff.
+						</Text>
+						<Button
+							{...CancelBtn}
+							onClick={() => {
+								this.setState({ addingNew: false });
+								uploadModal.destroy();
+								reject();
+							}}
+						>Cancel</Button>
+					</Flex>
+				)
+			});
+		})
 	};
 
 	categorizeFilter = (value) => {
