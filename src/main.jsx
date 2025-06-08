@@ -7,29 +7,19 @@ import { ConfigProvider, theme } from 'antd';
 import SignIn from './pages/SignIn';
 import Dashboard from './pages/Dashboard';
 
+import remToPx from './utils/remToPx';
+import rootToHex from './utils/rootToHex';
+
 import 'antd/dist/reset.css';
 import './styles/index.css';
-
-const remToPx = (rem) => {
-	const htmlFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-	return rem * htmlFontSize;
-};
-const rootToHex = (root) => {
-	if (root.startsWith('#')) return root;
-	if (root.startsWith('var(--')) {
-		const varName = root.slice(4, -1);
-		const computedStyle = getComputedStyle(document.documentElement);
-		return computedStyle.getPropertyValue(varName).trim();
-	};
-	return root;
-};
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 	<React.StrictMode>
 			<ConfigProvider
 				theme={{
 					algorithm: [
-						theme.defaultAlgorithm
+						theme.defaultAlgorithm,
+						theme.darkAlgorithm
 					],
 					cssVar: true,
 					token: {

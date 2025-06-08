@@ -3,11 +3,14 @@ import React from 'react';
 import {
 	Flex,
 	Card,
-	Grid,
+	Row,
+	Col,
 	Typography,
 	Button,
 	Input,
-	Segmented
+	Segmented,
+	Avatar,
+	Divider
 } from 'antd';
 
 import {
@@ -16,10 +19,15 @@ import {
 	LogoutOutlined,
 	ToolOutlined,
 	LoadingOutlined,
-	SearchOutlined
+	SearchOutlined,
+	EditOutlined,
+	LockOutlined,
+	CaretRightOutlined
 } from '@ant-design/icons';
 
 const { Title } = Typography;
+
+import remToPx from '../utils/remToPx';
 
 import Header from '../components/Header';
 
@@ -41,7 +49,8 @@ export default class Dashboard extends React.Component {
 						last: 'Martinez'
 					},
 					position: 'Head',
-					profilePicture: '/staffs/025-000.jpg'
+					category: '',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
 					id: '025-001',
@@ -51,7 +60,8 @@ export default class Dashboard extends React.Component {
 						last: 'Gray'
 					},
 					position: 'Guidance Student Affairs Officer',
-					profilePicture: '/staffs/025-001.jpg'
+					category: 'guidance',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
 					id: '025-002',
@@ -61,11 +71,52 @@ export default class Dashboard extends React.Component {
 						last: 'Wheeler'
 					},
 					position: 'Prefect of Discipline Officer',
-					profilePicture: '/staffs/025-002.jpg'
+					category: 'prefect',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-003',
+					name: {
+						first: 'Jordan',
+						middle: '',
+						last: 'Harris'
+					},
+					position: 'Guidance Officer',
+					category: 'guidance',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-004',
+					name: {
+						first: 'Taylor',
+						middle: '',
+						last: 'Reed'
+					},
+					position: 'Student Affairs Officer',
+					category: 'student-affairs',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-005',
+					name: {
+						first: 'Alex',
+						middle: '',
+						last: 'Carter'
+					},
+					position: 'Guidance Officer',
+					category: 'guidance',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				}
-			]
+			],
+
+			categorizedStaffs: [],
+			searchedCategorizedStaffs: []
 		};
 	};
+
+	componentDidMount() {
+		this.setState({ categorizedStaffs: this.state.staffs });
+	}
 
 	signOut = () => {
 		this.setState({ signingOut: true });
@@ -73,7 +124,7 @@ export default class Dashboard extends React.Component {
 		setTimeout(() => {
 			this.setState({ signingOut: false });
 			window.location.href = '/';
-		}, 2000);
+		}, remToPx(20));
 	};
 
 	addNew = () => {
@@ -81,7 +132,34 @@ export default class Dashboard extends React.Component {
 
 		setTimeout(() => {
 			this.setState({ addingNew: false });
-		}, 2000);
+		}, remToPx(20));
+	};
+
+	categorizeFilter = (value) => {
+		let categorizedStaffs = this.state.staffs;
+
+		this.setState({ categorizedStaffs: [] });
+
+		if (value !== 'all')
+			categorizedStaffs = this.state.staffs.filter(staff => staff.category.toLowerCase() == value);
+
+		setTimeout(() => {
+			this.setState({ categorizedStaffs });
+		}, remToPx(2));
+	};
+
+	searchCategorizedStaffs = (searchTerm) => {
+		const searchLower = searchTerm.toLowerCase();
+		const searchedCategorizedStaffs = this.state.categorizedStaffs.filter(staff =>
+			`${staff.name.first} ${staff.name.last}`.toLowerCase().includes(searchLower) ||
+			staff.position.toLowerCase().includes(searchLower)
+		);
+
+		this.setState({ searchedCategorizedStaffs });
+		if (searchTerm === '')
+			this.setState({ searchedCategorizedStaffs: [] });
+		else
+			this.setState({ searchedCategorizedStaffs });
 	};
 
 	render() {
@@ -100,6 +178,7 @@ export default class Dashboard extends React.Component {
 								<Button
 									type='primary'
 									icon={this.state.addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
+									onClick={this.addNew}
 								>Add New</Button>
 								<Button
 									type='primary'
@@ -113,11 +192,12 @@ export default class Dashboard extends React.Component {
 					/>
 
 					{/************************** Filter **************************/}
-					<Flex horizontal justify='space-between' align='center' gap='small'>
+					<Flex justify='space-between' align='center' gap='small'>
 						<Card size='small'>
 							<Input
 								placeholder='Search'
 								prefix={<SearchOutlined />}
+								onChange={(e) => this.searchCategorizedStaffs(e.target.value)}
 							/>
 						</Card>
 						<Card size='small'>
@@ -129,15 +209,67 @@ export default class Dashboard extends React.Component {
 									{ label: 'Student Affairs Officer', value: 'student-affairs' },
 								]}
 								defaultValue='all'
+								onChange={this.categorizeFilter}
 							/>
 						</Card>
 					</Flex>
 
 
-
 					{/************************** Grid of Staffs **************************/}
+					<Row gutter={[remToPx(1), remToPx(1)]}>
+						{(this.state.searchedCategorizedStaffs.length > 0 ? this.state.searchedCategorizedStaffs : this.state.categorizedStaffs).map((staff, index) => (
+							<Col key={staff.id} span={8}>
+								{/* Pass index to StaffCard for staggered animation if desired */}
+								<StaffCard staff={staff} animationDelay={index * 0.1} />
+							</Col>
+						))}
+					</Row>
 				</Flex>
 			</Card>
 		);
 	}
+};
+
+class StaffCard extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			mounted: false,
+		};
+	}
+
+	componentDidMount() {
+		setTimeout(() => {
+			this.setState({ mounted: true });
+		}, this.props.animationDelay * 1000 || 0);
+	}
+
+	render() {
+		const { staff } = this.props;
+		const { mounted } = this.state;
+
+		return (
+			<Card
+				size='small'
+				hoverable
+				className={mounted ? 'staff-card-mounted' : 'staff-card-unmounted'}
+				actions={[
+					<EditOutlined key='edit' />,
+					<LockOutlined key='lock' />,
+					<CaretRightOutlined key='view' />
+				]}
+			>
+				<Flex justify='flex-start' align='flex-start' gap='small' style={{ width: '100%' }}>
+					<Avatar
+						src={staff.profilePicture}
+						size='large'
+					/>
+					<Flex vertical justify='flex-start' align='flex-start' style={{ width: '100%' }}>
+						<Title level={4}>{`${staff.name.first} ${staff.name.last}`}</Title>
+						<p>{staff.position}</p>
+					</Flex>
+				</Flex>
+			</Card>
+		);
+	};
 };

@@ -8,12 +8,12 @@ export default class Header extends React.Component {
 	render() {
 		return (
 			<Card id='header' size='small'>
-				<Flex horizontal justify='space-between' align='center'>
-					<Flex id='title' horizontal justify='flex-start' align='center' gap='small'>
+				<Flex justify='space-between' align='center'>
+					<Flex id='title' justify='flex-start' align='center' gap='small'>
 						{this.props.icon}
 						{this.props.title}
 					</Flex>
-					<Flex horizontal justify='flex-end' align='center' gap='small'>
+					<Flex justify='flex-end' align='center' gap='small'>
 						{this.props.actions}
 					</Flex>
 				</Flex>

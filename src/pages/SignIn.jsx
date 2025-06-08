@@ -14,6 +14,8 @@ import {
 
 import { LoginOutlined, GoogleOutlined, LoadingOutlined } from '@ant-design/icons';
 
+import remToPx from '../utils/remToPx';
+
 const { Text, Title } = Typography;
 
 import '../styles/pages/SignIn.css';
@@ -32,7 +34,7 @@ export default class SignIn extends React.Component {
 		setTimeout(() => {
 			this.setState({ signingIn: false });
 			window.location.href = '/dashboard';
-		}, 2000);
+		}, remToPx(20));
 	};
 
 	render() {
@@ -61,7 +63,7 @@ export default class SignIn extends React.Component {
 								<Input placeholder='Email' type='email' />
 								<Input.Password placeholder='Password' type='password' />
 
-								<Flex horizontal justify='space-between' align='center' gap='small'>
+								<Flex justify='space-between' align='center' gap='small'>
 									<Checkbox>Remember me</Checkbox>
 									<Button
 										type='primary'
