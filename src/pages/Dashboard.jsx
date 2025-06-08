@@ -10,7 +10,7 @@ import {
 	Input,
 	Segmented,
 	Avatar,
-	Divider
+	Modal
 } from 'antd';
 
 import {
@@ -199,7 +199,16 @@ export default class Dashboard extends React.Component {
 				}
 			],
 
-			displayedStaffs: []
+			displayedStaffs: [],
+
+			newStaffForm: {
+				name: {
+					first: null,
+					middle: null,
+					last: null
+				},
+				position: null
+			}
 		};
 	};
 
@@ -220,9 +229,153 @@ export default class Dashboard extends React.Component {
 	addNew = () => {
 		this.setState({ addingNew: true });
 
-		setTimeout(() => {
-			this.setState({ addingNew: false });
-		}, remToPx(20));
+		const modal = Modal.info({
+			title: 'Add New Staff',
+			centered: true,
+			width: {
+				xs: '75%',
+				sm: '50%',
+				md: '25%',
+			},
+			open: this.state.addingNew,
+			content: (
+				<Flex vertical justify='flex-start' align='stretch' gap='small'>
+					<Input
+						placeholder='First Name *'
+						onChange={(e) => this.setState({
+							newStaffForm: {
+								...this.state.newStaffForm,
+								name: {
+									...this.state.newStaffForm.name,
+									first: e.target.value
+								}
+							}
+						})}
+					/>
+					<Input
+						placeholder='Middle Name'
+						onChange={(e) => this.setState({
+							newStaffForm: {
+								...this.state.newStaffForm,
+								name: {
+									...this.state.newStaffForm.name,
+									middle: e.target.value
+								}
+							}
+						})}
+					/>
+					<Input
+						placeholder='Last Name *'
+						onChange={(e) => this.setState({
+							newStaffForm: {
+								...this.state.newStaffForm,
+								name: {
+									...this.state.newStaffForm.name,
+									last: e.target.value
+								}
+							}
+						})}
+					/>
+					<Segmented
+						options={[
+							{ label: 'Guidance Officer', value: 'guidance' },
+							{ label: 'Prefect of Discipline Officer', value: 'prefect' },
+							{ label: 'Student Affairs Officer', value: 'student-affairs' }
+						]}
+						defaultValue='guidance'
+						onChange={(value) => this.setState({
+							newStaffForm: {
+								...this.state.newStaffForm,
+								position: value
+							}
+						})}
+					/>
+				</Flex>
+			),
+
+			onCancel: () => {
+				this.setState({ addingNew: false });
+				this.setState({
+					newStaffForm: {
+						name: {
+							first: null,
+							middle: null,
+							last: null
+						},
+						position: null
+					}
+				});
+				modal.destroy();
+			},
+
+			footer: (_, { OkBtn, CancelBtn }) => (
+				<Flex justify='flex-end' align='center' gap='small'>
+					<Button
+						{...CancelBtn}
+						onClick={() => {
+							this.setState({ addingNew: false });
+							modal.destroy();
+						}}
+					>Cancel</Button>
+					<Button
+						{...OkBtn}
+						type='primary'
+						onClick={() => {
+							if (
+								!this.state.newStaffForm.name.first ||
+								!this.state.newStaffForm.name.last ||
+								!this.state.newStaffForm.position
+							) {
+								const errorModal = Modal.error({
+									title: 'Error',
+									content: 'Please fill in all fields * before saving.',
+									centered: true,
+
+									onCancel: () => modal.destroy(),
+									footer: (
+										<Flex justify='flex-end' align='center' gap='small'>
+											<Button
+												type='primary'
+												onClick={() => {errorModal.destroy()}}
+											>OK</Button>
+										</Flex>
+									)
+								});
+								return;
+							};
+
+							const newStaff = {
+								id: `025-${Math.floor(Math.random() * 1000)}`,
+								name: {
+									first: this.state.newStaffForm.name.first,
+									middle: this.state.newStaffForm.name.middle || '',
+									last: this.state.newStaffForm.name.last
+								},
+								position: this.state.newStaffForm.position,
+								category: this.state.newStaffForm.position === 'guidance' ? 'Guidance Officer' :
+									this.state.newStaffForm.position === 'prefect' ? 'Prefect of Discipline Officer' :
+										'Student Affairs Officer',
+							};
+
+							this.setState((prevState) => ({
+								staffs: [...prevState.staffs, newStaff],
+								displayedStaffs: [...prevState.displayedStaffs, newStaff],
+								addingNew: false,
+								newStaffForm: {
+									name: {
+										first: null,
+										middle: null,
+										last: null
+									},
+									position: null
+								}
+							}));
+							modal.destroy();
+						}}
+					>Save</Button>
+				</Flex>
+			)
+		});
 	};
 
 	categorizeFilter = (value) => {
@@ -358,7 +511,7 @@ class StaffCard extends React.Component {
 						src={staff.profilePicture}
 						size='large'
 					/>
-					<Flex vertical justify='flex-start' align='flex-start' style={{ width: '100%' }}>
+					<Flex vertical justify='flex-start' align='flex-start'>
 						<Title level={4}>{`${staff.name.first} ${staff.name.last}`}</Title>
 						<p>{staff.position}</p>
 					</Flex>
