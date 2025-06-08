@@ -87,7 +87,7 @@ export default class Dashboard extends React.Component {
 	render() {
 		return (
 			<Card id='dashboard' size='small'>
-				/************************** Header **************************/
+				{/************************** Header **************************/}
 				<Flex vertical justify='flex-start' align='stretch' gap='small'>
 					<Header
 						icon={<HomeOutlined />}
@@ -112,7 +112,7 @@ export default class Dashboard extends React.Component {
 						}
 					/>
 
-					/************************** Filter **************************/
+					{/************************** Filter **************************/}
 					<Flex horizontal justify='space-between' align='center' gap='small'>
 						<Card size='small'>
 							<Input
@@ -135,7 +135,7 @@ export default class Dashboard extends React.Component {
 
 
 
-					/************************** Grid of Staffs **************************/
+					{/************************** Grid of Staffs **************************/}
 				</Flex>
 			</Card>
 		);
