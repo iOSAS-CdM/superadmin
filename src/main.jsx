@@ -18,8 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 			<ConfigProvider
 				theme={{
 					algorithm: [
-						theme.defaultAlgorithm,
-						theme.darkAlgorithm
+						theme.defaultAlgorithm
 					],
 					cssVar: true,
 					token: {
