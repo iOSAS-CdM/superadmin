@@ -40,7 +40,6 @@ span.ant-typography {
 	padding: 0 !important;
 }
 
-/* Scrollbar styles */
 ::-webkit-scrollbar {
 	width: var(--space-S);
 	height: var(--space-S);
@@ -56,16 +55,22 @@ span.ant-typography {
 .scrollable-content {
 	overflow: auto;
 	position: relative;
+	
+	scrollbar-width: thin;
+	scrollbar-color: transparent transparent;
+	transition: scrollbar-color var(--transition);
 }
 .scrollable-content::-webkit-scrollbar-thumb {
 	background: transparent;
 	border-radius: var(--space-S);
 	transition: background var(--transition);
 }
-.scrollable-content {
-	scrollbar-width: thin;
-	scrollbar-color: transparent transparent;
-	transition: scrollbar-color var(--transition);
+.scrollable-content::-webkit-scrollbar-track {
+	background: transparent;
+	border-radius: var(--space-XS);
+}
+.scrollable-content:hover {
+	scrollbar-color: var(--primary) transparent;
 }
 
 #root {

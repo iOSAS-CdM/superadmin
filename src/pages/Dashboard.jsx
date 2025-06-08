@@ -40,6 +40,8 @@ export default class Dashboard extends React.Component {
 			signingOut: false,
 			addingNew: false,
 
+			category: 'all',
+
 			staffs: [
 				{
 					id: '025-000',
@@ -106,16 +108,104 @@ export default class Dashboard extends React.Component {
 					position: 'Guidance Officer',
 					category: 'guidance',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-006',
+					name: {
+						first: 'Jamie',
+						middle: '',
+						last: 'Morgan'
+					},
+					position: 'Prefect of Discipline Officer',
+					category: 'prefect',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-007',
+					name: {
+						first: 'Casey',
+						middle: '',
+						last: 'Parker'
+					},
+					position: 'Student Affairs Officer',
+					category: 'student-affairs',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-008',
+					name: {
+						first: 'Riley',
+						middle: '',
+						last: 'Lee'
+					},
+					position: 'Guidance Officer',
+					category: 'guidance',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-009',
+					name: {
+						first: 'Drew',
+						middle: '',
+						last: 'Taylor'
+					},
+					position: 'Prefect of Discipline Officer',
+					category: 'prefect',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-010',
+					name: {
+						first: 'Skyler',
+						middle: '',
+						last: 'Anderson'
+					},
+					position: 'Student Affairs Officer',
+					category: 'student-affairs',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-011',
+					name: {
+						first: 'Taylor',
+						middle: '',
+						last: 'Johnson'
+					},
+					position: 'Guidance Officer',
+					category: 'guidance',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-012',
+					name: {
+						first: 'Jordan',
+						middle: '',
+						last: 'Smith'
+					},
+					position: 'Prefect of Discipline Officer',
+					category: 'prefect',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				},
+				{
+					id: '025-013',
+					name: {
+						first: 'Morgan',
+						middle: '',
+						last: 'Williams'
+					},
+					position: 'Student Affairs Officer',
+					category: 'student-affairs',
+					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				}
 			],
 
-			categorizedStaffs: [],
-			searchedCategorizedStaffs: []
+			displayedStaffs: []
 		};
 	};
 
 	componentDidMount() {
-		this.setState({ categorizedStaffs: this.state.staffs });
+		this.setState({ displayedStaffs: this.state.staffs });
+		this.categorizeFilter('all');
 	}
 
 	signOut = () => {
@@ -136,35 +226,36 @@ export default class Dashboard extends React.Component {
 	};
 
 	categorizeFilter = (value) => {
-		let categorizedStaffs = this.state.staffs;
+		let staffs = this.state.staffs;
 
-		this.setState({ categorizedStaffs: [] });
+		this.setState({ displayedStaffs: [] });
 
 		if (value !== 'all')
-			categorizedStaffs = this.state.staffs.filter(staff => staff.category.toLowerCase() == value);
+			staffs = staffs.filter(staff => staff.category === value);
 
 		setTimeout(() => {
-			this.setState({ categorizedStaffs });
+			this.setState({ displayedStaffs: staffs });
 		}, remToPx(2));
 	};
 
 	searchCategorizedStaffs = (searchTerm) => {
-		const searchLower = searchTerm.toLowerCase();
-		const searchedCategorizedStaffs = this.state.categorizedStaffs.filter(staff =>
-			`${staff.name.first} ${staff.name.last}`.toLowerCase().includes(searchLower) ||
-			staff.position.toLowerCase().includes(searchLower)
-		);
+		this.setState({ category: 'all' });
 
-		this.setState({ searchedCategorizedStaffs });
-		if (searchTerm === '')
-			this.setState({ searchedCategorizedStaffs: [] });
-		else
-			this.setState({ searchedCategorizedStaffs });
+		const filteredStaffs = this.state.staffs.filter(staff => {
+			const fullName = `${staff.name.first} ${staff.name.last}`.toLowerCase();
+			return fullName.includes(searchTerm.toLowerCase());
+		});
+
+		this.setState({ displayedStaffs: [] });
+
+		setTimeout(() => {
+			this.setState({ displayedStaffs: filteredStaffs });
+		}, remToPx(2));
 	};
 
 	render() {
 		return (
-			<Card id='dashboard' size='small'>
+			<Card id='dashboard' className='scrollable-content' size='small'>
 				{/************************** Header **************************/}
 				<Flex vertical justify='flex-start' align='stretch' gap='small'>
 					<Header
@@ -208,8 +299,12 @@ export default class Dashboard extends React.Component {
 									{ label: 'Prefect of Discipline Officer', value: 'prefect' },
 									{ label: 'Student Affairs Officer', value: 'student-affairs' },
 								]}
-								defaultValue='all'
-								onChange={this.categorizeFilter}
+								value={this.state.category}
+								onChange={(value) => {
+									this.setState({ category: value });
+									this.categorizeFilter(value);
+								}}
+								style={{ width: '100%' }}
 							/>
 						</Card>
 					</Flex>
@@ -217,9 +312,8 @@ export default class Dashboard extends React.Component {
 
 					{/************************** Grid of Staffs **************************/}
 					<Row gutter={[remToPx(1), remToPx(1)]}>
-						{(this.state.searchedCategorizedStaffs.length > 0 ? this.state.searchedCategorizedStaffs : this.state.categorizedStaffs).map((staff, index) => (
+						{this.state.displayedStaffs.map((staff, index) => (
 							<Col key={staff.id} span={8}>
-								{/* Pass index to StaffCard for staggered animation if desired */}
 								<StaffCard staff={staff} animationDelay={index * 0.1} />
 							</Col>
 						))}
@@ -234,7 +328,7 @@ class StaffCard extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			mounted: false,
+			mounted: false
 		};
 	}
 
