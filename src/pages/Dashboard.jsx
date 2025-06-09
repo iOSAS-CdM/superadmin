@@ -9,9 +9,7 @@ import {
 	Button,
 	Input,
 	Segmented,
-	Avatar,
-	Modal,
-	Upload
+	Avatar
 } from 'antd';
 
 import {
@@ -23,8 +21,7 @@ import {
 	SearchOutlined,
 	EditOutlined,
 	LockOutlined,
-	CaretRightOutlined,
-	PlusOutlined
+	CaretRightOutlined
 } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -52,8 +49,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Martinez'
 					},
-					position: 'Head',
-					category: '',
+					position: 'head',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -63,8 +59,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Gray'
 					},
-					position: 'Guidance Student Affairs Officer',
-					category: 'guidance',
+					position: 'guidance',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -74,8 +69,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Wheeler'
 					},
-					position: 'Prefect of Discipline Officer',
-					category: 'prefect',
+					position: 'prefect',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -85,8 +79,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Harris'
 					},
-					position: 'Guidance Officer',
-					category: 'guidance',
+					position: 'guidance',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -96,8 +89,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Reed'
 					},
-					position: 'Student Affairs Officer',
-					category: 'student-affairs',
+					position: 'student-affairs',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -107,8 +99,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Carter'
 					},
-					position: 'Guidance Officer',
-					category: 'guidance',
+					position: 'guidance',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -118,8 +109,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Morgan'
 					},
-					position: 'Prefect of Discipline Officer',
-					category: 'prefect',
+					position: 'prefect',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -129,8 +119,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Parker'
 					},
-					position: 'Student Affairs Officer',
-					category: 'student-affairs',
+					position: 'student-affairs',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -140,8 +129,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Lee'
 					},
-					position: 'Guidance Officer',
-					category: 'guidance',
+					position: 'guidance',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -151,8 +139,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Taylor'
 					},
-					position: 'Prefect of Discipline Officer',
-					category: 'prefect',
+					position: 'prefect',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -162,8 +149,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Anderson'
 					},
-					position: 'Student Affairs Officer',
-					category: 'student-affairs',
+					position: 'student-affairs',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -173,8 +159,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Johnson'
 					},
-					position: 'Guidance Officer',
-					category: 'guidance',
+					position: 'guidance',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -184,8 +169,7 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Smith'
 					},
-					position: 'Prefect of Discipline Officer',
-					category: 'prefect',
+					position: 'prefect',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				},
 				{
@@ -195,31 +179,19 @@ export default class Dashboard extends React.Component {
 						middle: '',
 						last: 'Williams'
 					},
-					position: 'Student Affairs Officer',
-					category: 'student-affairs',
+					position: 'student-affairs',
 					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
 				}
 			],
 
-			displayedStaffs: [],
-
-			newStaffForm: {
-				name: {
-					first: null,
-					middle: null,
-					last: null
-				},
-				category: null,
-				position: null,
-				profilePicture: null
-			}
+			displayedStaffs: []
 		};
 	};
 
 	componentDidMount() {
 		this.setState({ displayedStaffs: this.state.staffs });
 		this.categorizeFilter('all');
-	}
+	};
 
 	signOut = () => {
 		this.setState({ signingOut: true });
@@ -239,157 +211,17 @@ export default class Dashboard extends React.Component {
 				middle: null,
 				last: null
 			},
+			email: null,
+			employeeId: null,
 			position: null,
-			category: 'guidance',
 			profilePicture: null
 		};
 
-		await new Promise((resolve, reject) => {
-			const infoModal = Modal.info({
-				title: 'Add New Staff',
-				centered: true,
-				width: {
-					xs: '75%',
-					sm: '50%',
-					md: '25%',
-				},
-				open: this.state.addingNew,
-				content: (
-					<Flex vertical justify='flex-start' align='stretch' gap='small'>
-						<Input
-							placeholder='First Name *'
-							onChange={(e) => newStaff.name.first = e.target.value}
-						/>
-						<Input
-							placeholder='Middle Name'
-							onChange={(e) => newStaff.name.middle = e.target.value}
-						/>
-						<Input
-							placeholder='Last Name *'
-							onChange={(e) => newStaff.name.last = e.target.value}
-						/>
-						<Segmented
-							options={[
-								{ label: 'Guidance Officer', value: 'guidance' },
-								{ label: 'Prefect of Discipline Officer', value: 'prefect' },
-								{ label: 'Student Affairs Officer', value: 'student-affairs' }
-							]}
-							defaultValue='guidance'
-							onChange={(value => {
-								newStaff.category = value;
-								newStaff.position = value === 'guidance' ? 'Guidance Officer' :
-									value === 'prefect' ? 'Prefect of Discipline Officer' :
-										'Student Affairs Officer';
-							})}
-						/>
-					</Flex>
-				),
-
-				onCancel: () => {
-					this.setState({ addingNew: false });
-					this.setState({
-						newStaffForm: {
-							name: {
-								first: null,
-								middle: null,
-								last: null
-							},
-							position: null
-						}
-					});
-					infoModal.destroy();
-					reject();
-				},
-
-				footer: (_, { OkBtn, CancelBtn }) => (
-					<Flex justify='flex-end' align='center' gap='small'>
-						<Text type='secondary'>
-							Fields marked with * are required.
-						</Text>
-						<Button
-							{...CancelBtn}
-							onClick={() => {
-								this.setState({ addingNew: false });
-								infoModal.destroy();
-								reject();
-							}}
-						>Cancel</Button>
-						<Button
-							{...OkBtn}
-							type='primary'
-							onClick={() => {
-								if (
-									!newStaff.name.first ||
-									!newStaff.name.last
-								) {
-									const errorModal = Modal.error({
-										title: 'Error',
-										content: 'Please fill in all fields * before proceeding.',
-										centered: true,
-
-										onCancel: () => infoModal.destroy(),
-										footer: (
-											<Flex justify='flex-end' align='center' gap='small'>
-												<Button
-													type='primary'
-													onClick={() => {errorModal.destroy()}}
-												>OK</Button>
-											</Flex>
-										)
-									});
-									return;
-								};
-								
-								newStaff.position = newStaff.position || (newStaff.category === 'guidance' ? 'Guidance Officer' :
-									newStaff.category === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer');
-								newStaff.id = `025-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
-
-								infoModal.destroy();
-								resolve(newStaff);
-							}}
-						>Next</Button>
-					</Flex>
-				)
-			});
-		});
-
-		console.log('New Staff Form:', newStaff);
-
-		await new Promise((resolve, reject) => {
-			const uploadModal = Modal.info({
-				title: 'Upload Profile Picture',
-				centered: true,
-				width: {
-					xs: '75%',
-					sm: '50%',
-					md: '25%',
-				},
-				open: this.state.addingNew,
-				content: () => (
-					<Flex vertical justify='flex-start' align='stretch' gap='small'></Flex>
-				),
-				onCancel: () => {
-					this.setState({ addingNew: false });
-					uploadModal.destroy();
-					reject();
-				},
-				footer: (_, { OkBtn, CancelBtn }) => (
-					<Flex justify='flex-end' align='center' gap='small'>
-						<Text type='secondary'>
-							Upload a profile picture for the new staff.
-						</Text>
-						<Button
-							{...CancelBtn}
-							onClick={() => {
-								this.setState({ addingNew: false });
-								uploadModal.destroy();
-								reject();
-							}}
-						>Cancel</Button>
-					</Flex>
-				)
-			});
-		})
+		// Steps:
+		// 1. Necessary validations (e.g., name, email, employee id, position)
+		// 2. Avatar upload (mocked)
+		// 	2.1. Progress bar
+		// 3. Confirmation modal
 	};
 
 	categorizeFilter = (value) => {
@@ -398,7 +230,7 @@ export default class Dashboard extends React.Component {
 		this.setState({ displayedStaffs: [] });
 
 		if (value !== 'all')
-			staffs = staffs.filter(staff => staff.category === value);
+			staffs = staffs.filter(staff => staff.position === value);
 
 		setTimeout(() => {
 			this.setState({ displayedStaffs: staffs });
@@ -497,13 +329,13 @@ class StaffCard extends React.Component {
 		this.state = {
 			mounted: false
 		};
-	}
+	};
 
 	componentDidMount() {
 		setTimeout(() => {
 			this.setState({ mounted: true });
 		}, this.props.animationDelay * 1000 || 0);
-	}
+	};
 
 	render() {
 		const { staff } = this.props;
@@ -527,7 +359,10 @@ class StaffCard extends React.Component {
 					/>
 					<Flex vertical justify='flex-start' align='flex-start'>
 						<Title level={4}>{`${staff.name.first} ${staff.name.last}`}</Title>
-						<p>{staff.position}</p>
+						<p>{
+							staff.position === 'head' ? 'Head' : staff.position === 'guidance' ? 'Guidance Officer' :
+								staff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+						}</p>
 					</Flex>
 				</Flex>
 			</Card>
