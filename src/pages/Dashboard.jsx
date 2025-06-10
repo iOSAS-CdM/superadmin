@@ -5,11 +5,16 @@ import {
 	Card,
 	Row,
 	Col,
+	Dropdown,
 	Typography,
 	Button,
 	Input,
 	Segmented,
-	Avatar
+	Select,
+	Avatar,
+	Modal,
+	Form,
+	Space
 } from 'antd';
 
 import {
@@ -21,8 +26,12 @@ import {
 	SearchOutlined,
 	EditOutlined,
 	LockOutlined,
-	CaretRightOutlined
+	CaretRightOutlined,
+	SwapOutlined,
+	FilterOutlined
 } from '@ant-design/icons';
+
+import { MobileContext } from '../main';
 
 const { Title, Text } = Typography;
 
@@ -32,178 +41,179 @@ import Header from '../components/Header';
 
 import '../styles/pages/Dashboard.css';
 
-export default class Dashboard extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			signingOut: false,
-			addingNew: false,
+const Dashboard = () => {
+	const [signingOut, setSigningOut] = React.useState(false);
+	const [addingNew, setAddingNew] = React.useState(false);
+	const [category, setCategory] = React.useState('all');
+	const [staffs, setStaffs] = React.useState([]);
+	const [displayedStaffs, setDisplayedStaffs] = React.useState([]);
 
-			category: 'all',
+	const NewStaffForm = React.useRef(null);
+	const FilterForm = React.useRef(null);
 
-			staffs: [
-				{
-					id: '025-000',
-					name: {
-						first: 'Mia',
-						middle: '',
-						last: 'Martinez'
-					},
-					position: 'head',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+	React.useEffect(() => {
+		setStaffs([
+			{
+				id: '025-000',
+				name: {
+					first: 'Mia',
+					middle: '',
+					last: 'Martinez'
 				},
-				{
-					id: '025-001',
-					name: {
-						first: 'Brandy',
-						middle: '',
-						last: 'Gray'
-					},
-					position: 'guidance',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'head',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-001',
+				name: {
+					first: 'Brandy',
+					middle: '',
+					last: 'Gray'
 				},
-				{
-					id: '025-002',
-					name: {
-						first: 'Cameron',
-						middle: '',
-						last: 'Wheeler'
-					},
-					position: 'prefect',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'guidance',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-002',
+				name: {
+					first: 'Cameron',
+					middle: '',
+					last: 'Wheeler'
 				},
-				{
-					id: '025-003',
-					name: {
-						first: 'Jordan',
-						middle: '',
-						last: 'Harris'
-					},
-					position: 'guidance',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'prefect',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-003',
+				name: {
+					first: 'Jordan',
+					middle: '',
+					last: 'Harris'
 				},
-				{
-					id: '025-004',
-					name: {
-						first: 'Taylor',
-						middle: '',
-						last: 'Reed'
-					},
-					position: 'student-affairs',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'guidance',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-004',
+				name: {
+					first: 'Taylor',
+					middle: '',
+					last: 'Reed'
 				},
-				{
-					id: '025-005',
-					name: {
-						first: 'Alex',
-						middle: '',
-						last: 'Carter'
-					},
-					position: 'guidance',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'student-affairs',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-005',
+				name: {
+					first: 'Alex',
+					middle: '',
+					last: 'Carter'
 				},
-				{
-					id: '025-006',
-					name: {
-						first: 'Jamie',
-						middle: '',
-						last: 'Morgan'
-					},
-					position: 'prefect',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'guidance',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-006',
+				name: {
+					first: 'Jamie',
+					middle: '',
+					last: 'Morgan'
 				},
-				{
-					id: '025-007',
-					name: {
-						first: 'Casey',
-						middle: '',
-						last: 'Parker'
-					},
-					position: 'student-affairs',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'prefect',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-007',
+				name: {
+					first: 'Casey',
+					middle: '',
+					last: 'Parker'
 				},
-				{
-					id: '025-008',
-					name: {
-						first: 'Riley',
-						middle: '',
-						last: 'Lee'
-					},
-					position: 'guidance',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'student-affairs',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-008',
+				name: {
+					first: 'Riley',
+					middle: '',
+					last: 'Lee'
 				},
-				{
-					id: '025-009',
-					name: {
-						first: 'Drew',
-						middle: '',
-						last: 'Taylor'
-					},
-					position: 'prefect',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'guidance',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-009',
+				name: {
+					first: 'Drew',
+					middle: '',
+					last: 'Taylor'
 				},
-				{
-					id: '025-010',
-					name: {
-						first: 'Skyler',
-						middle: '',
-						last: 'Anderson'
-					},
-					position: 'student-affairs',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'prefect',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-010',
+				name: {
+					first: 'Skyler',
+					middle: '',
+					last: 'Anderson'
 				},
-				{
-					id: '025-011',
-					name: {
-						first: 'Taylor',
-						middle: '',
-						last: 'Johnson'
-					},
-					position: 'guidance',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'student-affairs',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-011',
+				name: {
+					first: 'Taylor',
+					middle: '',
+					last: 'Johnson'
 				},
-				{
-					id: '025-012',
-					name: {
-						first: 'Jordan',
-						middle: '',
-						last: 'Smith'
-					},
-					position: 'prefect',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+				position: 'guidance',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-012',
+				name: {
+					first: 'Jordan',
+					middle: '',
+					last: 'Smith'
 				},
-				{
-					id: '025-013',
-					name: {
-						first: 'Morgan',
-						middle: '',
-						last: 'Williams'
-					},
-					position: 'student-affairs',
-					profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-				}
-			],
+				position: 'prefect',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			},
+			{
+				id: '025-013',
+				name: {
+					first: 'Morgan',
+					middle: '',
+					last: 'Williams'
+				},
+				position: 'student-affairs',
+				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
+			}
+		]);
+	}, []);
 
-			displayedStaffs: []
-		};
-	};
+	React.useEffect(() => {
+		setDisplayedStaffs(staffs);
+		categorizeFilter('all');
+	}, [staffs]);
 
-	componentDidMount() {
-		this.setState({ displayedStaffs: this.state.staffs });
-		this.categorizeFilter('all');
-	};
-
-	signOut = () => {
-		this.setState({ signingOut: true });
+	const signOut = () => {
+		setSigningOut(true);
 
 		setTimeout(() => {
-			this.setState({ signingOut: false });
+			setSigningOut(false);
 			window.location.href = '/';
 		}, remToPx(20));
 	};
 
-	addNew = async () => {
-		this.setState({ addingNew: true });
+	const { mobile, setMobile } = React.useContext(MobileContext);
+
+	const addNew = () => {
+		setAddingNew(true);
 
 		const newStaff = {
 			name: {
@@ -222,106 +232,258 @@ export default class Dashboard extends React.Component {
 		// 2. Avatar upload (mocked)
 		// 	2.1. Progress bar
 		// 3. Confirmation modal
+
+		Modal.info({
+			title: 'Add New Staff',
+			centered: true,
+			width: {
+				xs: '100%',
+				sm: remToPx(80),
+				md: remToPx(80),
+				lg: remToPx(80),
+				xl: remToPx(80)
+			},
+			onOk: () => { },
+			content: (
+				<Form
+					layout='vertical'
+					ref={NewStaffForm}
+					onFinish={(values) => {
+						setStaffs([...staffs, { ...newStaff, ...values }]);
+						setAddingNew(false);
+					}}
+					initialValues={newStaff}
+					style={{ width: '100%' }}
+				>
+					<Space.Compact style={{ width: '100%' }}>
+						<Form.Item
+							name={['name', 'first']}
+							rules={[{ required: true, message: 'Please input the first name!' }]}
+							style={{ width: 'calc(100% /3)' }}
+						>
+							<Input placeholder='First Name *' />
+						</Form.Item>
+						<Form.Item
+							name={['name', 'middle']}
+							rules={[{ required: false }]}
+							style={{ width: 'calc(100% /3)' }}
+						>
+							<Input placeholder='Middle Name' />
+						</Form.Item>
+						<Form.Item
+							name={['name', 'last']}
+							rules={[{ required: true, message: 'Please input the last name!' }]}
+							style={{ width: 'calc(100% /3)' }}
+						>
+							<Input placeholder='Last Name *' />
+						</Form.Item>
+					</Space.Compact>
+
+					<Form.Item
+						name='email'
+						rules={[{ required: true, message: 'Please input the email!' }]}
+					>
+						<Input placeholder='Email *' type='email' />
+					</Form.Item>
+
+					<Space.Compact style={{ width: '100%' }}>
+						<Form.Item
+							name='employeeId'
+							rules={[{ required: true, message: 'Please input the employee ID!' }]}
+							style={{ width: '100%' }}
+						>
+							<Input placeholder='Employee ID *' />
+						</Form.Item>
+						<Button
+							type='primary'
+							icon={<SwapOutlined />}
+							style={{ width: 'fit-content' }}
+							onClick={() => {
+								let newId;
+								while (!newId || staffs.some(staff => staff.employeeId === newId))
+									newId = `025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+								NewStaffForm.current.setFieldsValue({
+									employeeId: newId
+								});
+							}}
+						>
+							Generate ID
+						</Button>
+					</Space.Compact>
+
+					<Form.Item
+						name='position'
+						rules={[{ required: true, message: 'Please select the position!' }]}
+					>
+						<Select
+							placeholder='Select Position *'
+							options={[
+								{ label: 'Head', value: 'head', disabled: true },
+								{ label: 'Guidance Officer', value: 'guidance' },
+								{ label: 'Prefect of Discipline Officer', value: 'prefect' },
+								{ label: 'Student Affairs Officer', value: 'student-affairs' }
+							]}
+							style={{ width: '100%' }}
+						>
+							<Select.Option value='head'>Head</Select.Option>
+							<Select.Option value='guidance'>Guidance Officer</Select.Option>
+							<Select.Option value='prefect'>Prefect of Discipline Officer</Select.Option>
+							<Select.Option value='student-affairs'>Student Affairs Officer</Select.Option>
+						</Select>
+					</Form.Item>
+				</Form>
+			),
+		});
 	};
 
-	categorizeFilter = (value) => {
-		let staffs = this.state.staffs;
-
-		this.setState({ displayedStaffs: [] });
+	const categorizeFilter = (value) => {
+		let filteredStaffs = staffs;
 
 		if (value !== 'all')
-			staffs = staffs.filter(staff => staff.position === value);
+			filteredStaffs = staffs.filter(staff => staff.position === value);
 
+		setDisplayedStaffs([]);
 		setTimeout(() => {
-			this.setState({ displayedStaffs: staffs });
+			setDisplayedStaffs(filteredStaffs);
 		}, remToPx(2));
 	};
 
-	searchCategorizedStaffs = (searchTerm) => {
-		this.setState({ category: 'all' });
+	const searchCategorizedStaffs = (searchTerm) => {
+		setCategory('all');
 
-		const filteredStaffs = this.state.staffs.filter(staff => {
+		const filteredStaffs = staffs.filter(staff => {
 			const fullName = `${staff.name.first} ${staff.name.last}`.toLowerCase();
 			return fullName.includes(searchTerm.toLowerCase());
 		});
 
-		this.setState({ displayedStaffs: [] });
-
+		setDisplayedStaffs([]);
 		setTimeout(() => {
-			this.setState({ displayedStaffs: filteredStaffs });
+			setDisplayedStaffs(filteredStaffs);
 		}, remToPx(2));
 	};
 
-	render() {
-		return (
-			<Card id='dashboard' className='scrollable-content' size='small'>
-				{/************************** Header **************************/}
-				<Flex vertical justify='flex-start' align='stretch' gap='small'>
-					<Header
-						icon={<HomeOutlined />}
-						title={<Title level={3}>Dashboard</Title>}
-						actions={
-							<>
-								<Button
-									icon={<ToolOutlined />}
-								>Configure System</Button>
-								<Button
-									type='primary'
-									icon={this.state.addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
-									onClick={this.addNew}
-								>Add New</Button>
-								<Button
-									type='primary'
-									icon={this.state.signingOut ? <LoadingOutlined /> : <LogoutOutlined />}
-									disabled={this.state.signingOut}
-									onClick={this.signOut}
-									danger
-								>Sign Out</Button>
-							</>
-						}
-					/>
+	return (
+		<Card id='dashboard' className='scrollable-content' size='small'>
+			{/************************** Header **************************/}
+			<Flex vertical justify='flex-start' align='stretch' gap='small'>
+				<Header
+					icon={<HomeOutlined />}
+					title={<Title level={3}>Dashboard</Title>}
+					actions={
+						<>
+							<Button
+								icon={<ToolOutlined />}
+							>Configure System</Button>
+							<Button
+								type='primary'
+								icon={addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
+								onClick={addNew}
+							>Add New</Button>
+							<Button
+								type='primary'
+								icon={signingOut ? <LoadingOutlined /> : <LogoutOutlined />}
+								disabled={signingOut}
+								onClick={signOut}
+								danger
+							>Sign Out</Button>
+						</>
+					}
+				/>
 
-					{/************************** Filter **************************/}
+				{/************************** Filter **************************/}
+				<Form
+					layout='vertical'
+					ref={FilterForm}
+					style={{ width: '100%' }}
+					initialValues={{ search: '', category: 'all' }}
+				>
 					<Flex justify='space-between' align='center' gap='small'>
-						<Card size='small'>
-							<Input
-								placeholder='Search'
-								prefix={<SearchOutlined />}
-								onChange={(e) => this.searchCategorizedStaffs(e.target.value)}
-							/>
+						<Card size='small' {...mobile ? { style: { width: '100%' } } : {}}>
+							<Form.Item
+								name='search'
+								style={{ margin: 0 }}
+							>
+								<Input
+									placeholder='Search'
+									allowClear
+									prefix={<SearchOutlined />}
+									onChange={(e) => searchCategorizedStaffs(e.target.value)}
+								/>
+							</Form.Item>
 						</Card>
 						<Card size='small'>
-							<Segmented
-								options={[
-									{ label: 'All', value: 'all' },
-									{ label: 'Guidance Officer', value: 'guidance' },
-									{ label: 'Prefect of Discipline Officer', value: 'prefect' },
-									{ label: 'Student Affairs Officer', value: 'student-affairs' },
-								]}
-								value={this.state.category}
-								onChange={(value) => {
-									this.setState({ category: value });
-									this.categorizeFilter(value);
-								}}
-								style={{ width: '100%' }}
-							/>
+							<Form.Item
+								name='category'
+								style={{ margin: 0 }}
+							>
+								{!mobile ?
+									<Segmented
+										options={[
+											{ label: 'All', value: 'all' },
+											{ label: 'Guidance Officer', value: 'guidance' },
+											{ label: 'Prefect of Discipline Officer', value: 'prefect' },
+											{ label: 'Student Affairs Officer', value: 'student-affairs' }
+										]}
+										value={category}
+										onChange={(value) => {
+											setCategory(value);
+											categorizeFilter(value);
+											FilterForm.current.setFieldsValue({ search: '' });
+										}}
+										style={{ width: '100%' }}
+									/>
+									:
+									<Dropdown
+										trigger={['click']}
+										placement='bottomRight'
+										arrow
+										popupRender={(menu) => (
+											<Card size='small'>
+												<Segmented
+													options={[
+														{ label: 'All', value: 'all' },
+														{ label: 'Guidance Officer', value: 'guidance' },
+														{ label: 'Prefect of Discipline Officer', value: 'prefect' },
+														{ label: 'Student Affairs Officer', value: 'student-affairs' }
+													]}
+													vertical
+													value={category}
+													onChange={(value) => {
+														setCategory(value);
+														categorizeFilter(value);
+														FilterForm.current.setFieldsValue({ search: '' });
+													}}
+													style={{ width: '100%' }}
+												/>
+											</Card>
+										)}
+									>
+										<Button
+											icon={<FilterOutlined />}
+											onClick={(e) => e.stopPropagation()}
+										/>
+									</Dropdown>
+								}
+							</Form.Item>
 						</Card>
 					</Flex>
+				</Form>
 
 
-					{/************************** Grid of Staffs **************************/}
-					<Row gutter={[remToPx(1), remToPx(1)]}>
-						{this.state.displayedStaffs.map((staff, index) => (
-							<Col key={staff.id} span={8}>
-								<StaffCard staff={staff} animationDelay={index * 0.1} />
-							</Col>
-						))}
-					</Row>
-				</Flex>
-			</Card>
-		);
-	}
+				{/************************** Grid of Staffs **************************/}
+				<Row gutter={[remToPx(1), remToPx(1)]}>
+					{displayedStaffs.map((staff, index) => (
+						<Col key={staff.id} span={!mobile ? 8 : 24}>
+							<StaffCard staff={staff} animationDelay={index * 0.1} />
+						</Col>
+					))}
+				</Row>
+			</Flex>
+		</Card>
+	);
 };
+
+export default Dashboard;
 
 class StaffCard extends React.Component {
 	constructor(props) {

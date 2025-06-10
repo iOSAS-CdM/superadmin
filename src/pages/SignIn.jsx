@@ -1,9 +1,9 @@
 import React from 'react';
 
 import {
+	Form,
 	Card,
 	Flex,
-	Space,
 	Button,
 	Divider,
 	Input,
@@ -14,80 +14,97 @@ import {
 
 import { LoginOutlined, GoogleOutlined, LoadingOutlined } from '@ant-design/icons';
 
+import { MobileContext } from '../main';
+
 import remToPx from '../utils/remToPx';
 
 const { Text, Title } = Typography;
 
 import '../styles/pages/SignIn.css';
 
-export default class SignIn extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			signingIn: false
-		};
-	};
+const SignIn = () => {
+	const [signingIn, setSigningIn] = React.useState(false);
 
-	signIn = () => {
-		this.setState({ signingIn: true });
+	const { mobile, setMobile } = React.useContext(MobileContext);
+
+	const signIn = () => {
+		setSigningIn(true);
 
 		setTimeout(() => {
-			this.setState({ signingIn: false });
+			setSigningIn(false);
 			window.location.href = '/dashboard';
 		}, remToPx(20));
 	};
 
-	render() {
-		return (
-			<>
-				<div id='auth-background'></div>
+	return (
+		<>
+			<div id='auth-background'></div>
 
-				<Card id='sign-in'>
-					<Flex vertical justify='space-between' align='center' gap='large'>
-						<Flex vertical justify='center' align='center' gap='large'>
-							<Image
-								src='/CdM-OSAS Banner.png'
-								alt='Logo Colegio de Montalban'
-								width='75%'
-								preview={false}
-							/>
+			<Card id='sign-in' className={mobile ? 'mobile' : ''}>
+				<Flex vertical justify='space-between' align='center' gap='large'>
+					<Flex vertical justify='center' align='center' gap='large'>
+						<Image
+							src='/CdM-OSAS Banner.png'
+							alt='Logo Colegio de Montalban'
+							width='75%'
+							preview={false}
+						/>
 
-							<Divider />
+						<Divider />
 
-							<Flex vertical justify='center' align='center'>
-								<Text>Welcome,</Text>
-								<Title level={1} style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Admin</Title>
-							</Flex>
-
-							<Flex vertical justify='center' align='center' gap='small'>
-								<Input placeholder='Email' type='email' />
-								<Input.Password placeholder='Password' type='password' />
-
-								<Flex justify='space-between' align='center' gap='small'>
-									<Checkbox>Remember me</Checkbox>
-									<Button
-										type='primary'
-										icon={this.state.signingIn ? <LoadingOutlined /> : <LoginOutlined />}
-										disabled={this.state.signingIn}
-										onClick={this.signIn}
-									>
-										Sign In
-									</Button>
-								</Flex>
-							</Flex>
-
-							<Divider>or</Divider>
-
-							<Button
-								icon={<GoogleOutlined />}
-							>
-								Sign in with Google
-							</Button>
+						<Flex vertical justify='center' align='center'>
+							<Text>Welcome,</Text>
+							<Title level={1} style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Admin</Title>
 						</Flex>
-						<Text style={{ display: 'block', textAlign: 'center' }}>Copyright © Colegio de Montalban 2025.</Text>
+
+						<Form
+							layout='vertical'
+							onFinish={(values) => {
+								signIn();
+							}}
+						>
+							<Form.Item
+								name='email'
+								rules={[{ required: true, message: 'Please input your email!' }]}
+							>
+								<Input placeholder='Email' type='email' />
+							</Form.Item>
+							
+							<Form.Item
+								name='password'
+								rules={[{ required: true, message: 'Please input your password!' }]}
+							>
+								<Input.Password placeholder='Password' type='password' />
+							</Form.Item>
+
+							<Flex justify='space-between' align='center' gap='small'>
+								<Form.Item name='remember' valuePropName='checked' noStyle>
+									<Checkbox>Remember me</Checkbox>
+								</Form.Item>
+								<Button
+									type='primary'
+									htmlType='submit'
+									icon={signingIn ? <LoadingOutlined /> : <LoginOutlined />}
+									disabled={signingIn}
+								>
+									Sign In
+								</Button>
+							</Flex>
+						</Form>
+
+						<Divider>or</Divider>
+
+						<Button
+							icon={<GoogleOutlined />}
+						>
+							Sign in with Google
+						</Button>
 					</Flex>
-				</Card>
-			</>
-		);
-	}
+					<Text style={{ display: 'block', textAlign: 'center' }}>Copyright © Colegio de Montalban 2025.</Text>
+				</Flex>
+			</Card>
+		</>
+	);
 };
+
+export default SignIn;
