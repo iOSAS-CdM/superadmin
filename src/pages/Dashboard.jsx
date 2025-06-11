@@ -31,7 +31,6 @@ import {
 	CaretRightOutlined,
 	SwapOutlined,
 	FilterOutlined,
-	UploadOutlined,
 	PlusCircleOutlined
 } from '@ant-design/icons';
 
@@ -56,148 +55,34 @@ const Dashboard = () => {
 	const FilterForm = React.useRef(null);
 
 	React.useEffect(() => {
-		setStaffs([
-			{
-				id: '025-000',
-				name: {
-					first: 'Mia',
-					middle: '',
-					last: 'Martinez'
-				},
-				position: 'head',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-001',
-				name: {
-					first: 'Brandy',
-					middle: '',
-					last: 'Gray'
-				},
-				position: 'guidance',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-002',
-				name: {
-					first: 'Cameron',
-					middle: '',
-					last: 'Wheeler'
-				},
-				position: 'prefect',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-003',
-				name: {
-					first: 'Jordan',
-					middle: '',
-					last: 'Harris'
-				},
-				position: 'guidance',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-004',
-				name: {
-					first: 'Taylor',
-					middle: '',
-					last: 'Reed'
-				},
-				position: 'student-affairs',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-005',
-				name: {
-					first: 'Alex',
-					middle: '',
-					last: 'Carter'
-				},
-				position: 'guidance',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-006',
-				name: {
-					first: 'Jamie',
-					middle: '',
-					last: 'Morgan'
-				},
-				position: 'prefect',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-007',
-				name: {
-					first: 'Casey',
-					middle: '',
-					last: 'Parker'
-				},
-				position: 'student-affairs',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-008',
-				name: {
-					first: 'Riley',
-					middle: '',
-					last: 'Lee'
-				},
-				position: 'guidance',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-009',
-				name: {
-					first: 'Drew',
-					middle: '',
-					last: 'Taylor'
-				},
-				position: 'prefect',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-010',
-				name: {
-					first: 'Skyler',
-					middle: '',
-					last: 'Anderson'
-				},
-				position: 'student-affairs',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-011',
-				name: {
-					first: 'Taylor',
-					middle: '',
-					last: 'Johnson'
-				},
-				position: 'guidance',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-012',
-				name: {
-					first: 'Jordan',
-					middle: '',
-					last: 'Smith'
-				},
-				position: 'prefect',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			},
-			{
-				id: '025-013',
-				name: {
-					first: 'Morgan',
-					middle: '',
-					last: 'Williams'
-				},
-				position: 'student-affairs',
-				profilePicture: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 100)}.jpg`
-			}
-		]);
+		fetch('https://randomuser.me/api/?results=20&inc=name,email,login,picture')
+			.then(response => response.json())
+			.then(data => {
+				const fetchedStaffs = [];
+				for (let i = 0; i < data.results.length; i++) {
+					const user = data.results[i];
+					fetchedStaffs.push({
+						id: i + 1,
+						name: {
+							first: user.name.first,
+							middle: user.name.middle || '',
+							last: user.name.last
+						},
+						email: user.email,
+						employeeId: (() => {
+							let id;
+							do {
+								id = `025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+							} while (fetchedStaffs.some(staff => staff.employeeId === id));
+							return id;
+						})(),
+						position: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
+						profilePicture: user.picture.large
+					});
+				};
+				setStaffs(fetchedStaffs);
+			})
+			.catch(error => console.error('Error fetching staff data:', error));
 	}, []);
 
 	React.useEffect(() => {
@@ -254,10 +139,7 @@ const Dashboard = () => {
 					<Form
 						layout='vertical'
 						ref={NewStaffForm}
-						onFinish={(values) => {
-							setStaffs([...staffs, { ...newStaff, ...values }]);
-							setAddingNew(false);
-						}}
+						onFinish={(values) => { }}
 						initialValues={newStaff}
 						style={{ width: '100%' }}
 					>
@@ -355,6 +237,10 @@ const Dashboard = () => {
 							onClick={() => {
 								NewStaffForm.current.validateFields()
 									.then(() => {
+										newStaff.name = NewStaffForm.current.getFieldValue('name');
+										newStaff.email = NewStaffForm.current.getFieldValue('email');
+										newStaff.employeeId = NewStaffForm.current.getFieldValue('employeeId');
+										newStaff.position = NewStaffForm.current.getFieldValue('position');
 										resolve(modal);
 									})
 									.catch((errorInfo) => {
@@ -367,8 +253,9 @@ const Dashboard = () => {
 					</Flex>
 				)
 			});
-			resolve(modal);
 		});
+
+		console.log('Staff: ', newStaff);
 
 		await new Promise((resolve, reject) => {
 			const modal = NewStaffModal.update({
@@ -378,11 +265,8 @@ const Dashboard = () => {
 					<Form
 						layout='vertical'
 						ref={NewStaffForm}
-						onFinish={(values) => {
-							setStaffs([...staffs, { ...newStaff, ...values }]);
-							setAddingNew(false);
-						}}
-						initialValues={newStaff}
+						onFinish={(values) => { }}
+						initialValues={NewStaffForm.current ? NewStaffForm.current.getFieldsValue() : newStaff}
 						style={{ width: '100%' }}
 					>
 						<Flex vertical justify='center' align='center' gap='small'>
@@ -432,8 +316,10 @@ const Dashboard = () => {
 								if (NewStaffForm.current) {
 									NewStaffForm.current.validateFields()
 										.then(() => {
-											console.log('a');
-
+											newStaff.profilePicture = NewStaffForm.current.getFieldValue('profilePicture');
+											NewStaffForm.current.setFieldsValue({
+												profilePicture: newStaff.profilePicture
+											});
 											resolve(modal);
 										})
 										.catch((errorInfo) => {
@@ -447,24 +333,24 @@ const Dashboard = () => {
 					</Flex>
 				)
 			});
-			resolve(modal);
 		});
+
+		console.log('Staff: ', newStaff);
 
 		await new Promise((resolve, reject) => {
 			const modal = NewStaffModal.update({
 				title: 'Add New Staff - Confirmation',
 				type: 'warning',
 				content: (
-						<Flex justify='flex-start' align='flex-start' gap='small'>
+					<Flex justify='flex-start' align='center' gap='small'>
 							<Avatar
 								src={newStaff.profilePicture}
 								size={remToPx(10)}
 							/>
-							<Flex vertical justify='flex-start' align='flex-start'>
+						<Flex vertical justify='center' align='flex-start'>
 								<Title level={5}>{newStaff.name.first} {newStaff.name.middle ? `${newStaff.name.middle} ` : ''}{newStaff.name.last}</Title>
 								<Text type='secondary'>{newStaff.position === 'head' ? 'Head' : newStaff.position === 'guidance' ? 'Guidance Officer' :
-									newStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'}</Text>
-								<Text type='secondary'>{newStaff.employeeId}</Text>
+								newStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'} - {newStaff.employeeId}</Text>
 								<Text type='secondary'>{newStaff.email}</Text>
 							</Flex>
 						</Flex>
@@ -491,6 +377,14 @@ const Dashboard = () => {
 				)
 			});
 		});
+
+		setAddingNew(false);
+
+		setTimeout(() => {
+			setDisplayedStaffs([...staffs, newStaff]);
+			categorizeFilter('all');
+			NewStaffModal.destroy();
+		}, remToPx(2));
 	};
 
 	const categorizeFilter = (value) => {
