@@ -407,8 +407,8 @@ const Dashboard = () => {
 		});
 
 		await new Promise((resolve) => setTimeout(resolve, remToPx(2)));
-		setStaffs([...staffs, newStaff]);
-		setDisplayedStaffs([...staffs, newStaff]);
+		await setStaffs([...staffs, newStaff]);
+		await setDisplayedStaffs(staffs);
 		NewStaffModal.destroy();
 
 		await new Promise((resolve) => setTimeout(resolve, remToPx(2)));
