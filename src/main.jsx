@@ -6,6 +6,7 @@ import { ConfigProvider, theme } from 'antd';
 
 import SignIn from './pages/SignIn';
 import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
 
 import remToPx from './utils/remToPx';
 import rootToHex from './utils/rootToHex';
@@ -62,6 +63,12 @@ const App = () => {
 								</MobileContext.Provider>
 							}
 						/>
+
+						<Route path='/staff/:staffId' element={
+							<MobileContext.Provider value={{ mobile, setMobile }}>
+								<Profile />
+							</MobileContext.Provider>
+						} />
 					</Routes>
 				</BrowserRouter>
 			</ConfigProvider>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router';
 
 import {
 	Form,
@@ -27,12 +28,14 @@ const SignIn = () => {
 
 	const { mobile, setMobile } = React.useContext(MobileContext);
 
+	const navigate = useNavigate();
+
 	const signIn = () => {
 		setSigningIn(true);
 
 		setTimeout(() => {
 			setSigningIn(false);
-			window.location.href = '/dashboard';
+			navigate('/dashboard');
 		}, remToPx(20));
 	};
 
@@ -40,7 +43,7 @@ const SignIn = () => {
 		<>
 			<div id='auth-background'></div>
 
-			<Card id='sign-in' className={mobile ? 'mobile' : ''}>
+			<Card id='sign-in' className={`page-container${mobile ? ' mobile' : ''}`}>
 				<Flex vertical justify='space-between' align='center' gap='large'>
 					<Flex vertical justify='center' align='center' gap='large'>
 						<Image

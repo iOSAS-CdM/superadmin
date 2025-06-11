@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router';
 
 import {
 	Flex,
@@ -12,7 +13,6 @@ import {
 	Segmented,
 	Select,
 	Upload,
-	Image,
 	Avatar,
 	Modal,
 	Form,
@@ -28,7 +28,7 @@ import {
 	SearchOutlined,
 	EditOutlined,
 	LockOutlined,
-	CaretRightOutlined,
+	RightOutlined,
 	SwapOutlined,
 	FilterOutlined,
 	PlusCircleOutlined
@@ -443,7 +443,7 @@ const Dashboard = () => {
 	};
 
 	return (
-		<Card id='dashboard' className='scrollable-content' size='small'>
+		<Card className='scrollable-content page-container' size='small'>
 			{/************************** Header **************************/}
 			<Flex vertical justify='flex-start' align='stretch' gap='small'>
 				<Header
@@ -565,49 +565,47 @@ const Dashboard = () => {
 
 export default Dashboard;
 
-class StaffCard extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			mounted: false
-		};
-	};
+const StaffCard = ({ staff, animationDelay }) => {
+	const [mounted, setMounted] = React.useState(false);
 
-	componentDidMount() {
-		setTimeout(() => {
-			this.setState({ mounted: true });
-		}, this.props.animationDelay * 1000 || 0);
-	};
+	const navigate = useNavigate();
 
-	render() {
-		const { staff } = this.props;
-		const { mounted } = this.state;
+	React.useEffect(() => {
+		const timer = setTimeout(() => {
+			setMounted(true);
+		}, animationDelay * 1000 || 0);
 
-		return (
-			<Card
-				size='small'
-				hoverable
-				className={mounted ? 'staff-card-mounted' : 'staff-card-unmounted'}
-				actions={[
-					<EditOutlined key='edit' />,
-					<LockOutlined key='lock' />,
-					<CaretRightOutlined key='view' />
-				]}
-			>
-				<Flex justify='flex-start' align='flex-start' gap='small' style={{ width: '100%' }}>
-					<Avatar
-						src={staff.profilePicture}
-						size='large'
-					/>
-					<Flex vertical justify='flex-start' align='flex-start'>
-						<Title level={4}>{`${staff.name.first} ${staff.name.last}`}</Title>
-						<p>{
-							staff.position === 'head' ? 'Head' : staff.position === 'guidance' ? 'Guidance Officer' :
-								staff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
-						}</p>
-					</Flex>
+		return () => clearTimeout(timer);
+	}, [animationDelay]);
+
+	return (
+		<Card
+			size='small'
+			hoverable
+			className={mounted ? 'staff-card-mounted' : 'staff-card-unmounted'}
+			actions={[
+				<EditOutlined key='edit' />,
+				<LockOutlined key='lock' />,
+				<RightOutlined onClick={() => {
+					navigate(`/staff/${staff.id}`, {
+						state: { staff }
+					});
+				}} key='view' />
+			]}
+		>
+			<Flex justify='flex-start' align='flex-start' gap='small' style={{ width: '100%' }}>
+				<Avatar
+					src={staff.profilePicture}
+					size='large'
+				/>
+				<Flex vertical justify='flex-start' align='flex-start'>
+					<Title level={4}>{`${staff.name.first} ${staff.name.last}`}</Title>
+					<p>{
+						staff.position === 'head' ? 'Head' : staff.position === 'guidance' ? 'Guidance Officer' :
+							staff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+					}</p>
 				</Flex>
-			</Card>
-		);
-	};
+			</Flex>
+		</Card>
+	);
 };
