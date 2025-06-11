@@ -135,6 +135,10 @@ const Dashboard = () => {
 					xxl: remToPx(90)
 				},
 				onOk: () => { },
+				onCancel: () => {
+					setAddingNew(false);
+					modal.destroy();
+				},
 				content: (
 					<Form
 						layout='vertical'
