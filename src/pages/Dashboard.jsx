@@ -16,7 +16,8 @@ import {
 	Avatar,
 	App,
 	Form,
-	Space
+	Space,
+	Empty
 } from 'antd';
 
 import {
@@ -434,6 +435,11 @@ const Dashboard = () => {
 	const searchCategorizedStaffs = (searchTerm) => {
 		setCategory('all');
 
+		if (searchTerm.trim() === '') {
+			setDisplayedStaffs(staffs);
+			return;
+		};
+
 		const filteredStaffs = staffs.filter(staff => {
 			const fullName = `${staff.name.first} ${staff.name.last}`.toLowerCase();
 			return fullName.includes(searchTerm.toLowerCase());
@@ -448,7 +454,7 @@ const Dashboard = () => {
 	return (
 		<Card className='scrollable-content page-container' size='small'>
 			{/************************** Header **************************/}
-			<Flex vertical justify='flex-start' align='stretch' gap='small'>
+			<Flex vertical justify='flex-start' align='stretch' gap='small' style={{ height: '100%' }}>
 				<Header
 					icon={<HomeOutlined />}
 					title={<Title level={3}>Dashboard</Title>}
@@ -555,13 +561,36 @@ const Dashboard = () => {
 
 
 				{/************************** Grid of Staffs **************************/}
-				<Row gutter={[remToPx(1), remToPx(1)]}>
-					{displayedStaffs.map((staff, index) => (
-						<Col key={staff.id} span={!mobile ? 8 : 24}>
-							<StaffCard staff={staff} animationDelay={index * 0.1} />
-						</Col>
-					))}
-				</Row>
+				{/* <Flex vertical justify='center' align='center' gap='small' flex={1}>
+					<Row gutter={[remToPx(1), remToPx(1)]}>
+						{displayedStaffs.length > 0 ?
+							displayedStaffs.map((staff, index) => (
+								<Col key={staff.id} span={!mobile ? 8 : 24}>
+									<StaffCard staff={staff} animationDelay={index * 0.1} />
+								</Col>
+								)) :
+							<Col span={24}>
+								<Empty description='No staff found' />
+							</Col>
+						}
+					</Row>
+				</Flex> */}
+				{displayedStaffs.length > 0 ?
+					<Flex vertical justify='flex-start' align='flex-start' gap='small' flex={1}>
+						<Row gutter={[remToPx(1), remToPx(1)]}>
+							{displayedStaffs.map((staff, index) => (
+								<Col key={staff.id} span={!mobile ? 8 : 24}>
+									<StaffCard staff={staff} animationDelay={index * 0.1} />
+								</Col>
+							))}
+						</Row>
+					</Flex>
+					:
+					<Flex vertical justify='center' align='center' flex={1}>
+						<Empty description='No staff found' />
+					</Flex>
+				}
+
 			</Flex>
 		</Card>
 	);
@@ -569,7 +598,7 @@ const Dashboard = () => {
 
 export default Dashboard;
 
-const StaffCard = ({ staff, animationDelay }) => {
+const StaffCard = ({ staff, animationDelay, placeholder }) => {
 	const [mounted, setMounted] = React.useState(false);
 
 	const navigate = useNavigate();
