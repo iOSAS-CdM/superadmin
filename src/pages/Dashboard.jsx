@@ -105,6 +105,7 @@ const Dashboard = () => {
 		setAddingNew(true);
 
 		const newStaff = {
+			id: staffs.length + 1,
 			name: {
 				first: null,
 				middle: null,
@@ -384,11 +385,35 @@ const Dashboard = () => {
 
 		setAddingNew(false);
 
-		setTimeout(() => {
-			setDisplayedStaffs([...staffs, newStaff]);
-			categorizeFilter('all');
-			NewStaffModal.destroy();
-		}, remToPx(2));
+		Modal.destroyAll();
+		Modal.success({
+			title: 'Staff Added Successfully',
+			centered: true,
+			content: (
+				<Flex justify='flex-start' align='center' gap='small'>
+					<Avatar
+						src={newStaff.profilePicture}
+						size={remToPx(10)}
+					/>
+					<Flex vertical justify='center' align='flex-start'>
+						<Title level={5}>{newStaff.name.first} {newStaff.name.middle ? `${newStaff.name.middle} ` : ''}{newStaff.name.last}</Title>
+						<Text type='secondary'>{newStaff.position === 'head' ? 'Head' : newStaff.position === 'guidance' ? 'Guidance Officer' :
+							newStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'} - {newStaff.employeeId}</Text>
+						<Text type='secondary'>{newStaff.email}</Text>
+					</Flex>
+				</Flex>
+			),
+			onOk: () => { }
+		});
+
+		await new Promise((resolve) => setTimeout(resolve, remToPx(2)));
+		setStaffs([...staffs, newStaff]);
+		setDisplayedStaffs([...staffs, newStaff]);
+		NewStaffModal.destroy();
+
+		await new Promise((resolve) => setTimeout(resolve, remToPx(2)));
+		FilterForm.current.setFieldsValue({ category: newStaff.position, search: '' });
+		categorizeFilter(newStaff.position);
 	};
 
 	const categorizeFilter = (value) => {
