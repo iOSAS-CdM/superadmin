@@ -14,7 +14,7 @@ import {
 	Select,
 	Upload,
 	Avatar,
-	Modal,
+	App,
 	Form,
 	Space
 } from 'antd';
@@ -50,6 +50,8 @@ const Dashboard = () => {
 	const [category, setCategory] = React.useState('all');
 	const [staffs, setStaffs] = React.useState([]);
 	const [displayedStaffs, setDisplayedStaffs] = React.useState([]);
+
+	const { modal } = App.useApp();
 
 	const NewStaffForm = React.useRef(null);
 	const FilterForm = React.useRef(null);
@@ -124,7 +126,7 @@ const Dashboard = () => {
 		// 3. Confirmation modal
 
 		let NewStaffModal = await new Promise((resolve, reject) => {
-			const modal = Modal.info({
+			const staffModal = modal.info({
 				title: 'Add New Staff',
 				centered: true,
 				width: {
@@ -138,7 +140,7 @@ const Dashboard = () => {
 				onOk: () => { },
 				onCancel: () => {
 					setAddingNew(false);
-					modal.destroy();
+					staffModal.destroy();
 				},
 				content: (
 					<Form
@@ -231,7 +233,7 @@ const Dashboard = () => {
 						<Button
 							onClick={() => {
 								setAddingNew(false);
-								modal.destroy();
+								staffModal.destroy();
 							}}
 						>
 							Cancel
@@ -246,7 +248,7 @@ const Dashboard = () => {
 										newStaff.email = NewStaffForm.current.getFieldValue('email');
 										newStaff.employeeId = NewStaffForm.current.getFieldValue('employeeId');
 										newStaff.position = NewStaffForm.current.getFieldValue('position');
-										resolve(modal);
+										resolve(staffModal);
 									})
 									.catch((errorInfo) => {
 										console.error('Validation Failed:', errorInfo);
@@ -263,7 +265,7 @@ const Dashboard = () => {
 		console.log('Staff: ', newStaff);
 
 		await new Promise((resolve, reject) => {
-			const modal = NewStaffModal.update({
+			const staffModal = NewStaffModal.update({
 				title: 'Add New Staff - Avatar Upload',
 				width: '',
 				content: (
@@ -289,7 +291,7 @@ const Dashboard = () => {
 												profilePicture: e.target.result
 											});
 											newStaff.profilePicture = e.target.result;
-											resolve(modal);
+											resolve(staffModal);
 										};
 										reader.readAsDataURL(file);
 										return false; // Prevent auto upload
@@ -309,7 +311,7 @@ const Dashboard = () => {
 						<Button
 							onClick={() => {
 								setAddingNew(false);
-								modal.destroy();
+								staffModal.destroy();
 							}}
 						>
 							Cancel
@@ -325,7 +327,7 @@ const Dashboard = () => {
 											NewStaffForm.current.setFieldsValue({
 												profilePicture: newStaff.profilePicture
 											});
-											resolve(modal);
+											resolve(staffModal);
 										})
 										.catch((errorInfo) => {
 											console.error('Validation Failed:', errorInfo);
@@ -343,7 +345,7 @@ const Dashboard = () => {
 		console.log('Staff: ', newStaff);
 
 		await new Promise((resolve, reject) => {
-			const modal = NewStaffModal.update({
+			const staffModal = NewStaffModal.update({
 				title: 'Add New Staff - Confirmation',
 				type: 'warning',
 				content: (
@@ -365,7 +367,7 @@ const Dashboard = () => {
 						<Button
 							onClick={() => {
 								setAddingNew(false);
-								modal.destroy();
+								staffModal.destroy();
 							}}
 						>
 							Cancel
@@ -373,7 +375,7 @@ const Dashboard = () => {
 						<Button
 							type='primary'
 							onClick={() => {
-								resolve(modal);
+								resolve(staffModal);
 							}}
 						>
 							Add Staff
@@ -386,6 +388,7 @@ const Dashboard = () => {
 		setAddingNew(false);
 
 		Modal.destroyAll();
+
 		Modal.success({
 			title: 'Staff Added Successfully',
 			centered: true,

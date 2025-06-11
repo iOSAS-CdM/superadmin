@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router';
 
-import { ConfigProvider, theme } from 'antd';
+import { ConfigProvider, App, theme } from 'antd';
 
 import SignIn from './pages/SignIn';
 import Dashboard from './pages/Dashboard';
@@ -14,7 +14,7 @@ import rootToHex from './utils/rootToHex';
 import 'antd/dist/reset.css';
 import './styles/index.css';
 
-const App = () => {
+const OSAS = () => {
 	const [mobile, setMobile] = React.useState(false);
 
 	React.useEffect(() => {
@@ -48,29 +48,30 @@ const App = () => {
 					}
 				}}
 			>
-				<BrowserRouter>
-					<Routes>
-						<Route path='/' element={
-							<MobileContext.Provider value={{ mobile, setMobile }}>
-								<SignIn />
-							</MobileContext.Provider>
-						} />
-						<Route
-							path='/dashboard'
-							element={
+				<App>
+					<BrowserRouter>
+						<Routes>
+							<Route path='/' element={
 								<MobileContext.Provider value={{ mobile, setMobile }}>
-									<Dashboard />
+									<SignIn />
 								</MobileContext.Provider>
-							}
-						/>
-
-						<Route path='/staff/:staffId' element={
-							<MobileContext.Provider value={{ mobile, setMobile }}>
-								<Profile />
-							</MobileContext.Provider>
-						} />
-					</Routes>
-				</BrowserRouter>
+							} />
+							<Route
+								path='/dashboard'
+								element={
+									<MobileContext.Provider value={{ mobile, setMobile }}>
+										<Dashboard />
+									</MobileContext.Provider>
+								}
+							/>
+							<Route path='/staff/:staffId' element={
+								<MobileContext.Provider value={{ mobile, setMobile }}>
+									<Profile />
+								</MobileContext.Provider>
+							} />
+						</Routes>
+					</BrowserRouter>
+				</App>
 			</ConfigProvider>
 		</React.StrictMode>
 	);
@@ -81,4 +82,4 @@ export const MobileContext = React.createContext({
 	setMobile: () => { }
 });
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(<OSAS />);
