@@ -11,6 +11,8 @@ import {
 	Input,
 	Segmented,
 	Select,
+	Upload,
+	Image,
 	Avatar,
 	Modal,
 	Form,
@@ -28,7 +30,9 @@ import {
 	LockOutlined,
 	CaretRightOutlined,
 	SwapOutlined,
-	FilterOutlined
+	FilterOutlined,
+	UploadOutlined,
+	PlusCircleOutlined
 } from '@ant-design/icons';
 
 import { MobileContext } from '../main';
@@ -212,7 +216,7 @@ const Dashboard = () => {
 
 	const { mobile, setMobile } = React.useContext(MobileContext);
 
-	const addNew = () => {
+	const addNew = async () => {
 		setAddingNew(true);
 
 		const newStaff = {
@@ -233,106 +237,259 @@ const Dashboard = () => {
 		// 	2.1. Progress bar
 		// 3. Confirmation modal
 
-		Modal.info({
-			title: 'Add New Staff',
-			centered: true,
-			width: {
-				xs: '100%',
-				sm: remToPx(80),
-				md: remToPx(80),
-				lg: remToPx(80),
-				xl: remToPx(80)
-			},
-			onOk: () => { },
-			content: (
-				<Form
-					layout='vertical'
-					ref={NewStaffForm}
-					onFinish={(values) => {
-						setStaffs([...staffs, { ...newStaff, ...values }]);
-						setAddingNew(false);
-					}}
-					initialValues={newStaff}
-					style={{ width: '100%' }}
-				>
-					<Space.Compact style={{ width: '100%' }}>
-						<Form.Item
-							name={['name', 'first']}
-							rules={[{ required: true, message: 'Please input the first name!' }]}
-							style={{ width: 'calc(100% /3)' }}
-						>
-							<Input placeholder='First Name *' />
-						</Form.Item>
-						<Form.Item
-							name={['name', 'middle']}
-							rules={[{ required: false }]}
-							style={{ width: 'calc(100% /3)' }}
-						>
-							<Input placeholder='Middle Name' />
-						</Form.Item>
-						<Form.Item
-							name={['name', 'last']}
-							rules={[{ required: true, message: 'Please input the last name!' }]}
-							style={{ width: 'calc(100% /3)' }}
-						>
-							<Input placeholder='Last Name *' />
-						</Form.Item>
-					</Space.Compact>
-
-					<Form.Item
-						name='email'
-						rules={[{ required: true, message: 'Please input the email!' }]}
+		let NewStaffModal = await new Promise((resolve, reject) => {
+			const modal = Modal.info({
+				title: 'Add New Staff',
+				centered: true,
+				width: {
+					xs: '100%',
+					sm: remToPx(50),
+					md: remToPx(60),
+					lg: remToPx(70),
+					xl: remToPx(80),
+					xxl: remToPx(90)
+				},
+				onOk: () => { },
+				content: (
+					<Form
+						layout='vertical'
+						ref={NewStaffForm}
+						onFinish={(values) => {
+							setStaffs([...staffs, { ...newStaff, ...values }]);
+							setAddingNew(false);
+						}}
+						initialValues={newStaff}
+						style={{ width: '100%' }}
 					>
-						<Input placeholder='Email *' type='email' />
-					</Form.Item>
+						<Space.Compact style={{ width: '100%' }}>
+							<Form.Item
+								name={['name', 'first']}
+								rules={[{ required: true, message: 'Please input the first name!' }]}
+								style={{ width: 'calc(100% /3)' }}
+							>
+								<Input placeholder='First Name *' />
+							</Form.Item>
+							<Form.Item
+								name={['name', 'middle']}
+								rules={[{ required: false }]}
+								style={{ width: 'calc(100% /3)' }}
+							>
+								<Input placeholder='Middle Name' />
+							</Form.Item>
+							<Form.Item
+								name={['name', 'last']}
+								rules={[{ required: true, message: 'Please input the last name!' }]}
+								style={{ width: 'calc(100% /3)' }}
+							>
+								<Input placeholder='Last Name *' />
+							</Form.Item>
+						</Space.Compact>
 
-					<Space.Compact style={{ width: '100%' }}>
 						<Form.Item
-							name='employeeId'
-							rules={[{ required: true, message: 'Please input the employee ID!' }]}
-							style={{ width: '100%' }}
+							name='email'
+							rules={[{ required: true, message: 'Please input the email!' }]}
 						>
-							<Input placeholder='Employee ID *' />
+							<Input placeholder='Email *' type='email' />
 						</Form.Item>
+
+						<Space.Compact style={{ width: '100%' }}>
+							<Form.Item
+								name='employeeId'
+								rules={[{ required: true, message: 'Please input the employee ID!' }]}
+								style={{ width: '100%' }}
+							>
+								<Input placeholder='Employee ID *' />
+							</Form.Item>
+							<Button
+								type='primary'
+								icon={<SwapOutlined />}
+								style={{ width: 'fit-content' }}
+								onClick={() => {
+									let newId;
+									while (!newId || staffs.some(staff => staff.employeeId === newId))
+										newId = `025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+									NewStaffForm.current.setFieldsValue({
+										employeeId: newId
+									});
+								}}
+							>
+								Generate ID
+							</Button>
+						</Space.Compact>
+
+						<Form.Item
+							name='position'
+							rules={[{ required: true, message: 'Please select the position!' }]}
+						>
+							<Select
+								placeholder='Select Position *'
+								options={[
+									{ label: 'Head', value: 'head', disabled: true },
+									{ label: 'Guidance Officer', value: 'guidance' },
+									{ label: 'Prefect of Discipline Officer', value: 'prefect' },
+									{ label: 'Student Affairs Officer', value: 'student-affairs' }
+								]}
+								style={{ width: '100%' }}
+							>
+								<Select.Option value='head'>Head</Select.Option>
+								<Select.Option value='guidance'>Guidance Officer</Select.Option>
+								<Select.Option value='prefect'>Prefect of Discipline Officer</Select.Option>
+								<Select.Option value='student-affairs'>Student Affairs Officer</Select.Option>
+							</Select>
+						</Form.Item>
+					</Form>
+				),
+				footer: (
+					<Flex justify='flex-end' gap='small'>
 						<Button
-							type='primary'
-							icon={<SwapOutlined />}
-							style={{ width: 'fit-content' }}
 							onClick={() => {
-								let newId;
-								while (!newId || staffs.some(staff => staff.employeeId === newId))
-									newId = `025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
-								NewStaffForm.current.setFieldsValue({
-									employeeId: newId
-								});
+								setAddingNew(false);
+								modal.destroy();
 							}}
 						>
-							Generate ID
+							Cancel
 						</Button>
-					</Space.Compact>
-
-					<Form.Item
-						name='position'
-						rules={[{ required: true, message: 'Please select the position!' }]}
-					>
-						<Select
-							placeholder='Select Position *'
-							options={[
-								{ label: 'Head', value: 'head', disabled: true },
-								{ label: 'Guidance Officer', value: 'guidance' },
-								{ label: 'Prefect of Discipline Officer', value: 'prefect' },
-								{ label: 'Student Affairs Officer', value: 'student-affairs' }
-							]}
-							style={{ width: '100%' }}
+						<Button
+							type='primary'
+							loading={addingNew}
+							onClick={() => {
+								NewStaffForm.current.validateFields()
+									.then(() => {
+										resolve(modal);
+									})
+									.catch((errorInfo) => {
+										console.error('Validation Failed:', errorInfo);
+									});
+							}}
 						>
-							<Select.Option value='head'>Head</Select.Option>
-							<Select.Option value='guidance'>Guidance Officer</Select.Option>
-							<Select.Option value='prefect'>Prefect of Discipline Officer</Select.Option>
-							<Select.Option value='student-affairs'>Student Affairs Officer</Select.Option>
-						</Select>
-					</Form.Item>
-				</Form>
-			),
+							Next
+						</Button>
+					</Flex>
+				)
+			});
+			resolve(modal);
+		});
+
+		await new Promise((resolve, reject) => {
+			const modal = NewStaffModal.update({
+				title: 'Add New Staff - Avatar Upload',
+				width: '',
+				content: (
+					<Form
+						layout='vertical'
+						ref={NewStaffForm}
+						onFinish={(values) => {
+							setStaffs([...staffs, { ...newStaff, ...values }]);
+							setAddingNew(false);
+						}}
+						initialValues={newStaff}
+						style={{ width: '100%' }}
+					>
+						<Flex vertical justify='center' align='center' gap='small'>
+							<Form.Item
+								name='profilePicture'
+								rules={[{ required: true, message: 'Please upload a profile picture!' }]}
+							>
+								<Upload
+									listType='picture-card'
+									showUploadList={false}
+									beforeUpload={(file) => {
+										const reader = new FileReader();
+										reader.onload = (e) => {
+											NewStaffForm.current.setFieldsValue({
+												profilePicture: e.target.result
+											});
+											newStaff.profilePicture = e.target.result;
+											resolve(modal);
+										};
+										reader.readAsDataURL(file);
+										return false; // Prevent auto upload
+									}}
+								>
+									<Button
+										icon={<PlusCircleOutlined />}
+										style={{ width: '100%', height: '100%' }}
+									/>
+								</Upload>
+							</Form.Item>
+						</Flex>
+					</Form>
+				),
+				footer: (
+					<Flex justify='flex-end' gap='small'>
+						<Button
+							onClick={() => {
+								setAddingNew(false);
+								modal.destroy();
+							}}
+						>
+							Cancel
+						</Button>
+						<Button
+							type='primary'
+							loading={addingNew}
+							onClick={() => {
+								if (NewStaffForm.current) {
+									NewStaffForm.current.validateFields()
+										.then(() => {
+											console.log('a');
+
+											resolve(modal);
+										})
+										.catch((errorInfo) => {
+											console.error('Validation Failed:', errorInfo);
+										});
+								};
+							}}
+						>
+							Next
+						</Button>
+					</Flex>
+				)
+			});
+			resolve(modal);
+		});
+
+		await new Promise((resolve, reject) => {
+			const modal = NewStaffModal.update({
+				title: 'Add New Staff - Confirmation',
+				type: 'warning',
+				content: (
+						<Flex justify='flex-start' align='flex-start' gap='small'>
+							<Avatar
+								src={newStaff.profilePicture}
+								size={remToPx(10)}
+							/>
+							<Flex vertical justify='flex-start' align='flex-start'>
+								<Title level={5}>{newStaff.name.first} {newStaff.name.middle ? `${newStaff.name.middle} ` : ''}{newStaff.name.last}</Title>
+								<Text type='secondary'>{newStaff.position === 'head' ? 'Head' : newStaff.position === 'guidance' ? 'Guidance Officer' :
+									newStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'}</Text>
+								<Text type='secondary'>{newStaff.employeeId}</Text>
+								<Text type='secondary'>{newStaff.email}</Text>
+							</Flex>
+						</Flex>
+				),
+				footer: (
+					<Flex justify='flex-end' gap='small'>
+						<Button
+							onClick={() => {
+								setAddingNew(false);
+								modal.destroy();
+							}}
+						>
+							Cancel
+						</Button>
+						<Button
+							type='primary'
+							onClick={() => {
+								resolve(modal);
+							}}
+						>
+							Add Staff
+						</Button>
+					</Flex>
+				)
+			});
 		});
 	};
 
