@@ -475,6 +475,7 @@ const Dashboard = () => {
 
 				{/************************** Filter **************************/}
 				<Form
+					id='filter'
 					layout='vertical'
 					ref={FilterForm}
 					style={{ width: '100%' }}
@@ -591,7 +592,8 @@ const StaffCard = ({ staff, animationDelay }) => {
 				<LockOutlined key='lock' />,
 				<RightOutlined onClick={() => {
 					navigate(`/staff/${staff.id}`, {
-						state: { staff }
+						state: { staff },
+						viewTransition: true
 					});
 				}} key='view' />
 			]}
