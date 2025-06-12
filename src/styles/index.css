@@ -61,6 +61,7 @@ span.ant-typography {
 
 .scrollable-content {
 	overflow: auto;
+	scrollbar-gutter: stable;
 	position: relative;
 	
 	scrollbar-width: thin;
