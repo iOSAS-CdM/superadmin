@@ -14,7 +14,7 @@ import {
 	Select,
 	Upload,
 	Avatar,
-	App,
+	Modal,
 	Form,
 	Space,
 	Empty
@@ -52,13 +52,11 @@ const Dashboard = () => {
 	const [staffs, setStaffs] = React.useState([]);
 	const [displayedStaffs, setDisplayedStaffs] = React.useState([]);
 
-	const { modal } = App.useApp();
-
 	const NewStaffForm = React.useRef(null);
 	const FilterForm = React.useRef(null);
 
 	React.useEffect(() => {
-		fetch('https://randomuser.me/api/?results=20&inc=name,email,login,picture')
+		fetch('https://randomuser.me/api/?results=20&inc=name,email,phone,login,picture')
 			.then(response => response.json())
 			.then(data => {
 				const fetchedStaffs = [];
@@ -72,6 +70,7 @@ const Dashboard = () => {
 							last: user.name.last
 						},
 						email: user.email,
+						phone: user.phone,
 						employeeId: (() => {
 							let id;
 							do {
@@ -126,10 +125,11 @@ const Dashboard = () => {
 		// 	2.1. Progress bar
 		// 3. Confirmation modal
 
-		let NewStaffModal = await new Promise((resolve, reject) => {
-			const staffModal = modal.info({
+		const NewStaffModal = await new Promise((resolve, reject) => {
+			const modal = Modal.info({
 				title: 'Add New Staff',
 				centered: true,
+				open: addingNew,
 				width: {
 					xs: '100%',
 					sm: remToPx(50),
@@ -138,10 +138,8 @@ const Dashboard = () => {
 					xl: remToPx(80),
 					xxl: remToPx(90)
 				},
-				onOk: () => { },
 				onCancel: () => {
 					setAddingNew(false);
-					staffModal.destroy();
 				},
 				content: (
 					<Form
@@ -229,37 +227,24 @@ const Dashboard = () => {
 						</Form.Item>
 					</Form>
 				),
-				footer: (
-					<Flex justify='flex-end' gap='small'>
-						<Button
-							onClick={() => {
-								setAddingNew(false);
-								staffModal.destroy();
-							}}
-						>
-							Cancel
-						</Button>
-						<Button
-							type='primary'
-							loading={addingNew}
-							onClick={() => {
-								NewStaffForm.current.validateFields()
-									.then(() => {
-										newStaff.name = NewStaffForm.current.getFieldValue('name');
-										newStaff.email = NewStaffForm.current.getFieldValue('email');
-										newStaff.employeeId = NewStaffForm.current.getFieldValue('employeeId');
-										newStaff.position = NewStaffForm.current.getFieldValue('position');
-										resolve(staffModal);
-									})
-									.catch((errorInfo) => {
-										console.error('Validation Failed:', errorInfo);
-									});
-							}}
-						>
-							Next
-						</Button>
-					</Flex>
-				)
+				okType: 'primary',
+				okText: 'Next',
+				onOk: (args) => {
+					NewStaffForm.current?.validateFields()
+						.then(() => {
+							newStaff.name.first = NewStaffForm.current.getFieldValue(['name', 'first']);
+							newStaff.name.middle = NewStaffForm.current.getFieldValue(['name', 'middle']);
+							newStaff.name.last = NewStaffForm.current.getFieldValue(['name', 'last']);
+							newStaff.email = NewStaffForm.current.getFieldValue('email');
+							newStaff.employeeId = NewStaffForm.current.getFieldValue('employeeId');
+							newStaff.position = NewStaffForm.current.getFieldValue('position');
+
+							resolve(modal);
+						})
+						.catch((errorInfo) => {
+							console.error('Validation Failed:', errorInfo);
+						});
+				}
 			});
 		});
 
@@ -304,6 +289,13 @@ const Dashboard = () => {
 									/>
 								</Upload>
 							</Form.Item>
+
+							<Title level={5} style={{ textAlign: 'center' }}>
+								Upload Profile Picture
+							</Title>
+							<Text type='secondary' style={{ textAlign: 'center' }}>
+								Click to upload a profile picture. Recommended size: 200x200 pixels.
+							</Text>
 						</Flex>
 					</Form>
 				),
@@ -561,20 +553,6 @@ const Dashboard = () => {
 
 
 				{/************************** Grid of Staffs **************************/}
-				{/* <Flex vertical justify='center' align='center' gap='small' flex={1}>
-					<Row gutter={[remToPx(1), remToPx(1)]}>
-						{displayedStaffs.length > 0 ?
-							displayedStaffs.map((staff, index) => (
-								<Col key={staff.id} span={!mobile ? 8 : 24}>
-									<StaffCard staff={staff} animationDelay={index * 0.1} />
-								</Col>
-								)) :
-							<Col span={24}>
-								<Empty description='No staff found' />
-							</Col>
-						}
-					</Row>
-				</Flex> */}
 				{displayedStaffs.length > 0 ?
 					<Flex vertical justify='flex-start' align='flex-start' gap='small' flex={1}>
 						<Row gutter={[remToPx(1), remToPx(1)]}>
