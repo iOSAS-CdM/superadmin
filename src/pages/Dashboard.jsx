@@ -102,6 +102,7 @@ const Dashboard = () => {
 	};
 
 	const { mobile, setMobile } = React.useContext(MobileContext);
+	const navigate = useNavigate();
 
 	const addNew = async () => {
 		setAddingNew(true);
@@ -461,6 +462,9 @@ const Dashboard = () => {
 						<>
 							<Button
 								icon={<ToolOutlined />}
+								onClick={() => {
+									navigate('/configure');
+								}}
 							>Configure System</Button>
 							<Button
 								type='primary'

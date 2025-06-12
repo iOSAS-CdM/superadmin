@@ -7,6 +7,7 @@ import { ConfigProvider, App, theme } from 'antd';
 import SignIn from './pages/SignIn';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import Configure from './pages/Configure';
 
 import remToPx from './utils/remToPx';
 import rootToHex from './utils/rootToHex';
@@ -67,6 +68,11 @@ const OSAS = () => {
 							<Route path='/staff/:staffId' element={
 								<MobileContext.Provider value={{ mobile, setMobile }}>
 									<Profile />
+								</MobileContext.Provider>
+							} />
+							<Route path='/configure' element={
+								<MobileContext.Provider value={{ mobile, setMobile }}>
+									<Configure />
 								</MobileContext.Provider>
 							} />
 						</Routes>
