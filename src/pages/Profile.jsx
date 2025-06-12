@@ -86,7 +86,7 @@ const Profile = () => {
 
 				{/************************** Profile **************************/}
 				<Flex justify='flex-start' align='stretch' gap='small'>
-					<Avatar
+					{!mobile && <Avatar
 						src={location.state?.staff?.profilePicture || 'https://via.placeholder.com/150'}
 						objectFit='cover'
 						alt='Profile Picture'
@@ -95,10 +95,27 @@ const Profile = () => {
 							height: 'calc(var(--space-XL) * 12)',
 							width: 'calc(var(--space-XL) * 12)'
 						}}
-					/>
+					/>}
 
 					<Card style={{ flex: 1 }}>
-						<Flex vertical gap='small' justify='center' align='stretch' style={{ height: '100%' }}>
+						<Flex
+							vertical
+							gap='small'
+							justify='center'
+							align={!mobile ? 'stretch' : 'center'}
+							style={{ height: '100%', ...mobile ? { textAlign: 'center' } : {} }}
+						>
+							{mobile && <Avatar
+								src={location.state?.staff?.profilePicture || 'https://via.placeholder.com/150'}
+								objectFit='cover'
+								alt='Profile Picture'
+								shape='square'
+								style={{
+									height: 'calc(var(--space-XL) * 12)',
+									width: 'calc(var(--space-XL) * 12)'
+								}}
+							/>}
+
 							<Title level={2}>
 								{`${location.state?.staff?.name.first} ${location.state?.staff?.name.middle ? `${location.state?.staff?.name.middle} ` : ''}`} {location.state?.staff?.name.last}
 							</Title>
@@ -149,51 +166,51 @@ const Profile = () => {
 				</Flex>
 
 				{/************************** Recent Activities **************************/}
-				<Flex vertical gap='small' justify='flex-start' align='stretch'>
-					<Card title='Recent Activities' size='small'>
-						<Table
-							dataSource={activities}
-							rowKey='id'
-							pagination={false}
-							bordered
-							size='small'
-						>
-							<Table.Column
-								title='Timestamp'
-								dataIndex='timestamp'
-								key='timestamp'
-								render={(timestamp) => {
-									// Day (word) - Month (word) - Year, Hour:Minute:Second
-									const date = new Date(timestamp);
-									return date.toLocaleString('en-US', {
-										weekday: 'long',
-										year: 'numeric',
-										month: 'long',
-										day: 'numeric',
-										hour: '2-digit',
-										minute: '2-digit',
-										second: '2-digit'
-									});
-								}}
-							/>
-							<Table.Column
-								title='Type'
-								dataIndex='type'
-								key='type'
-								render={(type) => (
-									<Tag color={type === 'login' ? 'green' : 'blue'}>
-										{type.charAt(0).toUpperCase() + type.slice(1)}
-									</Tag>
-								)}
-							/>
-							<Table.Column
-								title='Description'
-								dataIndex='description'
-								key='description'
-							/>
-						</Table>
-					</Card>
-				</Flex>
+				<Table
+					dataSource={activities}
+					rowKey='id'
+					pagination={false}
+					bordered
+					size='small'
+					showHeader={true}
+					title={() => (
+						<Title level={4} style={{ margin: 0 }}>Recent Activities</Title>
+					)}
+				>
+					<Table.Column
+						title='Timestamp'
+						dataIndex='timestamp'
+						key='timestamp'
+						render={(timestamp) => {
+							// Day (word) - Month (word) - Year, Hour:Minute:Second
+							const date = new Date(timestamp);
+							return date.toLocaleString('en-US', {
+								weekday: 'long',
+								year: 'numeric',
+								month: 'long',
+								day: 'numeric',
+								hour: '2-digit',
+								minute: '2-digit',
+								second: '2-digit'
+							});
+						}}
+					/>
+					<Table.Column
+						title='Type'
+						dataIndex='type'
+						key='type'
+						render={(type) => (
+							<Tag color={type === 'login' ? 'green' : 'blue'}>
+								{type.charAt(0).toUpperCase() + type.slice(1)}
+							</Tag>
+						)}
+					/>
+					<Table.Column
+						title='Description'
+						dataIndex='description'
+						key='description'
+					/>
+				</Table>
 			</Flex>
 		</Card>
 	);
