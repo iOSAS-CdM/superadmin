@@ -133,13 +133,3 @@ span.ant-typography {
 
 	padding: var(--space-XL);
 }
-
-.controls {
-	width: 100%;
-
-	display: flex;
-	gap: var(--space-3XL);
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-}
