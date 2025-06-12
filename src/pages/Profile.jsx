@@ -88,7 +88,6 @@ const Profile = () => {
 				<Flex justify='flex-start' align='stretch' gap='small'>
 					{!mobile && <Avatar
 						src={location.state?.staff?.profilePicture || 'https://via.placeholder.com/150'}
-						objectFit='cover'
 						alt='Profile Picture'
 						shape='square'
 						style={{
