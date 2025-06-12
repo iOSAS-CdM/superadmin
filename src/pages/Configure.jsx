@@ -6,15 +6,16 @@ import {
 	Card,
 	Typography,
 	Button,
-	Input,
-	Upload
+	Input
 } from 'antd';
 
 import {
 	ToolOutlined,
 	LeftOutlined,
 	RightOutlined,
-	KeyOutlined
+	KeyOutlined,
+	SaveOutlined,
+	ClearOutlined
 } from '@ant-design/icons';
 
 import { MobileContext } from '../main';
@@ -157,6 +158,11 @@ const Profile = () => {
 
 				<Card
 					title={<Title level={2}>Secret Keys</Title>}
+					extra={
+						<Text type='secondary'>
+							These keys are used to authenticate with various services. Please keep them secure.
+						</Text>
+					}
 				>
 					<Flex vertical justify='flex-start' align='stretch' gap='large'>
 						<Flex justify='flex-start' align='stretch' gap='small'>
@@ -185,21 +191,32 @@ const Profile = () => {
 						</Flex>
 						<Flex justify='flex-start' align='stretch' gap='small'>
 							<Title level={5} style={{ width: 'calc(var(--space-XL) * 14)' }}>Firebase Admin Credentials</Title>
-							<Flex vertical justify='flex-start' align='stretch' flex={1}>
-								<Upload
-									listType='text'
-									fileList={[
-										{
-											name: 'firebase-admin.json',
-											status: 'done',
-											url: 'https://example.com/firebase-admin.json',
-											size: 12345,
-											type: 'application/json'
-										}
-									]}
-								></Upload>
-								<Text type='secondary'>Upload your Firebase Admin credentials in JSON format.</Text>
-							</Flex>
+							<Input.TextArea
+								value='AIzaSyD3pl0y3d-0s4s'
+								readOnly
+								suffix={<KeyOutlined />}
+							/>
+						</Flex>
+
+						<Flex justify='flex-end' gap='small'>
+							<Button
+								type='default'
+								onClick={() => {
+									console.log('Discard action triggered');
+								}}
+								icon={<ClearOutlined />}
+							>
+								Discard Changes
+							</Button>
+							<Button
+								type='primary'
+								onClick={() => {
+									console.log('Save action triggered');
+								}}
+								icon={<SaveOutlined />}
+							>
+								Save and Restart
+							</Button>
 						</Flex>
 					</Flex>
 				</Card>
