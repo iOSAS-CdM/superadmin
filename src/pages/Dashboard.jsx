@@ -130,6 +130,7 @@ const Dashboard = () => {
 				title: 'Add New Staff',
 				centered: true,
 				open: addingNew,
+				maskClosable: true,
 				width: {
 					xs: '100%',
 					sm: remToPx(50),
@@ -267,35 +268,39 @@ const Dashboard = () => {
 								name='profilePicture'
 								rules={[{ required: true, message: 'Please upload a profile picture!' }]}
 							>
-								<Upload
-									listType='picture-card'
-									showUploadList={false}
-									beforeUpload={(file) => {
-										const reader = new FileReader();
-										reader.onload = (e) => {
-											NewStaffForm.current.setFieldsValue({
-												profilePicture: e.target.result
-											});
-											newStaff.profilePicture = e.target.result;
-											resolve(staffModal);
-										};
-										reader.readAsDataURL(file);
-										return false; // Prevent auto upload
-									}}
-								>
-									<Button
-										icon={<PlusCircleOutlined />}
-										style={{ width: '100%', height: '100%' }}
-									/>
-								</Upload>
-							</Form.Item>
+								<Flex vertical justify='center' align='center' gap='small'>
+									<Upload
+										listType='picture-card'
+										showUploadList={false}
+										beforeUpload={(file) => {
+											const reader = new FileReader();
+											reader.onload = (e) => {
+												NewStaffForm.current.setFieldsValue({
+													profilePicture: e.target.result
+												});
+												newStaff.profilePicture = e.target.result;
+												resolve(staffModal);
+											};
+											reader.readAsDataURL(file);
+											return false; // Prevent auto upload
+										}}
+									>
+										<Button
+											icon={<PlusCircleOutlined />}
+											style={{ width: '100%', height: '100%' }}
+										/>
+									</Upload>
 
-							<Title level={5} style={{ textAlign: 'center' }}>
-								Upload Profile Picture
-							</Title>
-							<Text type='secondary' style={{ textAlign: 'center' }}>
-								Click to upload a profile picture. Recommended size: 200x200 pixels.
-							</Text>
+									<Flex vertical justify='center' align='center'>
+										<Title level={5} style={{ textAlign: 'center' }}>
+											Upload Profile Picture
+										</Title>
+										<Text type='secondary' style={{ textAlign: 'center' }}>
+											Click to upload a profile picture. Recommended size: 200x200 pixels.
+										</Text>
+									</Flex>
+								</Flex>
+							</Form.Item>
 						</Flex>
 					</Form>
 				),
@@ -343,17 +348,18 @@ const Dashboard = () => {
 				type: 'warning',
 				content: (
 					<Flex justify='flex-start' align='center' gap='small'>
-							<Avatar
-								src={newStaff.profilePicture}
-								size={remToPx(10)}
-							/>
+						<Avatar
+							src={newStaff.profilePicture}
+							size={remToPx(10)}
+						/>
 						<Flex vertical justify='center' align='flex-start'>
-								<Title level={5}>{newStaff.name.first} {newStaff.name.middle ? `${newStaff.name.middle} ` : ''}{newStaff.name.last}</Title>
-								<Text type='secondary'>{newStaff.position === 'head' ? 'Head' : newStaff.position === 'guidance' ? 'Guidance Officer' :
-								newStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'} - {newStaff.employeeId}</Text>
-								<Text type='secondary'>{newStaff.email}</Text>
-							</Flex>
+							<Title level={5}>{newStaff.name.first} {newStaff.name.middle ? `${newStaff.name.middle} ` : ''}{newStaff.name.last}</Title>
+							<Text type='secondary'>{newStaff.employeeId}</Text>
+							<Text type='secondary'>{newStaff.position === 'head' ? 'Head' : newStaff.position === 'guidance' ? 'Guidance Officer' :
+								newStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'}</Text>
+							<Text type='secondary'>{newStaff.email}</Text>
 						</Flex>
+					</Flex>
 				),
 				footer: (
 					<Flex justify='flex-end' gap='small'>
@@ -393,17 +399,18 @@ const Dashboard = () => {
 					/>
 					<Flex vertical justify='center' align='flex-start'>
 						<Title level={5}>{newStaff.name.first} {newStaff.name.middle ? `${newStaff.name.middle} ` : ''}{newStaff.name.last}</Title>
+						<Text type='secondary'>{newStaff.employeeId}</Text>
 						<Text type='secondary'>{newStaff.position === 'head' ? 'Head' : newStaff.position === 'guidance' ? 'Guidance Officer' :
-							newStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'} - {newStaff.employeeId}</Text>
+							newStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'}</Text>
 						<Text type='secondary'>{newStaff.email}</Text>
 					</Flex>
 				</Flex>
 			),
 			onOk: () => { }
 		});
-
-		await new Promise((resolve) => setTimeout(resolve, remToPx(2)));
+		
 		await setStaffs([...staffs, newStaff]);
+		await new Promise((resolve) => setTimeout(resolve, remToPx(2)));
 		await setDisplayedStaffs(staffs);
 		NewStaffModal.destroy();
 
