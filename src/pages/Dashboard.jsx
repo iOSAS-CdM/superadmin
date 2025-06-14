@@ -14,7 +14,7 @@ import {
 	Select,
 	Upload,
 	Avatar,
-	Modal,
+	App,
 	Form,
 	Space,
 	Empty
@@ -30,9 +30,7 @@ import {
 	EditOutlined,
 	LockOutlined,
 	RightOutlined,
-	SwapOutlined,
-	FilterOutlined,
-	PlusCircleOutlined
+	FilterOutlined
 } from '@ant-design/icons';
 
 import { MobileContext } from '../main';
@@ -56,7 +54,31 @@ const Dashboard = () => {
 	const [displayedStaffs, setDisplayedStaffs] = React.useState([]);
 	const FilterForm = React.useRef(null);
 
+	const Modal = App.useApp().modal;
+
 	React.useEffect(() => {
+		const placeholderStaffs = [];
+		for (let i = 0; i < 20; i++) {
+			const id = `placeholder-025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+			if (staffs.some(staff => staff.employeeId === id)) {
+				continue;
+			};
+			placeholderStaffs.push({
+				id: id,
+				name: {
+					first: `First ${i + 1}`,
+					middle: `Middle ${i + 1}`,
+					last: `Last ${i + 1}`
+				},
+				email: `staff${i + 1}@example.com`,
+				employeeId: id,
+				position: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
+				profilePicture: null,
+				placeholder: true
+			});
+		};
+		setStaffs(placeholderStaffs);
+
 		fetch('https://randomuser.me/api/?results=20&inc=name,email,phone,login,picture')
 			.then(response => response.json())
 			.then(data => {
@@ -80,7 +102,8 @@ const Dashboard = () => {
 							return id;
 						})(),
 						position: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
-						profilePicture: user.picture.large
+						profilePicture: user.picture.large,
+						placeholder: false
 					});
 				};
 				setStaffs(fetchedStaffs);
@@ -157,7 +180,7 @@ const Dashboard = () => {
 								icon={addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
 								onClick={async () => {
 									setAddingNew(true);
-									const staff = await AddNewStaff();
+									const staff = await AddNewStaff(Modal);
 									if (staff) {
 										setStaffs([...staffs, staff]);
 										setDisplayedStaffs([...displayedStaffs, staff]);
@@ -262,10 +285,10 @@ const Dashboard = () => {
 				{/************************** Grid of Staffs **************************/}
 				{displayedStaffs.length > 0 ?
 					<Flex vertical justify='flex-start' align='flex-start' gap='small' flex={1}>
-						<Row gutter={[remToPx(1), remToPx(1)]}>
+						<Row gutter={[remToPx(1), remToPx(1)]} style={{ width: '100%' }}>
 							{displayedStaffs.map((staff, index) => (
 								<Col key={staff.id} span={!mobile ? 8 : 24}>
-									<StaffCard staff={staff} animationDelay={index * 0.1} />
+									<StaffCard staff={staff} animationDelay={index * 0.1} loading={staff.placeholder} />
 								</Col>
 							))}
 						</Row>
@@ -275,7 +298,6 @@ const Dashboard = () => {
 						<Empty description='No staff found' />
 					</Flex>
 				}
-
 			</Flex>
 		</Card>
 	);
@@ -283,7 +305,7 @@ const Dashboard = () => {
 
 export default Dashboard;
 
-const StaffCard = ({ staff, animationDelay }) => {
+const StaffCard = ({ staff, animationDelay, loading }) => {
 	const [mounted, setMounted] = React.useState(false);
 
 	const [thisStaff, setThisStaff] = React.useState(staff);
@@ -302,6 +324,7 @@ const StaffCard = ({ staff, animationDelay }) => {
 		<Card
 			size='small'
 			hoverable
+			loading={loading}
 			className={mounted ? 'staff-card-mounted' : 'staff-card-unmounted'}
 			actions={[
 				<EditOutlined onClick={() => EditStaff(thisStaff, setThisStaff)} key='edit' />,

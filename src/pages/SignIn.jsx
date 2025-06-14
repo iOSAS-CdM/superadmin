@@ -44,8 +44,8 @@ const SignIn = () => {
 			<div id='auth-background'></div>
 
 			<Card id='sign-in' className={`page-container${mobile ? ' mobile' : ''}`}>
-				<Flex vertical justify='space-between' align='center' gap='large'>
-					<Flex vertical justify='center' align='center' gap='large'>
+				<Flex vertical justify='space-between' align='center' gap='large' style={{ height: '100%' }}>
+					<Flex vertical justify='center' align='center' gap='large' style={{ height: '100%' }}>
 						<Image
 							src='/CdM-OSAS Banner.png'
 							alt='Logo Colegio de Montalban'
