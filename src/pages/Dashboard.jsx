@@ -298,6 +298,12 @@ const StaffCard = ({ staff, animationDelay }) => {
 		return () => clearTimeout(timer);
 	}, [animationDelay]);
 
+	React.useEffect(() => {
+		return () => {
+			console.log(`StaffCard for ${staff.name.first} is unmounting.`);
+		};
+	}, [staff]);
+
 	return (
 		<Card
 			size='small'
