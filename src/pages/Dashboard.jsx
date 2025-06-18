@@ -330,6 +330,9 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 		};
 	}, [staff]);
 
+	const app = App.useApp();
+	const Modal = app.modal;
+
 	return (
 		<Card
 			size='small'
@@ -337,7 +340,7 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 			loading={loading}
 			className={mounted ? 'staff-card-mounted' : 'staff-card-unmounted'}
 			actions={[
-				<EditOutlined onClick={() => EditStaff(thisStaff, setThisStaff)} key='edit' />,
+				<EditOutlined onClick={() => EditStaff(Modal, thisStaff, setThisStaff)} key='edit' />,
 				<LockOutlined key='lock' />,
 				<RightOutlined onClick={() => {
 					navigate(`/staff/${thisStaff.id}`, {

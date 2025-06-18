@@ -7,32 +7,26 @@ import {
 	Select,
 	Flex,
 	Upload,
-	Steps,
 	Typography,
 	Space,
-	Image,
 	Avatar
 } from 'antd';
 
 import {
 	UploadOutlined,
 	ClearOutlined,
-	RightOutlined,
 	SwapOutlined,
-	SolutionOutlined,
-	SmileOutlined,
-	LoadingOutlined,
 	UserAddOutlined,
 	SaveOutlined
 } from '@ant-design/icons';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 import remToPx from '../utils/remToPx';
 
 const NewStaffForm = React.createRef();
 
-const InformationForm = ({ setProgress }) => {
+const InformationForm = () => {
 	const [ProfilePicture, setProfilePicture] = React.useState('');
 
 	const newStaff = {
@@ -79,8 +73,8 @@ const InformationForm = ({ setProgress }) => {
 								return false;
 							}}
 							style={{
-								width: 'calc(var(--space-XL) * 8)',
-								height: 'calc(var(--space-XL) * 8)',
+								width: 'calc(var(--space-XL) * 12)',
+								height: 'calc(var(--space-XL) * 12)',
 							}}
 						>
 							{ProfilePicture ? (
@@ -176,71 +170,6 @@ const InformationForm = ({ setProgress }) => {
 					</Form.Item>
 				</Flex>
 			</Flex>
-
-			{/* <Flex vertical gap='small'>
-				<Steps
-					current={steps}
-					items={[
-						{
-							title: 'Information',
-							icon: <SolutionOutlined />
-						},
-						{
-							title: 'Profile Picture',
-							icon: <SmileOutlined />
-						},
-						{
-							title: 'Confirmation',
-							icon: <LoadingOutlined />
-						}
-					]}
-				/>
-				<Flex justify='flex-end' align='center' gap='small'>
-					<Text type='secondary'>
-						Please fill all the required fields *
-					</Text>
-					<Button
-						type='default'
-						icon={<ClearOutlined />}
-						iconPosition='start'
-						disabled={steps === 0}
-						onClick={() => setSteps(steps - 1)}
-					>
-						Back
-					</Button>
-					<Button
-						type='primary'
-						icon={steps === 2 ? <SaveOutlined /> : <RightOutlined />}
-						iconPosition={steps === 2 ? 'start' : 'end'}
-						onClick={() => {
-							if (steps < 2) {
-								NewStaffForm.current.validateFields()
-									.then((values) => {
-										setSteps(steps + 1);
-									})
-									.catch((errorInfo) => {
-										console.error('Validation Failed:', errorInfo);
-									});
-							} else {
-								NewStaffForm.current.validateFields()
-									.then((values) => {
-										onChange({
-											...values,
-											profilePicture: ProfilePicture
-										});
-										setAddingNew(false);
-										modal.destroyAll();
-									})
-									.catch((errorInfo) => {
-										console.error('Validation Failed:', errorInfo);
-									});
-							};
-						}}
-					>
-						{steps === 2 ? 'Submit' : 'Next'}
-					</Button>
-				</Flex>
-			</Flex> */}
 		</Form>
 	);
 };

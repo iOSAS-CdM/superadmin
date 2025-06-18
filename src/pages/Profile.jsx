@@ -9,11 +9,12 @@ import {
 	Avatar,
 	Table,
 	Tag,
-	Divider
+	Divider,
+	App
 } from 'antd';
 
 import {
-	UserOutlined,
+	EditOutlined,
 	LeftOutlined,
 	MailOutlined,
 	PhoneOutlined,
@@ -25,6 +26,8 @@ import { MobileContext } from '../main';
 const { Title, Text } = Typography;
 
 import Header from '../components/Header';
+
+import EditStaff from '../modals/EditStaff';
 
 import '../styles/pages/Dashboard.css';
 
@@ -64,12 +67,28 @@ const Profile = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 
+	const [thisStaff, setThisStaff] = React.useState(location.state?.staff || {
+		id: '12345',
+		name: {
+			first: 'John',
+			middle: 'A.',
+			last: 'Doe'
+		},
+		email: 'email@mail.com',
+		employeeId: '22-00250',
+		position: 'head',
+		profilePicture: 'https://via.placeholder.com/150'
+	});
+
+	const app = App.useApp();
+	const Modal = app.modal;
+
 	return (
 		<Card className='scrollable-content page-container' size='small'>
 			{/************************** Header **************************/}
 			<Flex vertical justify='flex-start' align='stretch' gap='small'>
 				<Header
-					icon={<UserOutlined />}
+					icon={<EditOutlined />}
 					title={<Title level={3}>Staff Profile</Title>}
 					actions={
 						<>
@@ -87,7 +106,7 @@ const Profile = () => {
 				{/************************** Profile **************************/}
 				<Flex justify='flex-start' align='stretch' gap='small'>
 					{!mobile && <Avatar
-						src={location.state?.staff?.profilePicture || 'https://via.placeholder.com/150'}
+						src={thisStaff.profilePicture || 'https://via.placeholder.com/150'}
 						alt='Profile Picture'
 						shape='square'
 						style={{
@@ -105,7 +124,7 @@ const Profile = () => {
 							style={{ height: '100%', ...mobile ? { textAlign: 'center' } : {} }}
 						>
 							{mobile && <Avatar
-								src={location.state?.staff?.profilePicture || 'https://via.placeholder.com/150'}
+								src={thisStaff.profilePicture || 'https://via.placeholder.com/150'}
 								objectFit='cover'
 								alt='Profile Picture'
 								shape='square'
@@ -116,14 +135,14 @@ const Profile = () => {
 							/>}
 
 							<Title level={2}>
-								{`${location.state?.staff?.name.first} ${location.state?.staff?.name.middle ? `${location.state?.staff?.name.middle} ` : ''}`} {location.state?.staff?.name.last}
+								{`${thisStaff.name.first} ${thisStaff.name.middle ? `${thisStaff.name.middle} ` : ''}`} {thisStaff.name.last}
 							</Title>
 							<Text type='secondary'>
 								{
-									location.state?.position === 'head' ? 'Head' : location.state?.position === 'guidance' ? 'Guidance Officer' :
-										location.state?.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+									thisStaff.position === 'head' ? 'Head' : thisStaff.position === 'guidance' ? 'Guidance Officer' :
+										thisStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
 								}
-								- {location.state?.staff?.employeeId}
+								- {thisStaff.employeeId}
 							</Text>
 
 							<Flex gap='small' >
@@ -132,16 +151,16 @@ const Profile = () => {
 									icon={<MailOutlined />}
 									style={{ padding: 0 }}
 								>
-									{location.state?.staff?.email}
+									{thisStaff.email}
 								</Button>
 
-								{location.state?.staff?.phone &&
+								{thisStaff.phone &&
 									<Button
 										type='link'
 										icon={<PhoneOutlined />}
 										style={{ padding: 0 }}
 									>
-										{location.state?.staff?.phone}
+										{thisStaff.phone}
 									</Button>
 								}
 							</Flex>
@@ -151,7 +170,8 @@ const Profile = () => {
 							<Flex justify='flex-start' align='stretch' gap='small'>
 								<Button
 									type='primary'
-									icon={<UserOutlined />}
+									icon={<EditOutlined />}
+									onClick={() => EditStaff(Modal, thisStaff, setThisStaff)}
 								>
 									Edit Profile
 								</Button>
