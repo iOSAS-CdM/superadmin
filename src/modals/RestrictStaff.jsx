@@ -52,15 +52,13 @@ const RestrictStaff = async (Modal, staff) => {
 				</Form.Item>
 			</Form>
 		),
-		okText: 'Restrict',
-		cancelText: 'Cancel',
 		footer: (_, { CancelBtn, OkBtn }) => (
 			<Flex justify='flex-end' align='center' gap='small'>
 				<CancelBtn />
 				<OkBtn />
 			</Flex>
 		),
-		okText: 'Save',
+		okText: 'Restrict',
 		okButtonProps: {
 			icon: <SaveOutlined />
 		},
