@@ -16,7 +16,7 @@ import {
 
 import {
 	UploadOutlined,
-	LeftOutlined,
+	ClearOutlined,
 	RightOutlined,
 	SwapOutlined,
 	SolutionOutlined,
@@ -201,7 +201,7 @@ const InformationForm = ({ setProgress }) => {
 					</Text>
 					<Button
 						type='default'
-						icon={<LeftOutlined />}
+						icon={<ClearOutlined />}
 						iconPosition='start'
 						disabled={steps === 0}
 						onClick={() => setSteps(steps - 1)}
@@ -285,6 +285,12 @@ const AddNewStaff = async (Modal, addingNew, setAddingNew, staffs, setStaffs) =>
 			xl: remToPx(80),
 			xxl: remToPx(90)
 		},
+		footer: (_, { CancelBtn, OkBtn }) => (
+			<Flex justify='flex-end' align='center' gap='small'>
+				<CancelBtn />
+				<OkBtn />
+			</Flex>
+		),
 		okText: 'Save',
 		okButtonProps: {
 			icon: <SaveOutlined />
@@ -306,7 +312,8 @@ const AddNewStaff = async (Modal, addingNew, setAddingNew, staffs, setStaffs) =>
 		},
 		cancelText: 'Cancel',
 		cancelButtonProps: {
-			icon: <LeftOutlined />
+			icon: <ClearOutlined />,
+			hidden: false
 		},
 		onCancel: () => {
 			setAddingNew(false);

@@ -54,7 +54,9 @@ const Dashboard = () => {
 	const [displayedStaffs, setDisplayedStaffs] = React.useState([]);
 	const FilterForm = React.useRef(null);
 
-	const Modal = App.useApp().modal;
+	const app = App.useApp();
+	const Modal = app.modal;
+	const Notification = app.notification;
 
 	React.useEffect(() => {
 		const placeholderStaffs = [];
@@ -185,7 +187,11 @@ const Dashboard = () => {
 										setDisplayedStaffs([...displayedStaffs, staff]);
 										FilterForm.current.setFieldsValue({ category: staff.position, search: '' });
 										categorizeFilter(staff.position);
-									};
+										Notification.success({
+											message: 'Success',
+											description: 'New staff member added successfully.'
+										});
+									}
 								}}
 							>Add New</Button>
 							<Button
