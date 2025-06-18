@@ -59,7 +59,7 @@ const Dashboard = () => {
 	React.useEffect(() => {
 		const placeholderStaffs = [];
 		for (let i = 0; i < 20; i++) {
-			const id = `placeholder-025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+			const id = `placeholder-025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}-${i + 1}`;
 			if (staffs.some(staff => staff.employeeId === id)) {
 				continue;
 			};
@@ -179,15 +179,13 @@ const Dashboard = () => {
 								type='primary'
 								icon={addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
 								onClick={async () => {
-									setAddingNew(true);
-									const staff = await AddNewStaff(Modal);
+									const staff = await AddNewStaff(Modal, addingNew, setAddingNew, staffs, setStaffs);
 									if (staff) {
 										setStaffs([...staffs, staff]);
 										setDisplayedStaffs([...displayedStaffs, staff]);
 										FilterForm.current.setFieldsValue({ category: staff.position, search: '' });
 										categorizeFilter(staff.position);
 									};
-									setAddingNew(false);
 								}}
 							>Add New</Button>
 							<Button
@@ -321,8 +319,8 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 	}, [animationDelay]);
 
 	React.useEffect(() => {
-		return () => {
-			console.log(`StaffCard for ${staff.name.first} is unmounting.`);
+		if (staff) {
+			setThisStaff(staff);
 		};
 	}, [staff]);
 

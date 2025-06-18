@@ -118,10 +118,13 @@ const Profile = () => {
 							<Title level={2}>
 								{`${location.state?.staff?.name.first} ${location.state?.staff?.name.middle ? `${location.state?.staff?.name.middle} ` : ''}`} {location.state?.staff?.name.last}
 							</Title>
-							<Text type='secondary'>{
-								location.state?.position === 'head' ? 'Head' : location.state?.position === 'guidance' ? 'Guidance Officer' :
-									location.state?.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
-							}</Text>
+							<Text type='secondary'>
+								{
+									location.state?.position === 'head' ? 'Head' : location.state?.position === 'guidance' ? 'Guidance Officer' :
+										location.state?.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+								}
+								- {location.state?.staff?.employeeId}
+							</Text>
 
 							<Flex gap='small' >
 								<Button
