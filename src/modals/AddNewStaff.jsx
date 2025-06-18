@@ -254,7 +254,7 @@ const InformationForm = ({ setProgress }) => {
  * @return {Promise<Object>} - A promise that resolves to the new staff object.
  */
 const AddNewStaff = async (Modal, addingNew, setAddingNew, staffs, setStaffs) => {
-	const newStaff = {
+	let newStaff = {
 		id: Math.random().toString(36).substring(2, 15),
 		name: {
 			first: null,
@@ -311,6 +311,7 @@ const AddNewStaff = async (Modal, addingNew, setAddingNew, staffs, setStaffs) =>
 		onCancel: () => {
 			setAddingNew(false);
 			return new Promise((resolve) => {
+				newStaff = null; // Reset newStaff if cancelled
 				resolve();
 			});
 		}
