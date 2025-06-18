@@ -45,6 +45,7 @@ import '../styles/pages/Dashboard.css';
 
 import AddNewStaff from '../modals/AddNewStaff';
 import EditStaff from '../modals/EditStaff';
+import RestrictStaff from '../modals/RestrictStaff';
 
 const Dashboard = () => {
 	const [signingOut, setSigningOut] = React.useState(false);
@@ -76,7 +77,8 @@ const Dashboard = () => {
 				employeeId: id,
 				position: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
 				profilePicture: null,
-				placeholder: true
+				placeholder: true,
+				status: 'active'
 			});
 		};
 		setStaffs(placeholderStaffs);
@@ -105,7 +107,8 @@ const Dashboard = () => {
 						})(),
 						position: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
 						profilePicture: user.picture.large,
-						placeholder: false
+						placeholder: false,
+						status: ['active', 'restricted', 'archived'][Math.floor(Math.random() * 3)]
 					});
 				};
 				setStaffs(fetchedStaffs);
@@ -341,7 +344,7 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 			className={mounted ? 'staff-card-mounted' : 'staff-card-unmounted'}
 			actions={[
 				<EditOutlined onClick={() => EditStaff(Modal, thisStaff, setThisStaff)} key='edit' />,
-				<LockOutlined key='lock' />,
+				<LockOutlined onClick={() => RestrictStaff(Modal, thisStaff)} key='restrict' />,
 				<RightOutlined onClick={() => {
 					navigate(`/staff/${thisStaff.id}`, {
 						state: { staff: thisStaff },
