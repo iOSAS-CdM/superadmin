@@ -13,7 +13,6 @@
     transition: opacity var(--transition), transform var(--transition);
 }
 
-/* Mounted state (after mounting) */
 .staff-card-mounted {
     opacity: 1;
     transform: translateY(0);
