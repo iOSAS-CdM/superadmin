@@ -209,9 +209,8 @@ const EditStaff = async (Modal, staff, setThisStaff) => {
 			hidden: false
 		},
 		onCancel: () => {
-			setAddingNew(false);
 			return new Promise((resolve) => {
-				newStaff = null; // Reset newStaff if cancelled
+				EditStaffForm.current.resetFields();
 				resolve();
 			});
 		}
