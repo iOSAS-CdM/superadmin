@@ -8,7 +8,7 @@
 	--space-2XL: 3rem;
 	--space-3XL: 4rem;
 
-	--primary: #106A2E;
+	--primary: #106a2e;
 
 	--transition: 0.5s ease;
 }
@@ -63,7 +63,7 @@ span.ant-typography {
 	overflow: auto;
 	scrollbar-gutter: stable;
 	position: relative;
-	
+
 	scrollbar-width: thin;
 	scrollbar-color: transparent transparent;
 	transition: scrollbar-color var(--transition);
@@ -79,6 +79,9 @@ span.ant-typography {
 }
 .scrollable-content:hover {
 	scrollbar-color: var(--primary) transparent;
+}
+.scrollable-content > .ant-card-body {
+	height: unset;
 }
 
 #root {
@@ -97,7 +100,7 @@ span.ant-typography {
 .page-container {
 	width: 100vw;
 	height: 100vh;
-	
+
 	border: none;
 	border-radius: 0;
 }
@@ -110,7 +113,7 @@ span.ant-typography {
 	width: 100vw;
 	height: 100vh;
 
-	background-image: url('/Authentication Background.jpg');
+	background-image: url("/Authentication Background.jpg");
 	background-position: center center;
 	background-size: cover;
 

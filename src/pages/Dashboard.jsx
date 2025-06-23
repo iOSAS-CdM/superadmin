@@ -360,10 +360,10 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 				/>
 				<Flex vertical justify='flex-start' align='flex-start'>
 					<Title level={4}>{`${thisStaff.name.first} ${thisStaff.name.last}`}</Title>
-					<p>{
+					<Text>{
 						thisStaff.position === 'head' ? 'Head' : thisStaff.position === 'guidance' ? 'Guidance Officer' :
 							thisStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
-					}</p>
+					}</Text>
 				</Flex>
 			</Flex>
 		</Card>
