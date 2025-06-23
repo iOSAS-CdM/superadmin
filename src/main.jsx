@@ -65,7 +65,7 @@ const OSAS = () => {
 									</MobileContext.Provider>
 								}
 							/>
-							<Route path='/staff/:staffId' element={
+							<Route path='/admin/:adminId' element={
 								<MobileContext.Provider value={{ mobile, setMobile }}>
 									<Profile />
 								</MobileContext.Provider>

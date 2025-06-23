@@ -27,7 +27,7 @@ const { Title, Text } = Typography;
 
 import Header from '../components/Header';
 
-import EditStaff from '../modals/EditStaff';
+import EditAdmin from '../modals/EditAdmin';
 
 import '../styles/pages/Dashboard.css';
 
@@ -67,7 +67,7 @@ const Profile = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	const [thisStaff, setThisStaff] = React.useState(location.state?.staff || {
+	const [thisAdmin, setThisAdmin] = React.useState(location.state?.admin || {
 		id: '12345',
 		name: {
 			first: 'John',
@@ -89,7 +89,7 @@ const Profile = () => {
 			<Flex vertical justify='flex-start' align='stretch' gap='small'>
 				<Header
 					icon={<EditOutlined />}
-					title={<Title level={3}>Staff Profile</Title>}
+					title={<Title level={3}>Admin Profile</Title>}
 					actions={
 						<>
 							<Button
@@ -106,7 +106,7 @@ const Profile = () => {
 				{/************************** Profile **************************/}
 				<Flex justify='flex-start' align='stretch' gap='small'>
 					{!mobile && <Avatar
-						src={thisStaff.profilePicture || 'https://via.placeholder.com/150'}
+						src={thisAdmin.profilePicture || 'https://via.placeholder.com/150'}
 						alt='Profile Picture'
 						shape='square'
 						style={{
@@ -124,7 +124,7 @@ const Profile = () => {
 							style={{ height: '100%', ...mobile ? { textAlign: 'center' } : {} }}
 						>
 							{mobile && <Avatar
-								src={thisStaff.profilePicture || 'https://via.placeholder.com/150'}
+								src={thisAdmin.profilePicture || 'https://via.placeholder.com/150'}
 								objectFit='cover'
 								alt='Profile Picture'
 								shape='square'
@@ -135,14 +135,14 @@ const Profile = () => {
 							/>}
 
 							<Title level={2}>
-								{`${thisStaff.name.first} ${thisStaff.name.middle ? `${thisStaff.name.middle} ` : ''}`} {thisStaff.name.last}
+								{`${thisAdmin.name.first} ${thisAdmin.name.middle ? `${thisAdmin.name.middle} ` : ''}`} {thisAdmin.name.last}
 							</Title>
 							<Text type='secondary'>
 								{
-									thisStaff.position === 'head' ? 'Head' : thisStaff.position === 'guidance' ? 'Guidance Officer' :
-										thisStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+									thisAdmin.position === 'head' ? 'Head' : thisAdmin.position === 'guidance' ? 'Guidance Officer' :
+										thisAdmin.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
 								}
-								- {thisStaff.employeeId}
+								- {thisAdmin.employeeId}
 							</Text>
 
 							<Flex gap='small' >
@@ -151,16 +151,16 @@ const Profile = () => {
 									icon={<MailOutlined />}
 									style={{ padding: 0 }}
 								>
-									{thisStaff.email}
+									{thisAdmin.email}
 								</Button>
 
-								{thisStaff.phone &&
+								{thisAdmin.phone &&
 									<Button
 										type='link'
 										icon={<PhoneOutlined />}
 										style={{ padding: 0 }}
 									>
-										{thisStaff.phone}
+										{thisAdmin.phone}
 									</Button>
 								}
 							</Flex>
@@ -171,7 +171,7 @@ const Profile = () => {
 								<Button
 									type='primary'
 									icon={<EditOutlined />}
-									onClick={() => EditStaff(Modal, thisStaff, setThisStaff)}
+									onClick={() => EditAdmin(Modal, thisAdmin, setThisAdmin)}
 								>
 									Edit Profile
 								</Button>

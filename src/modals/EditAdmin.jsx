@@ -24,19 +24,19 @@ const { Title, Text } = Typography;
 
 import remToPx from '../utils/remToPx';
 
-const EditStaffForm = React.createRef();
+const EditAdminForm = React.createRef();
 
-const StaffForm = ({ staff }) => {
-	console.log(staff);
+const AdminForm = ({ admin }) => {
+	console.log(admin);
 
-	const [ProfilePicture, setProfilePicture] = React.useState(staff.profilePicture || '');
+	const [ProfilePicture, setProfilePicture] = React.useState(admin.profilePicture || '');
 
 	return (
 		<Form
 			layout='vertical'
-			ref={EditStaffForm}
+			ref={EditAdminForm}
 			onFinish={(values) => { }}
-			initialValues={staff}
+			initialValues={admin}
 			style={{ width: '100%' }}
 		>
 			<Flex justify='center' align='flex-start' gap='large'>
@@ -54,7 +54,7 @@ const StaffForm = ({ staff }) => {
 								reader.onload = (e) => {
 									file.preview = e.target.result;
 									setProfilePicture(e.target.result);
-									EditStaffForm.current.setFieldsValue({
+									EditAdminForm.current.setFieldsValue({
 										profilePicture: e.target.result
 									});
 								};
@@ -129,7 +129,7 @@ const StaffForm = ({ staff }) => {
 							icon={<SwapOutlined />}
 							style={{ width: 'fit-content' }}
 							onClick={() => {
-								EditStaffForm.current.setFieldsValue({
+								EditAdminForm.current.setFieldsValue({
 									employeeId: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
 								});
 							}}
@@ -163,13 +163,13 @@ const StaffForm = ({ staff }) => {
 	);
 };
 
-const EditStaff = async (Modal, staff, setThisStaff) => {
+const EditAdmin = async (Modal, admin, setThisAdmin) => {
 	Modal.info({
-		title: 'Edit Staff',
+		title: 'Edit Admin',
 		centered: true,
 		closable: { 'aria-label': 'Close' },
 		content: (
-			<StaffForm staff={staff} onChange={setThisStaff} />
+			<AdminForm admin={admin} onChange={setThisAdmin} />
 		),
 		icon: <EditOutlined />,
 		width: {
@@ -192,9 +192,9 @@ const EditStaff = async (Modal, staff, setThisStaff) => {
 		},
 		onOk: () => {
 			return new Promise((resolve, reject) => {
-				EditStaffForm.current.validateFields()
+				EditAdminForm.current.validateFields()
 					.then((values) => {
-						setThisStaff(values);
+						setThisAdmin(values);
 						resolve();
 					})
 					.catch((errorInfo) => {
@@ -209,11 +209,11 @@ const EditStaff = async (Modal, staff, setThisStaff) => {
 		},
 		onCancel: () => {
 			return new Promise((resolve) => {
-				EditStaffForm.current.resetFields();
+				EditAdminForm.current.resetFields();
 				resolve();
 			});
 		}
 	});
 };
 
-export default EditStaff;
+export default EditAdmin;

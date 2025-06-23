@@ -190,7 +190,7 @@ const Profile = () => {
 							/>
 						</Flex>
 						<Flex justify='flex-start' align='stretch' gap='small'>
-							<Title level={5} style={{ width: 'calc(var(--space-XL) * 14)' }}>Firebase Admin Credentials</Title>
+							<Title level={5} style={{ width: 'calc(var(--space-XL) * 14)' }}>Firebase Super Administrator Credentials</Title>
 							<Input.TextArea
 								value='AIzaSyD3pl0y3d-0s4s'
 								readOnly

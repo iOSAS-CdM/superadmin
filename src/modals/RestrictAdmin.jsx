@@ -24,22 +24,22 @@ const { Title, Text } = Typography;
 
 import remToPx from '../utils/remToPx';
 
-const RestrictStaffForm = React.createRef();
+const RestrictAdminForm = React.createRef();
 
 /**
- * Function to restrict staff member.
+ * Function to restrict admin member.
  * @param {import('antd/es/modal/useModal').HookAPI} Modal - The Ant Design Modal component.
- * @param {Object} staff - The staff member data to be restricted.
+ * @param {Object} admin - The admin member data to be restricted.
  */
-const RestrictStaff = async (Modal, staff) => {
+const RestrictAdmin = async (Modal, admin) => {
 	Modal.warning({
-		title: 'Restrict Staff Member',
+		title: 'Restrict Admin Member',
 		content: (
 			<Form
 				layout='vertical'
-				ref={RestrictStaffForm}
+				ref={RestrictAdminForm}
 				initialValues={{
-					staffId: staff.id,
+					adminId: admin.id,
 					reason: ''
 				}}
 			>
@@ -48,7 +48,7 @@ const RestrictStaff = async (Modal, staff) => {
 					label='Reason for Restriction'
 					rules={[{ required: true, message: 'Please provide a reason for the restriction.' }]}
 				>
-					<Input.TextArea rows={4} placeholder='Enter the reason for restricting this staff member.' />
+					<Input.TextArea rows={4} placeholder='Enter the reason for restricting this admin member.' />
 				</Form.Item>
 			</Form>
 		),
@@ -64,9 +64,9 @@ const RestrictStaff = async (Modal, staff) => {
 		},
 		onOk: () => {
 			return new Promise((resolve, reject) => {
-				RestrictStaffForm.current.validateFields()
+				RestrictAdminForm.current.validateFields()
 					.then((values) => {
-						console.log('Staff member restricted:', values);
+						console.log('Admin member restricted:', values);
 						resolve();
 					})
 					.catch((errorInfo) => {
@@ -83,11 +83,11 @@ const RestrictStaff = async (Modal, staff) => {
 		onCancel: () => {
 			setAddingNew(false);
 			return new Promise((resolve) => {
-				newStaff = null; // Reset newStaff if cancelled
+				newAdmin = null; // Reset newAdmin if cancelled
 				resolve();
 			});
 		}
 	});
 };
 
-export default RestrictStaff;
+export default RestrictAdmin;

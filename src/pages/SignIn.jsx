@@ -57,7 +57,7 @@ const SignIn = () => {
 
 						<Flex vertical justify='center' align='center'>
 							<Text>Welcome,</Text>
-							<Title level={1} style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Admin</Title>
+							<Title level={1} style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Super Administrator</Title>
 						</Flex>
 
 						<Form

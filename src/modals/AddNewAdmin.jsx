@@ -24,12 +24,12 @@ const { Text } = Typography;
 
 import remToPx from '../utils/remToPx';
 
-const NewStaffForm = React.createRef();
+const NewAdminForm = React.createRef();
 
 const InformationForm = () => {
 	const [ProfilePicture, setProfilePicture] = React.useState('');
 
-	const newStaff = {
+	const newAdmin = {
 		id: Math.random().toString(36).substring(2, 15),
 		name: {
 			first: null,
@@ -45,9 +45,9 @@ const InformationForm = () => {
 	return (
 		<Form
 			layout='vertical'
-			ref={NewStaffForm}
+			ref={NewAdminForm}
 			onFinish={(values) => { }}
-			initialValues={newStaff}
+			initialValues={newAdmin}
 			style={{ width: '100%' }}
 		>
 			<Flex justify='center' align='flex-start' gap='large'>
@@ -65,7 +65,7 @@ const InformationForm = () => {
 								reader.onload = (e) => {
 									file.preview = e.target.result;
 									setProfilePicture(e.target.result);
-									NewStaffForm.current.setFieldsValue({
+									NewAdminForm.current.setFieldsValue({
 										profilePicture: e.target.result
 									});
 								};
@@ -140,7 +140,7 @@ const InformationForm = () => {
 							icon={<SwapOutlined />}
 							style={{ width: 'fit-content' }}
 							onClick={() => {
-								NewStaffForm.current.setFieldsValue({
+								NewAdminForm.current.setFieldsValue({
 									employeeId: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
 								});
 							}}
@@ -175,15 +175,15 @@ const InformationForm = () => {
 };
 
 /**
- * Function to add a new staff member.
+ * Function to add a new admin member.
  * @param {import('antd/es/modal/useModal').HookAPI} Modal - The Ant Design Modal component.
  * @param {React.Dispatch<React.SetStateAction<boolean>>} setAddingNew - React.Dispatch<React.SetStateAction<boolean>> to set the adding new state.
- * @param {Array} staffs - The current list of staff members.
- * @param {React.Dispatch<React.SetStateAction<boolean>>} setStaffs - Function to update the list of staff members.
- * @return {Promise<Object>} - A promise that resolves to the new staff object.
+ * @param {Array} admins - The current list of admin members.
+ * @param {React.Dispatch<React.SetStateAction<boolean>>} setAdmins - Function to update the list of admin members.
+ * @return {Promise<Object>} - A promise that resolves to the new admin object.
  */
-const AddNewStaff = async (Modal, addingNew, setAddingNew, staffs, setStaffs) => {
-	let newStaff = {
+const AddNewAdmin = async (Modal, addingNew, setAddingNew, admins, setAdmins) => {
+	let newAdmin = {
 		id: Math.random().toString(36).substring(2, 15),
 		name: {
 			first: null,
@@ -198,12 +198,12 @@ const AddNewStaff = async (Modal, addingNew, setAddingNew, staffs, setStaffs) =>
 
 	setAddingNew(true);
 	await Modal.info({
-		title: 'Add New Staff',
+		title: 'Add New Admin',
 		centered: true,
 		closable: { 'aria-label': 'Close' },
 		open: addingNew,
 		content: (
-			<InformationForm setAddingNew={setAddingNew} onChange={(updatedStaff) => Object.assign(newStaff, updatedStaff)} />
+			<InformationForm setAddingNew={setAddingNew} onChange={(updatedAdmin) => Object.assign(newAdmin, updatedAdmin)} />
 		),
 		icon: <UserAddOutlined />,
 		width: {
@@ -226,12 +226,12 @@ const AddNewStaff = async (Modal, addingNew, setAddingNew, staffs, setStaffs) =>
 		},
 		onOk: () => {
 			return new Promise((resolve, reject) => {
-				NewStaffForm.current.validateFields()
+				NewAdminForm.current.validateFields()
 					.then((values) => {
-						Object.assign(newStaff, values);
-						newStaff.profilePicture = values.profilePicture || newStaff.profilePicture;
-						setStaffs([...staffs, newStaff]);
-						resolve(newStaff);
+						Object.assign(newAdmin, values);
+						newAdmin.profilePicture = values.profilePicture || newAdmin.profilePicture;
+						setAdmins([...admins, newAdmin]);
+						resolve(newAdmin);
 					})
 					.catch((errorInfo) => {
 						console.error('Validation Failed:', errorInfo);
@@ -247,14 +247,14 @@ const AddNewStaff = async (Modal, addingNew, setAddingNew, staffs, setStaffs) =>
 		onCancel: () => {
 			setAddingNew(false);
 			return new Promise((resolve) => {
-				newStaff = null; // Reset newStaff if cancelled
+				newAdmin = null; // Reset newAdmin if cancelled
 				resolve();
 			});
 		}
 	});
 	setAddingNew(false);
 
-	return newStaff;
+	return newAdmin;
 };
 
-export default AddNewStaff;
+export default AddNewAdmin;

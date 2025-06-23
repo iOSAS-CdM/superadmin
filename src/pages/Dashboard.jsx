@@ -43,16 +43,16 @@ import Header from '../components/Header';
 
 import '../styles/pages/Dashboard.css';
 
-import AddNewStaff from '../modals/AddNewStaff';
-import EditStaff from '../modals/EditStaff';
-import RestrictStaff from '../modals/RestrictStaff';
+import AddNewAdmin from '../modals/AddNewAdmin';
+import EditAdmin from '../modals/EditAdmin';
+import RestrictAdmin from '../modals/RestrictAdmin';
 
 const Dashboard = () => {
 	const [signingOut, setSigningOut] = React.useState(false);
 	const [addingNew, setAddingNew] = React.useState(false);
 	const [category, setCategory] = React.useState('all');
-	const [staffs, setStaffs] = React.useState([]);
-	const [displayedStaffs, setDisplayedStaffs] = React.useState([]);
+	const [admins, setAdmins] = React.useState([]);
+	const [displayedAdmins, setDisplayedAdmins] = React.useState([]);
 	const FilterForm = React.useRef(null);
 
 	const app = App.useApp();
@@ -60,20 +60,20 @@ const Dashboard = () => {
 	const Notification = app.notification;
 
 	React.useEffect(() => {
-		const placeholderStaffs = [];
+		const placeholderAdmins = [];
 		for (let i = 0; i < 20; i++) {
 			const id = `placeholder-025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}-${i + 1}`;
-			if (staffs.some(staff => staff.employeeId === id)) {
+			if (admins.some(admin => admin.employeeId === id)) {
 				continue;
 			};
-			placeholderStaffs.push({
+			placeholderAdmins.push({
 				id: id,
 				name: {
 					first: `First ${i + 1}`,
 					middle: `Middle ${i + 1}`,
 					last: `Last ${i + 1}`
 				},
-				email: `staff${i + 1}@example.com`,
+				email: `admin${i + 1}@example.com`,
 				employeeId: id,
 				position: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
 				profilePicture: null,
@@ -81,15 +81,15 @@ const Dashboard = () => {
 				status: 'active'
 			});
 		};
-		setStaffs(placeholderStaffs);
+		setAdmins(placeholderAdmins);
 
 		fetch('https://randomuser.me/api/?results=20&inc=name,email,phone,login,picture')
 			.then(response => response.json())
 			.then(data => {
-				const fetchedStaffs = [];
+				const fetchedAdmins = [];
 				for (let i = 0; i < data.results.length; i++) {
 					const user = data.results[i];
-					fetchedStaffs.push({
+					fetchedAdmins.push({
 						id: i + 1,
 						name: {
 							first: user.name.first,
@@ -102,7 +102,7 @@ const Dashboard = () => {
 							let id;
 							do {
 								id = `025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
-							} while (fetchedStaffs.some(staff => staff.employeeId === id));
+							} while (fetchedAdmins.some(admin => admin.employeeId === id));
 							return id;
 						})(),
 						position: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
@@ -111,15 +111,15 @@ const Dashboard = () => {
 						status: ['active', 'restricted', 'archived'][Math.floor(Math.random() * 3)]
 					});
 				};
-				setStaffs(fetchedStaffs);
+				setAdmins(fetchedAdmins);
 			})
-			.catch(error => console.error('Error fetching staff data:', error));
+			.catch(error => console.error('Error fetching admin data:', error));
 	}, []);
 
 	React.useEffect(() => {
-		setDisplayedStaffs(staffs);
+		setDisplayedAdmins(admins);
 		categorizeFilter('all');
-	}, [staffs]);
+	}, [admins]);
 
 	const signOut = () => {
 		setSigningOut(true);
@@ -135,33 +135,33 @@ const Dashboard = () => {
 	const navigate = useNavigate();
 
 	const categorizeFilter = (value) => {
-		let filteredStaffs = staffs;
+		let filteredAdmins = admins;
 
 		if (value !== 'all')
-			filteredStaffs = staffs.filter(staff => staff.position === value);
+			filteredAdmins = admins.filter(admin => admin.position === value);
 
-		setDisplayedStaffs([]);
+		setDisplayedAdmins([]);
 		setTimeout(() => {
-			setDisplayedStaffs(filteredStaffs);
+			setDisplayedAdmins(filteredAdmins);
 		}, remToPx(2));
 	};
 
-	const searchCategorizedStaffs = (searchTerm) => {
+	const searchCategorizedAdmins = (searchTerm) => {
 		setCategory('all');
 
 		if (searchTerm.trim() === '') {
-			setDisplayedStaffs(staffs);
+			setDisplayedAdmins(admins);
 			return;
 		};
 
-		const filteredStaffs = staffs.filter(staff => {
-			const fullName = `${staff.name.first} ${staff.name.last}`.toLowerCase();
+		const filteredAdmins = admins.filter(admin => {
+			const fullName = `${admin.name.first} ${admin.name.last}`.toLowerCase();
 			return fullName.includes(searchTerm.toLowerCase());
 		});
 
-		setDisplayedStaffs([]);
+		setDisplayedAdmins([]);
 		setTimeout(() => {
-			setDisplayedStaffs(filteredStaffs);
+			setDisplayedAdmins(filteredAdmins);
 		}, remToPx(2));
 	};
 
@@ -184,15 +184,15 @@ const Dashboard = () => {
 								type='primary'
 								icon={addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
 								onClick={async () => {
-									const staff = await AddNewStaff(Modal, addingNew, setAddingNew, staffs, setStaffs);
-									if (staff) {
-										setStaffs([...staffs, staff]);
-										setDisplayedStaffs([...displayedStaffs, staff]);
-										FilterForm.current.setFieldsValue({ category: staff.position, search: '' });
-										categorizeFilter(staff.position);
+									const admin = await AddNewAdmin(Modal, addingNew, setAddingNew, admins, setAdmins);
+									if (admin) {
+										setAdmins([...admins, admin]);
+										setDisplayedAdmins([...displayedAdmins, admin]);
+										FilterForm.current.setFieldsValue({ category: admin.position, search: '' });
+										categorizeFilter(admin.position);
 										Notification.success({
 											message: 'Success',
-											description: 'New staff member added successfully.'
+											description: 'New admin member added successfully.'
 										});
 									}
 								}}
@@ -226,7 +226,7 @@ const Dashboard = () => {
 									placeholder='Search'
 									allowClear
 									prefix={<SearchOutlined />}
-									onChange={(e) => searchCategorizedStaffs(e.target.value)}
+									onChange={(e) => searchCategorizedAdmins(e.target.value)}
 								/>
 							</Form.Item>
 						</Card>
@@ -289,20 +289,20 @@ const Dashboard = () => {
 				</Form>
 
 
-				{/************************** Grid of Staffs **************************/}
-				{displayedStaffs.length > 0 ?
+				{/************************** Grid of Admins **************************/}
+				{displayedAdmins.length > 0 ?
 					<Flex vertical justify='flex-start' align='flex-start' gap='small' flex={1}>
 						<Row gutter={[remToPx(1), remToPx(1)]} style={{ width: '100%' }}>
-							{displayedStaffs.map((staff, index) => (
-								<Col key={staff.id} span={!mobile ? 8 : 24}>
-									<StaffCard staff={staff} animationDelay={index * 0.1} loading={staff.placeholder} />
+							{displayedAdmins.map((admin, index) => (
+								<Col key={admin.id} span={!mobile ? 8 : 24}>
+									<AdminCard admin={admin} animationDelay={index * 0.1} loading={admin.placeholder} />
 								</Col>
 							))}
 						</Row>
 					</Flex>
 					:
 					<Flex vertical justify='center' align='center' flex={1}>
-						<Empty description='No staff found' />
+						<Empty description='No admin found' />
 					</Flex>
 				}
 			</Flex>
@@ -312,10 +312,10 @@ const Dashboard = () => {
 
 export default Dashboard;
 
-const StaffCard = ({ staff, animationDelay, loading }) => {
+const AdminCard = ({ admin, animationDelay, loading }) => {
 	const [mounted, setMounted] = React.useState(false);
 
-	const [thisStaff, setThisStaff] = React.useState(staff);
+	const [thisAdmin, setThisAdmin] = React.useState(admin);
 
 	const navigate = useNavigate();
 
@@ -328,10 +328,10 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 	}, [animationDelay]);
 
 	React.useEffect(() => {
-		if (staff) {
-			setThisStaff(staff);
+		if (admin) {
+			setThisAdmin(admin);
 		};
-	}, [staff]);
+	}, [admin]);
 
 	const app = App.useApp();
 	const Modal = app.modal;
@@ -341,13 +341,13 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 			size='small'
 			hoverable
 			loading={loading}
-			className={mounted ? 'staff-card-mounted' : 'staff-card-unmounted'}
+			className={mounted ? 'admin-card-mounted' : 'admin-card-unmounted'}
 			actions={[
-				<EditOutlined onClick={() => EditStaff(Modal, thisStaff, setThisStaff)} key='edit' />,
-				<LockOutlined onClick={() => RestrictStaff(Modal, thisStaff)} key='restrict' />,
+				<EditOutlined onClick={() => EditAdmin(Modal, thisAdmin, setThisAdmin)} key='edit' />,
+				<LockOutlined onClick={() => RestrictAdmin(Modal, thisAdmin)} key='restrict' />,
 				<RightOutlined onClick={() => {
-					navigate(`/staff/${thisStaff.id}`, {
-						state: { staff: thisStaff },
+					navigate(`/admin/${thisAdmin.id}`, {
+						state: { admin: thisAdmin },
 						viewTransition: true
 					});
 				}} key='view' />
@@ -355,14 +355,14 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 		>
 			<Flex justify='flex-start' align='flex-start' gap='small' style={{ width: '100%' }}>
 				<Avatar
-					src={thisStaff.profilePicture}
+					src={thisAdmin.profilePicture}
 					size='large'
 				/>
 				<Flex vertical justify='flex-start' align='flex-start'>
-					<Title level={4}>{`${thisStaff.name.first} ${thisStaff.name.last}`}</Title>
+					<Title level={4}>{`${thisAdmin.name.first} ${thisAdmin.name.last}`}</Title>
 					<Text>{
-						thisStaff.position === 'head' ? 'Head' : thisStaff.position === 'guidance' ? 'Guidance Officer' :
-							thisStaff.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+						thisAdmin.position === 'head' ? 'Head' : thisAdmin.position === 'guidance' ? 'Guidance Officer' :
+							thisAdmin.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
 					}</Text>
 				</Flex>
 			</Flex>
