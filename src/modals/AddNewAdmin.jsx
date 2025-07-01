@@ -161,12 +161,7 @@ const InformationForm = () => {
 								{ label: 'Student Affairs Officer', value: 'student-affairs' }
 							]}
 							style={{ width: '100%' }}
-						>
-							<Select.Option value='head'>Head</Select.Option>
-							<Select.Option value='guidance'>Guidance Officer</Select.Option>
-							<Select.Option value='prefect'>Prefect of Discipline Officer</Select.Option>
-							<Select.Option value='student-affairs'>Student Affairs Officer</Select.Option>
-						</Select>
+						/>
 					</Form.Item>
 				</Flex>
 			</Flex>
