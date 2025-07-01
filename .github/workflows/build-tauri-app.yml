@@ -1,70 +1,60 @@
-name: Build Tauri App
+name: 'publish'
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+  push:
+    branches:
+      - release
 
 jobs:
-    build-tauri:
-        strategy:
-            fail-fast: false
-            matrix:
-                platform: [macos-latest, ubuntu-latest, windows-latest]
+  publish-tauri:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest'
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest'
+            args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04'
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
 
-        runs-on: ${{ matrix.platform }}
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 20
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
 
-            - name: Setup Rust
-              uses: dtolnay/rust-toolchain@stable
-              with:
-                  toolchain: stable
-                  target: ${{ matrix.platform == 'macos-latest' && 'x86_64-apple-darwin' || matrix.platform == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || 'x86_64-pc-windows-msvc' }}
-                  components: rustfmt, clippy
-                  targets: |
-                      x86_64-apple-darwin
-                      x86_64-unknown-linux-gnu
-                      x86_64-pc-windows-msvc
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-            - name: Install dependencies (Linux)
-              if: matrix.platform == 'ubuntu-latest'
-              run: |
-                  sudo apt-get update
-                  sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+      - uses: Swatinem/rust-cache@v2
 
-            - name: Install frontend dependencies
-              run: npm install
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-            - name: Build Tauri app
-              run: npm run tauri build
+      - name: install frontend dependencies
+        run: npm install
 
-            - name: Upload artifact (macOS)
-              if: matrix.platform == 'macos-latest'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: tauri-app-macos
-                  path: src-tauri/target/release/bundle/dmg/*.dmg
-
-            - name: Upload artifact (Windows)
-              if: matrix.platform == 'windows-latest'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: tauri-app-windows
-                  path: src-tauri/target/release/bundle/msi/*.msi
-
-            - name: Upload artifact (Linux)
-              if: matrix.platform == 'ubuntu-latest'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: tauri-app-linux
-                  path: src-tauri/target/release/bundle/deb/*.deb
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: app-v__VERSION__
+          releaseName: 'App v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
