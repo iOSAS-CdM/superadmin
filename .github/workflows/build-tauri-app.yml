@@ -8,7 +8,7 @@ on:
     branches:
       - main
   release:
-    types: [created]
+    types: [created] # This workflow runs when a new release is created
 
 jobs:
   build-tauri:
@@ -31,8 +31,11 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
+          # Note: The target might need to be more specific for cross-compilation if you're building
+          # all targets on a single OS, but for matrix strategy, this is generally fine.
           target: ${{ matrix.platform == 'macos-latest' && 'x86_64-apple-darwin' || matrix.platform == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || 'x86_64-pc-windows-msvc' }}
           components: rustfmt, clippy
+          # Ensure all targets are available if cross-compiling, otherwise only the specific one
           targets: |
             x86_64-apple-darwin
             x86_64-unknown-linux-gnu
@@ -45,11 +48,13 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Install frontend dependencies
-        run: npm install
+        run: npm install # Or yarn install, depending on your package manager
 
       - name: Build Tauri app
-        run: npm run tauri build
+        run: npm run tauri build # Or yarn tauri build
 
+      # The following 'Upload artifact' steps are useful for debugging and storing
+      # artifacts with the workflow run, but are not directly used for release uploads.
       - name: Upload artifact (macOS)
         if: matrix.platform == 'macos-latest'
         uses: actions/upload-artifact@v4
@@ -70,15 +75,18 @@ jobs:
         with:
           name: tauri-app-linux
           path: src-tauri/target/release/bundle/deb/*.deb
-          
+
       - name: Upload release asset
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/') # Only upload if triggered by a tag (release)
         with:
+          # This now correctly uses the specific path for the artifact built on the current platform.
+          # The previous version attempted to upload all three types in each platform's job,
+          # which would lead to errors as files for other platforms wouldn't exist.
           files: |
-            src-tauri/target/release/bundle/dmg/*.dmg
-            src-tauri/target/release/bundle/msi/*.msi
-            src-tauri/target/release/bundle/deb/*.deb
+            ${{ matrix.platform == 'macos-latest' && 'src-tauri/target/release/bundle/dmg/*.dmg' || '' }}
+            ${{ matrix.platform == 'windows-latest' && 'src-tauri/target/release/bundle/msi/*.msi' || '' }}
+            ${{ matrix.platform == 'ubuntu-latest' && 'src-tauri/target/release/bundle/deb/*.deb' || '' }}
           name: ${{ github.event.release.name || github.ref_name }}
           tag_name: ${{ github.ref }}
           body: ${{ github.event.release.body }}
