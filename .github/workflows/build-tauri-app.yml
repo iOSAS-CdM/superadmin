@@ -1,70 +1,75 @@
-name: Build Tauri App
+name: Build and Release Tauri App
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+  release:
+    types: [published] # This workflow runs when a new release is published
 
 jobs:
-    build-tauri:
-        strategy:
-            fail-fast: false
-            matrix:
-                platform: [macos-latest, ubuntu-latest, windows-latest]
+  build-tauri:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-latest, windows-latest]
 
-        runs-on: ${{ matrix.platform }}
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 20
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-            - name: Setup Rust
-              uses: dtolnay/rust-toolchain@stable
-              with:
-                  toolchain: stable
-                  target: ${{ matrix.platform == 'macos-latest' && 'x86_64-apple-darwin' || matrix.platform == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || 'x86_64-pc-windows-msvc' }}
-                  components: rustfmt, clippy
-                  targets: |
-                      x86_64-apple-darwin
-                      x86_64-unknown-linux-gnu
-                      x86_64-pc-windows-msvc
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          # Note: The target might need to be more specific for cross-compilation if you're building
+          # all targets on a single OS, but for matrix strategy, this is generally fine.
+          target: ${{ matrix.platform == 'macos-latest' && 'x86_64-apple-darwin' || matrix.platform == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || 'x86_64-pc-windows-msvc' }}
+          components: rustfmt, clippy
+          # Ensure all targets are available if cross-compiling, otherwise only the specific one
+          targets: |
+            x86_64-apple-darwin
+            x86_64-unknown-linux-gnu
+            x86_64-pc-windows-msvc
 
-            - name: Install dependencies (Linux)
-              if: matrix.platform == 'ubuntu-latest'
-              run: |
-                  sudo apt-get update
-                  sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      - name: Install dependencies (Linux)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-            - name: Install frontend dependencies
-              run: npm install
+      - name: Install frontend dependencies
+        run: yarn install # Or npm install, depending on your package manager
 
-            - name: Build Tauri app
-              run: npm run tauri build
+      - name: Build Tauri app
+        run: yarn tauri build # Or npm run tauri build
 
-            - name: Upload artifact (macOS)
-              if: matrix.platform == 'macos-latest'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: tauri-app-macos
-                  path: src-tauri/target/release/bundle/dmg/*.dmg
+      - name: Get artifact path and name
+        id: get_artifact
+        run: |
+          if [ "${{ matrix.platform }}" == "macos-latest" ]; then
+            echo "::set-output name=path::src-tauri/target/release/bundle/dmg/*.dmg"
+            echo "::set-output name=name::tauri-app-macos.dmg"
+          elif [ "${{ matrix.platform }}" == "windows-latest" ]; then
+            echo "::set-output name=path::src-tauri/target/release/bundle/msi/*.msi"
+            echo "::set-output name=name::tauri-app-windows.msi"
+          elif [ "${{ matrix.platform }}" == "ubuntu-latest" ]; then
+            echo "::set-output name=path::src-tauri/target/release/bundle/deb/*.deb"
+            echo "::set-output name=name::tauri-app-linux.deb"
+          fi
 
-            - name: Upload artifact (Windows)
-              if: matrix.platform == 'windows-latest'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: tauri-app-windows
-                  path: src-tauri/target/release/bundle/msi/*.msi
-
-            - name: Upload artifact (Linux)
-              if: matrix.platform == 'ubuntu-latest'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: tauri-app-linux
-                  path: src-tauri/target/release/bundle/deb/*.deb
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/') # Only upload if triggered by a tag (release)
+        with:
+          files: ${{ steps.get_artifact.outputs.path }}
+          name: ${{ github.event.release.name || github.ref_name }}
+          tag_name: ${{ github.ref }}
+          body: ${{ github.event.release.body }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is automatically provided by GitHub Actions
