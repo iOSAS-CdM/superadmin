@@ -1,16 +1,17 @@
 {
-	"$schema": "../gen/schemas/desktop-schema.json",
-	"identifier": "default",
-	"description": "Capability for the main window",
-	"windows": [
-		"main"
-	],
-	"permissions": [
-		"core:default",
-		"opener:default",
-		"shell:default",
-		"dialog:default",
-		"oauth:allow-start",
-		"oauth:allow-cancel"
-	]
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "shell:default",
+    "dialog:default",
+    "oauth:allow-start",
+    "oauth:allow-cancel",
+    "deep-link:default"
+  ]
 }

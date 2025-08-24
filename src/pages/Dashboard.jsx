@@ -125,6 +125,9 @@ const Dashboard = () => {
 	const signOut = () => {
 		supabase.auth.signOut();
 	};
+	React.useEffect(() => {
+		window.focus();
+	}, []);
 
 	const { mobile } = React.useContext(MobileContext);
 

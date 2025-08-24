@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
 import supabase from '../utils/supabaseClient';
-import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { open } from '@tauri-apps/plugin-shell';
 import { start, cancel } from '@fabianlars/tauri-plugin-oauth';
@@ -77,13 +76,15 @@ const SignIn = () => {
 					location.reload();
 
 					unlisten();
+					cancel(port)
+						.catch((e) => console.error(`Error cancelling OAuth listener for port ${port}:`, e));
 				});
 			};
 		});
 
 		await start({
 			ports: [8000],
-			response: ''
+			response: `<script>window.location.href = 'http://${window.location.hostname}:${window.location.port}/auth-return';</script>`,
 		})
 			.then(async (p) => {
 				console.log(`OAuth listener started on port ${p}`);
@@ -96,7 +97,7 @@ const SignIn = () => {
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'google',
 			options: {
-				redirectTo: `${window.location.hostname}:${port}`,
+				redirectTo: `http://localhost:${port}`,
 				skipBrowserRedirect: true
 			}
 		});

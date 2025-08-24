@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import supabase from './utils/supabaseClient';
+import { getCurrent, onOpenUrl } from '@tauri-apps/plugin-deep-link';
 
 import { ConfigProvider, App, theme } from 'antd';
 
@@ -9,6 +10,7 @@ import SignIn from './pages/SignIn';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Configure from './pages/Configure';
+import AuthReturn from './pages/AuthReturn';
 
 import remToPx from './utils/remToPx';
 import rootToHex from './utils/rootToHex';
@@ -69,6 +71,8 @@ const OSAS = () => {
 								<Route path='/dashboard' element={session ? <Dashboard /> : <Navigate to='/' />} />
 								<Route path='/admin/:adminId' element={session ? <Profile /> : <Navigate to='/' />} />
 								<Route path='/configure' element={session ? <Configure /> : <Navigate to='/' />} />
+
+								<Route path='/auth-return' element={<AuthReturn />} />
 							</Routes>
 						</MobileContext.Provider>
 					</BrowserRouter>
