@@ -26,9 +26,9 @@ import remToPx from '../utils/remToPx';
 
 const EditAdminForm = React.createRef();
 
-const AdminForm = ({ admin }) => {
-	console.log(admin);
+import { API_Route } from '../main';
 
+const AdminForm = ({ admin }) => {
 	const [ProfilePicture, setProfilePicture] = React.useState(admin.profilePicture || '');
 
 	return (
@@ -48,6 +48,7 @@ const AdminForm = ({ admin }) => {
 						<Upload
 							listType='picture-card'
 							showUploadList={false}
+							accept='image/*'
 							beforeUpload={(file) => {
 								// Open the file
 								const reader = new FileReader();
@@ -144,7 +145,7 @@ const AdminForm = ({ admin }) => {
 						<Select
 							placeholder='Select Role *'
 							options={[
-								{ label: 'Head', value: 'head', disabled: true },
+								{ label: 'Head', value: 'head' },
 								{ label: 'Guidance Officer', value: 'guidance' },
 								{ label: 'Prefect of Discipline Officer', value: 'prefect' },
 								{ label: 'Student Affairs Officer', value: 'student-affairs' }
@@ -158,8 +159,8 @@ const AdminForm = ({ admin }) => {
 	);
 };
 
-const EditAdmin = async (Modal, admin, setThisAdmin) => {
-	Modal.info({
+const EditAdmin = async (Modal, admin, setThisAdmin, Notification) => {
+	await Modal.info({
 		title: 'Edit Admin',
 		centered: true,
 		closable: { 'aria-label': 'Close' },
@@ -188,7 +189,51 @@ const EditAdmin = async (Modal, admin, setThisAdmin) => {
 		onOk: () => {
 			return new Promise((resolve, reject) => {
 				EditAdminForm.current.validateFields()
-					.then((values) => {
+					.then(async (values) => {
+						const newAdmin = {
+							id: null,
+							name: {
+								first: null,
+								middle: null,
+								last: null
+							},
+							email: null,
+							role: null,
+							profilePicture: null
+						};
+
+						if (admin.id !== values.id) newAdmin.id = values.id;
+						if (admin.name.first !== values.name.first) newAdmin.name.first = values.name.first;
+						if (admin.name.middle !== values.name.middle) newAdmin.name.middle = values.name.middle;
+						if (admin.name.last !== values.name.last) newAdmin.name.last = values.name.last;
+						if (admin.email !== values.email) newAdmin.email = values.email;
+						if (admin.role !== values.role) newAdmin.role = values.role;
+						if (admin.profilePicture !== values.profilePicture) newAdmin.profilePicture = values.profilePicture;
+
+						const request = await fetch(`${API_Route}/superadmin/admin/${admin.id}`, {
+							method: 'PUT',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(newAdmin)
+						});
+
+						if (!request.ok) {
+							reject(new Error(data.message || 'Failed to update admin'));
+							Notification.error({
+								message: 'Update Failed',
+								description: data.message || 'Failed to update admin'
+							});
+							return;
+						};
+
+						const data = await request.json();
+
+						Notification.success({
+							message: 'Update Successful',
+							description: 'Admin details updated successfully'
+						});
+
 						setThisAdmin(values);
 						resolve();
 					})

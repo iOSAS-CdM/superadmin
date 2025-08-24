@@ -307,6 +307,7 @@ const AdminCard = ({ admin, animationDelay, loading }) => {
 
 	const app = App.useApp();
 	const Modal = app.modal;
+	const Notification = app.notification;
 
 	return (
 		<Card
@@ -315,7 +316,7 @@ const AdminCard = ({ admin, animationDelay, loading }) => {
 			loading={loading}
 			className={mounted ? 'admin-card-mounted' : 'admin-card-unmounted'}
 			actions={[
-				<EditOutlined onClick={() => EditAdmin(Modal, thisAdmin, setThisAdmin)} key='edit' />,
+				<EditOutlined onClick={() => EditAdmin(Modal, thisAdmin, setThisAdmin, Notification)} key='edit' />,
 				<LockOutlined onClick={() => RestrictAdmin(Modal, thisAdmin)} key='restrict' />,
 				<RightOutlined onClick={() => {
 					navigate(`/admin/${thisAdmin.id}`, {

@@ -157,7 +157,7 @@ const InformationForm = () => {
 						<Select
 							placeholder='Select Role *'
 							options={[
-								{ label: 'Head', value: 'head', disabled: true },
+								{ label: 'Head', value: 'head' },
 								{ label: 'Guidance Officer', value: 'guidance' },
 								{ label: 'Prefect of Discipline Officer', value: 'prefect' },
 								{ label: 'Student Affairs Officer', value: 'student-affairs' }
@@ -227,7 +227,6 @@ const AddNewAdmin = async (Modal, addingNew, setAddingNew, admins, setAdmins, No
 					.then(async (values) => {
 						Object.assign(newAdmin, values);
 						newAdmin.profilePicture = values.profilePicture || newAdmin.profilePicture;
-
 
 						const request = await fetch(`${API_Route}/superadmin/admin`, {
 							method: 'POST',
