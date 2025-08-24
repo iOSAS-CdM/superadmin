@@ -8,10 +8,9 @@ const supabase = createClient(
 	supabaseAPIKey,
 	{
 		auth: {
-			storageKey: 'supabase.auth.token',
+			persistSession: true,
+			storageKey: 'CustomApp',
 			storage: window.localStorage,
-			detectSessionInUrl: true,
-			autoRefreshToken: true,
 			flowType: 'pkce'
 		}
 	}

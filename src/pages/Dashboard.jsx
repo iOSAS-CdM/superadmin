@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
+import supabase from '../utils/supabaseClient';
 
 import {
 	Flex,
@@ -122,12 +123,7 @@ const Dashboard = () => {
 	}, [admins]);
 
 	const signOut = () => {
-		setSigningOut(true);
-
-		setTimeout(() => {
-			setSigningOut(false);
-			window.location.href = '/';
-		}, remToPx(20));
+		supabase.auth.signOut();
 	};
 
 	const { mobile } = React.useContext(MobileContext);

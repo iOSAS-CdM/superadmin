@@ -1,5 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
+import supabase from '../utils/supabaseClient';
+import { invoke } from '@tauri-apps/api/core';
+import { listen } from '@tauri-apps/api/event';
+import { open } from '@tauri-apps/plugin-shell';
+import { start, cancel } from '@fabianlars/tauri-plugin-oauth';
+
 
 import {
 	Form,
@@ -17,27 +23,130 @@ import { LoginOutlined, GoogleOutlined, LoadingOutlined } from '@ant-design/icon
 
 import { MobileContext } from '../main';
 
-import remToPx from '../utils/remToPx';
-
 const { Text, Title } = Typography;
 
 import '../styles/pages/SignIn.css';
 
 const SignIn = () => {
 	const [signingIn, setSigningIn] = React.useState(false);
-
 	const { mobile, setMobile } = React.useContext(MobileContext);
 
 	const navigate = useNavigate();
+	const AuthForm = React.useRef(null);
 
-	const signIn = () => {
+	const [port, setPort] = React.useState(null);
+	// React.useEffect(() => {
+	// 	console.log('Refresh', port, new Date());
+	// 	if (port) return;
+
+	// 	const unlisten = listen('oauth://url', (data) => {
+	// 		setPort(null);
+	// 		if (!data.payload) return;
+
+	// 		const url = new URL(data.payload);
+	// 		const code = new URLSearchParams(url.search).get('code');
+
+	// 		if (code) {
+	// 			supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+	// 				if (error) {
+	// 					alert(error.message);
+	// 					console.error(error);
+	// 					return;
+	// 				}
+	// 				location.reload();
+	// 			});
+	// 		};
+	// 	});
+
+	// 	let _port = null;
+	// 	start({ ports: [8000, 8001, 8002, 8003, 8004, 8005] })
+	// 		.then(async (port) => {
+	// 			console.log(`OAuth listener started on port ${port}`);
+	// 			await setPort(port);
+	// 			_port = port;
+	// 		})
+	// 		.catch((e) => console.error('Error starting OAuth listener:', e));
+
+	// 	return () => {
+	// 		console.log('Unsubscribing from oauth://url');
+	// 		unlisten?.then((u) => u());
+	// 		cancel(_port)
+	// 			.catch((e) => console.error(`Error cancelling OAuth listener for port ${_port}:`, e));
+	// 	};
+	// }, [port]);
+
+	const signIn = async (values) => {
+		if (!AuthForm.current) return;
 		setSigningIn(true);
+		const { error } = await supabase.auth.signInWithPassword({
+			email: values.email,
+			password: values.password
+		});
 
-		setTimeout(() => {
-			setSigningIn(false);
+		if (error) {
+			AuthForm.current.setFields([{
+				name: 'email',
+				errors: ['']
+			}]);
+			AuthForm.current.setFields([{
+				name: 'password',
+				errors: [error.message]
+			}]);
+		} else {
 			navigate('/dashboard');
-		}, remToPx(20));
+		};
+		setSigningIn(false);
 	};
+
+	const signInWithGoogle = React.useCallback(async () => {
+		setSigningIn(true);
+		let port;
+
+		const unlisten = await listen('oauth://url', (data) => {
+			if (!data.payload) return;
+
+			const url = new URL(data.payload);
+			const code = new URLSearchParams(url.search).get('code');
+
+			if (code) {
+				supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+					if (error) {
+						alert(error.message);
+						console.error(error);
+						return;
+					};
+					location.reload();
+
+					unlisten();
+				});
+			};
+		});
+
+		await start({
+			ports: [8000],
+			response: ''
+		})
+			.then(async (p) => {
+				console.log(`OAuth listener started on port ${p}`);
+				port = p;
+			})
+			.catch((e) => console.error('Error starting OAuth listener:', e));
+
+		if (!port) return;
+
+		const { data, error } = await supabase.auth.signInWithOAuth({
+			provider: 'google',
+			options: {
+				redirectTo: `${window.location.hostname}:${port}`,
+				skipBrowserRedirect: true
+			}
+		});
+
+		if (data.url)
+			open(data.url);
+		else if (error)
+			console.error('Error signing in with Google:', error.message);		
+	}, []);
 
 	return (
 		<>
@@ -62,8 +171,9 @@ const SignIn = () => {
 
 						<Form
 							layout='vertical'
+							ref={AuthForm}
 							onFinish={(values) => {
-								signIn();
+								signIn(values);
 							}}
 						>
 							<Form.Item
@@ -72,7 +182,7 @@ const SignIn = () => {
 							>
 								<Input placeholder='Email' type='email' />
 							</Form.Item>
-							
+
 							<Form.Item
 								name='password'
 								rules={[{ required: true, message: 'Please input your password!' }]}
@@ -98,7 +208,8 @@ const SignIn = () => {
 						<Divider>or</Divider>
 
 						<Button
-							icon={<GoogleOutlined />}
+							icon={signingIn ? <LoadingOutlined /> : <GoogleOutlined />}
+							onClick={signInWithGoogle}
 						>
 							Sign in with Google
 						</Button>
