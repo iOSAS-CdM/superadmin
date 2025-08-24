@@ -24,6 +24,8 @@ const { Text } = Typography;
 
 import remToPx from '../utils/remToPx';
 
+import { API_Route } from '../main';
+
 const NewAdminForm = React.createRef();
 
 const InformationForm = () => {
@@ -227,7 +229,7 @@ const AddNewAdmin = async (Modal, addingNew, setAddingNew, admins, setAdmins, No
 						newAdmin.profilePicture = values.profilePicture || newAdmin.profilePicture;
 
 
-						const request = await fetch(`${import.meta.env.VITE_API_URL}/superadmin/admin`, {
+						const request = await fetch(`${API_Route}/superadmin/admin`, {
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json'
