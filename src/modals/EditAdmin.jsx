@@ -118,7 +118,7 @@ const AdminForm = ({ admin }) => {
 					</Form.Item>
 					<Space.Compact style={{ width: '100%' }}>
 						<Form.Item
-							name='employeeId'
+							name='id'
 							rules={[{ required: true, message: 'Please input the employee ID!' }]}
 							style={{ width: '100%' }}
 						>
@@ -130,7 +130,7 @@ const AdminForm = ({ admin }) => {
 							style={{ width: 'fit-content' }}
 							onClick={() => {
 								EditAdminForm.current.setFieldsValue({
-									employeeId: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
+									id: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
 								});
 							}}
 						>
@@ -138,11 +138,11 @@ const AdminForm = ({ admin }) => {
 						</Button>
 					</Space.Compact>
 					<Form.Item
-						name='position'
-						rules={[{ required: true, message: 'Please select the position!' }]}
+						name='role'
+						rules={[{ required: true, message: 'Please select the role!' }]}
 					>
 						<Select
-							placeholder='Select Position *'
+							placeholder='Select Role *'
 							options={[
 								{ label: 'Head', value: 'head', disabled: true },
 								{ label: 'Guidance Officer', value: 'guidance' },

@@ -75,8 +75,7 @@ const Profile = () => {
 			last: 'Doe'
 		},
 		email: 'email@mail.com',
-		employeeId: '22-00250',
-		position: 'head',
+		role: 'head',
 		profilePicture: 'https://via.placeholder.com/150'
 	});
 
@@ -139,10 +138,10 @@ const Profile = () => {
 							</Title>
 							<Text type='secondary'>
 								{
-									thisAdmin.position === 'head' ? 'Head' : thisAdmin.position === 'guidance' ? 'Guidance Officer' :
-										thisAdmin.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+									thisAdmin.role === 'head' ? 'Head' : thisAdmin.role === 'guidance' ? 'Guidance Officer' :
+										thisAdmin.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
 								}
-								- {thisAdmin.employeeId}
+								- {thisAdmin.id}
 							</Text>
 
 							<Flex gap='small' >

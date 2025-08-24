@@ -31,20 +31,5 @@
 			"icons/icon.icns",
 			"icons/icon.ico"
 		]
-	},
-	"plugins": {
-		"features": {
-			"protocol": [
-				"all"
-			]
-		},
-		"deep-link": {
-      		"schema": "osas-superadmin",
-			"desktop": {
-				"schemes": [
-					"osas-superadmin"
-				]
-			}
-		}
 	}
 }

@@ -67,12 +67,13 @@ const SignIn = () => {
 			const code = new URLSearchParams(url.search).get('code');
 
 			if (code) {
-				supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+				supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
 					if (error) {
 						alert(error.message);
 						console.error(error);
 						return;
 					};
+					console.log(data);
 					location.reload();
 
 					unlisten();
@@ -101,6 +102,7 @@ const SignIn = () => {
 				skipBrowserRedirect: true
 			}
 		});
+		console.log(data, error);
 
 		if (data.url)
 			open(data.url);

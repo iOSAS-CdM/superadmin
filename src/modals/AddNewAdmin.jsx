@@ -30,15 +30,14 @@ const InformationForm = () => {
 	const [ProfilePicture, setProfilePicture] = React.useState('');
 
 	const newAdmin = {
-		id: Math.random().toString(36).substring(2, 15),
+		id: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
 		name: {
 			first: null,
 			middle: null,
 			last: null
 		},
 		email: null,
-		employeeId: null,
-		position: null,
+		role: null,
 		profilePicture: null
 	};
 
@@ -59,6 +58,7 @@ const InformationForm = () => {
 						<Upload
 							listType='picture-card'
 							showUploadList={false}
+							accept='image/*'
 							beforeUpload={(file) => {
 								// Open the file
 								const reader = new FileReader();
@@ -129,7 +129,7 @@ const InformationForm = () => {
 					</Form.Item>
 					<Space.Compact style={{ width: '100%' }}>
 						<Form.Item
-							name='employeeId'
+							name='id'
 							rules={[{ required: true, message: 'Please input the employee ID!' }]}
 							style={{ width: '100%' }}
 						>
@@ -141,7 +141,7 @@ const InformationForm = () => {
 							style={{ width: 'fit-content' }}
 							onClick={() => {
 								NewAdminForm.current.setFieldsValue({
-									employeeId: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
+									id: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
 								});
 							}}
 						>
@@ -149,11 +149,11 @@ const InformationForm = () => {
 						</Button>
 					</Space.Compact>
 					<Form.Item
-						name='position'
-						rules={[{ required: true, message: 'Please select the position!' }]}
+						name='role'
+						rules={[{ required: true, message: 'Please select the role!' }]}
 					>
 						<Select
-							placeholder='Select Position *'
+							placeholder='Select Role *'
 							options={[
 								{ label: 'Head', value: 'head', disabled: true },
 								{ label: 'Guidance Officer', value: 'guidance' },
@@ -175,19 +175,19 @@ const InformationForm = () => {
  * @param {React.Dispatch<React.SetStateAction<boolean>>} setAddingNew - React.Dispatch<React.SetStateAction<boolean>> to set the adding new state.
  * @param {Array} admins - The current list of admin members.
  * @param {React.Dispatch<React.SetStateAction<boolean>>} setAdmins - Function to update the list of admin members.
+ * @param {import('antd/es/notification/useNotification').NotificationInstance} Notification - The Ant Design Notification component.
  * @return {Promise<Object>} - A promise that resolves to the new admin object.
  */
-const AddNewAdmin = async (Modal, addingNew, setAddingNew, admins, setAdmins) => {
+const AddNewAdmin = async (Modal, addingNew, setAddingNew, admins, setAdmins, Notification) => {
 	let newAdmin = {
-		id: Math.random().toString(36).substring(2, 15),
+		id: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
 		name: {
 			first: null,
 			middle: null,
 			last: null
 		},
 		email: null,
-		employeeId: null,
-		position: null,
+		role: null,
 		profilePicture: null
 	};
 
@@ -222,10 +222,32 @@ const AddNewAdmin = async (Modal, addingNew, setAddingNew, admins, setAdmins) =>
 		onOk: () => {
 			return new Promise((resolve, reject) => {
 				NewAdminForm.current.validateFields()
-					.then((values) => {
+					.then(async (values) => {
 						Object.assign(newAdmin, values);
 						newAdmin.profilePicture = values.profilePicture || newAdmin.profilePicture;
-						setAdmins([...admins, newAdmin]);
+
+
+						const request = await fetch(`${import.meta.env.VITE_API_URL}/superadmin/admin`, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(newAdmin)
+						});
+						if (!request.ok) {
+							const errorData = await request.json();
+							Notification.error({
+								message: 'Error',
+								description: errorData.message || 'Failed to add new admin.'
+							});
+							return reject(errorData);
+						};
+						const data = await request.json();
+						Notification.success({
+							message: 'Success',
+							description: 'New admin member added successfully.'
+						});
+
 						resolve(newAdmin);
 					})
 					.catch((errorInfo) => {

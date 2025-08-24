@@ -46,6 +46,7 @@ const OSAS = () => {
 		supabase.auth.onAuthStateChange((_event, session) => {
 			setSession(session);
 		});
+		console.log(session);
 	}, []);
 
 	// Modify `fetch`
@@ -108,10 +109,12 @@ const OSAS = () => {
 					<BrowserRouter>
 						<MobileContext.Provider value={{ mobile, setMobile }}>
 							<Routes>
-								<Route path='/' element={session ? <Navigate to='/dashboard' /> : <SignIn />} />
-								<Route path='/dashboard' element={session ? <Dashboard /> : <Navigate to='/' />} />
-								<Route path='/admin/:adminId' element={session ? <Profile /> : <Navigate to='/' />} />
-								<Route path='/configure' element={session ? <Configure /> : <Navigate to='/' />} />
+								<Route path='/' element={session ? <Navigate to='/signUp' /> : <SignIn />} />
+								<Route path='/signUp' element={session ? <Navigate to='/dashboard' /> : <SignIn />} />
+
+								<Route path='/dashboard' element={session ? <Dashboard /> : <Navigate to='/signUp' />} />
+								<Route path='/admin/:adminId' element={session ? <Profile /> : <Navigate to='/signUp' />} />
+								<Route path='/configure' element={session ? <Configure /> : <Navigate to='/signUp' />} />
 
 								<Route path='/auth-return' element={<AuthReturn />} />
 							</Routes>
@@ -127,5 +130,7 @@ export const MobileContext = React.createContext({
 	mobile: false,
 	setMobile: () => { }
 });
+
+export const API_Route = import.meta.env.DEV ? 'http://localhost:3001' : 'https://api.example.com';
 
 ReactDOM.createRoot(document.getElementById('root')).render(<OSAS />);

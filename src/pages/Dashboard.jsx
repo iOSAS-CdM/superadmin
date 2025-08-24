@@ -48,6 +48,8 @@ import AddNewAdmin from '../modals/AddNewAdmin';
 import EditAdmin from '../modals/EditAdmin';
 import RestrictAdmin from '../modals/RestrictAdmin';
 
+import { API_Route } from '../main';
+
 const Dashboard = () => {
 	const [signingOut, setSigningOut] = React.useState(false);
 	const [addingNew, setAddingNew] = React.useState(false);
@@ -64,7 +66,7 @@ const Dashboard = () => {
 		const placeholderAdmins = [];
 		for (let i = 0; i < 20; i++) {
 			const id = `placeholder-025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}-${i + 1}`;
-			if (admins.some(admin => admin.employeeId === id)) {
+			if (admins.some(admin => admin.id === id)) {
 				continue;
 			};
 			placeholderAdmins.push({
@@ -75,8 +77,7 @@ const Dashboard = () => {
 					last: `Last ${i + 1}`
 				},
 				email: `admin${i + 1}@example.com`,
-				employeeId: id,
-				position: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
+				role: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
 				profilePicture: null,
 				placeholder: true,
 				status: 'active'
@@ -84,35 +85,11 @@ const Dashboard = () => {
 		};
 		setAdmins(placeholderAdmins);
 
-		fetch('https://randomuser.me/api/?results=20&inc=name,email,phone,login,picture')
+		fetch(`${API_Route}/superadmin/admins`)
 			.then(response => response.json())
 			.then(data => {
-				const fetchedAdmins = [];
-				for (let i = 0; i < data.results.length; i++) {
-					const user = data.results[i];
-					fetchedAdmins.push({
-						id: i + 1,
-						name: {
-							first: user.name.first,
-							middle: user.name.middle || '',
-							last: user.name.last
-						},
-						email: user.email,
-						phone: user.phone,
-						employeeId: (() => {
-							let id;
-							do {
-								id = `025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
-							} while (fetchedAdmins.some(admin => admin.employeeId === id));
-							return id;
-						})(),
-						position: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
-						profilePicture: user.picture.large,
-						placeholder: false,
-						status: ['active', 'restricted', 'archived'][Math.floor(Math.random() * 3)]
-					});
-				};
-				setAdmins(fetchedAdmins);
+				if (Array.isArray(data))
+					setAdmins(data);
 			})
 			.catch(error => console.error('Error fetching admin data:', error));
 	}, []);
@@ -133,19 +110,19 @@ const Dashboard = () => {
 
 	const navigate = useNavigate();
 
-	const categorizeFilter = (value) => {
+	const categorizeFilter = React.useCallback((value) => {
 		let filteredAdmins = admins;
 
 		if (value !== 'all')
-			filteredAdmins = admins.filter(admin => admin.position === value);
+			filteredAdmins = admins.filter(admin => admin.role === value);
 
 		setDisplayedAdmins([]);
 		setTimeout(() => {
 			setDisplayedAdmins(filteredAdmins);
 		}, remToPx(2));
-	};
+	}, [admins]);
 
-	const searchCategorizedAdmins = (searchTerm) => {
+	const searchCategorizedAdmins = React.useCallback((searchTerm) => {
 		setCategory('all');
 
 		if (searchTerm.trim() === '') {
@@ -162,7 +139,7 @@ const Dashboard = () => {
 		setTimeout(() => {
 			setDisplayedAdmins(filteredAdmins);
 		}, remToPx(2));
-	};
+	}, [admins]);
 
 	return (
 		<Card className='scrollable-content page-container' size='small'>
@@ -183,17 +160,13 @@ const Dashboard = () => {
 								type='primary'
 								icon={addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
 								onClick={async () => {
-									const admin = await AddNewAdmin(Modal, addingNew, setAddingNew, admins, setAdmins);
-									if (admin) {
-										setAdmins([...admins, admin]);
-										setDisplayedAdmins([...displayedAdmins, admin]);
-										FilterForm.current.setFieldsValue({ category: admin.position, search: '' });
-										categorizeFilter(admin.position);
-										Notification.success({
-											message: 'Success',
-											description: 'New admin member added successfully.'
-										});
-									}
+									const admin = await AddNewAdmin(Modal, addingNew, setAddingNew, admins, setAdmins, Notification);
+									if (!admin) return;
+
+									setAdmins([...admins, admin]);
+									setDisplayedAdmins([...displayedAdmins, admin]);
+									FilterForm.current.setFieldsValue({ category: admin.role, search: '' });
+									categorizeFilter(admin.role);
 								}}
 							>Add New</Button>
 							<Button
@@ -354,14 +327,14 @@ const AdminCard = ({ admin, animationDelay, loading }) => {
 		>
 			<Flex justify='flex-start' align='flex-start' gap='small' style={{ width: '100%' }}>
 				<Avatar
-					src={thisAdmin.profilePicture}
+					src={thisAdmin.profilePicture ?? thisAdmin.name.first.charAt(0).toUpperCase()}
 					size='large'
 				/>
 				<Flex vertical justify='flex-start' align='flex-start'>
 					<Title level={4}>{`${thisAdmin.name.first} ${thisAdmin.name.last}`}</Title>
 					<Text>{
-						thisAdmin.position === 'head' ? 'Head' : thisAdmin.position === 'guidance' ? 'Guidance Officer' :
-							thisAdmin.position === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+						thisAdmin.role === 'head' ? 'Head' : thisAdmin.role === 'guidance' ? 'Guidance Officer' :
+							thisAdmin.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
 					}</Text>
 				</Flex>
 			</Flex>
