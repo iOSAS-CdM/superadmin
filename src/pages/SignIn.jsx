@@ -34,47 +34,6 @@ const SignIn = () => {
 	const navigate = useNavigate();
 	const AuthForm = React.useRef(null);
 
-	const [port, setPort] = React.useState(null);
-	// React.useEffect(() => {
-	// 	console.log('Refresh', port, new Date());
-	// 	if (port) return;
-
-	// 	const unlisten = listen('oauth://url', (data) => {
-	// 		setPort(null);
-	// 		if (!data.payload) return;
-
-	// 		const url = new URL(data.payload);
-	// 		const code = new URLSearchParams(url.search).get('code');
-
-	// 		if (code) {
-	// 			supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-	// 				if (error) {
-	// 					alert(error.message);
-	// 					console.error(error);
-	// 					return;
-	// 				}
-	// 				location.reload();
-	// 			});
-	// 		};
-	// 	});
-
-	// 	let _port = null;
-	// 	start({ ports: [8000, 8001, 8002, 8003, 8004, 8005] })
-	// 		.then(async (port) => {
-	// 			console.log(`OAuth listener started on port ${port}`);
-	// 			await setPort(port);
-	// 			_port = port;
-	// 		})
-	// 		.catch((e) => console.error('Error starting OAuth listener:', e));
-
-	// 	return () => {
-	// 		console.log('Unsubscribing from oauth://url');
-	// 		unlisten?.then((u) => u());
-	// 		cancel(_port)
-	// 			.catch((e) => console.error(`Error cancelling OAuth listener for port ${_port}:`, e));
-	// 	};
-	// }, [port]);
-
 	const signIn = async (values) => {
 		if (!AuthForm.current) return;
 		setSigningIn(true);
