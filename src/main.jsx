@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Configure from './pages/Configure';
 import AuthReturn from './pages/AuthReturn';
+import Unauthorized from './pages/Unauthorized';
 
 import remToPx from './utils/remToPx';
 import rootToHex from './utils/rootToHex';
@@ -77,8 +78,10 @@ const OSAS = () => {
 			const response = await originalFetch(...args);
 
 			// If we have a session but get a 403 Forbidden response, sign out
-			if (session && response.status === 403)
+			if (session && response.status === 403) {
 				await supabase.auth.signOut();
+				window.location.href = '/unauthorized';
+			};
 
 			return response;
 		};
@@ -117,6 +120,7 @@ const OSAS = () => {
 								<Route path='/configure' element={session ? <Configure /> : <Navigate to='/signUp' />} />
 
 								<Route path='/auth-return' element={<AuthReturn />} />
+								<Route path='/unauthorized' element={<Unauthorized />} />
 							</Routes>
 						</MobileContext.Provider>
 					</BrowserRouter>
