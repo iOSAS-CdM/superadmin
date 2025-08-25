@@ -159,7 +159,7 @@ const AdminForm = ({ admin }) => {
 	);
 };
 
-const EditAdmin = async (Modal, admin, editing, setEditing, setThisAdmin, Notification) => {
+const EditAdmin = async (Modal, admin, setRefreshSeed, editing, setEditing, setThisAdmin, Notification) => {
 	await Modal.info({
 		title: 'Edit Admin',
 		centered: true,
@@ -205,6 +205,7 @@ const EditAdmin = async (Modal, admin, editing, setEditing, setThisAdmin, Notifi
 								message: 'Error',
 								description: errorData.message || 'Failed to update admin.'
 							});
+							setRefreshSeed(prev => prev + 1);
 							return reject(errorData);
 						};
 
@@ -215,6 +216,7 @@ const EditAdmin = async (Modal, admin, editing, setEditing, setThisAdmin, Notifi
 							description: 'Admin details updated successfully'
 						});
 
+						setRefreshSeed(prev => prev + 1);
 						setThisAdmin(values);
 						resolve();
 					})

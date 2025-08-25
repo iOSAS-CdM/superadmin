@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router';
+import { useNavigate, useLocation, useParams } from 'react-router';
 
 import {
 	Flex,
@@ -31,9 +31,12 @@ import EditAdmin from '../modals/EditAdmin';
 
 import '../styles/pages/Dashboard.css';
 
+import { API_Route } from '../main';
+
 const Profile = () => {
 	const { mobile } = React.useContext(MobileContext);
 	const [activities, setActivities] = React.useState([]);
+	const [editing, setEditing] = React.useState(false);
 
 	React.useEffect(() => {
 		setActivities([
@@ -67,20 +70,36 @@ const Profile = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	const [thisAdmin, setThisAdmin] = React.useState(location.state?.admin || {
-		id: '12345',
+
+	const { adminId } = useParams();
+
+	const [admin, setAdmin] = React.useState({
+		id: '',
 		name: {
-			first: 'John',
-			middle: 'A.',
-			last: 'Doe'
+			first: '',
+			middle: '',
+			last: ''
 		},
-		email: 'email@mail.com',
-		role: 'head',
-		profilePicture: 'https://via.placeholder.com/150'
+		email: '',
+		role: '',
+		profilePicture: ''
 	});
+	const [refreshSeed, setRefreshSeed] = React.useState(0);
+
+	React.useEffect(() => {
+		fetch(`${API_Route}/superadmin/admin/${adminId}`)
+			.then(response => response.json())
+			.then(data => {
+				console.log(data);
+				if (data)
+					setAdmin(data);
+			})
+			.catch(error => console.error('Error fetching admin data:', error));
+	}, [refreshSeed])
 
 	const app = App.useApp();
 	const Modal = app.modal;
+	const Notification = app.notification;
 
 	return (
 		<Card className='scrollable-content page-container' size='small'>
@@ -105,7 +124,7 @@ const Profile = () => {
 				{/************************** Profile **************************/}
 				<Flex justify='flex-start' align='stretch' gap='small'>
 					{!mobile && <Avatar
-						src={thisAdmin.profilePicture || 'https://via.placeholder.com/150'}
+						src={admin.profilePicture}
 						alt='Profile Picture'
 						shape='square'
 						style={{
@@ -123,7 +142,7 @@ const Profile = () => {
 							style={{ height: '100%', ...mobile ? { textAlign: 'center' } : {} }}
 						>
 							{mobile && <Avatar
-								src={thisAdmin.profilePicture || 'https://via.placeholder.com/150'}
+								src={admin.profilePicture}
 								objectFit='cover'
 								alt='Profile Picture'
 								shape='square'
@@ -134,14 +153,13 @@ const Profile = () => {
 							/>}
 
 							<Title level={2}>
-								{`${thisAdmin.name.first} ${thisAdmin.name.middle ? `${thisAdmin.name.middle} ` : ''}`} {thisAdmin.name.last}
+								{`${admin.name.first} ${admin.name.middle ? `${admin.name.middle} ` : ''}`} {admin.name.last}
 							</Title>
 							<Text type='secondary'>
 								{
-									thisAdmin.role === 'head' ? 'Head' : thisAdmin.role === 'guidance' ? 'Guidance Officer' :
-										thisAdmin.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
-								}
-								- {thisAdmin.id}
+									admin.role === 'head' ? 'Head' : admin.role === 'guidance' ? 'Guidance Officer' :
+										admin.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+								} - {admin.id}
 							</Text>
 
 							<Flex gap='small' >
@@ -150,16 +168,16 @@ const Profile = () => {
 									icon={<MailOutlined />}
 									style={{ padding: 0 }}
 								>
-									{thisAdmin.email}
+									{admin.email}
 								</Button>
 
-								{thisAdmin.phone &&
+								{admin.phone &&
 									<Button
 										type='link'
 										icon={<PhoneOutlined />}
 										style={{ padding: 0 }}
 									>
-										{thisAdmin.phone}
+										{admin.phone}
 									</Button>
 								}
 							</Flex>
@@ -170,7 +188,9 @@ const Profile = () => {
 								<Button
 									type='primary'
 									icon={<EditOutlined />}
-									onClick={() => EditAdmin(Modal, thisAdmin, setThisAdmin)}
+									onClick={async () => {
+										EditAdmin(Modal, admin, setRefreshSeed, editing, setEditing, setAdmin, Notification);
+									}}
 								>
 									Edit Profile
 								</Button>
