@@ -53,14 +53,15 @@ import { API_Route } from '../main';
 const Dashboard = () => {
 	const [signingOut, setSigningOut] = React.useState(false);
 	const [addingNew, setAddingNew] = React.useState(false);
-	const [category, setCategory] = React.useState('all');
-	const [admins, setAdmins] = React.useState([]);
-	const [displayedAdmins, setDisplayedAdmins] = React.useState([]);
 	const FilterForm = React.useRef(null);
 
 	const app = App.useApp();
 	const Modal = app.modal;
 	const Notification = app.notification;
+
+	const [category, setCategory] = React.useState('all');
+	const [searchTerm, setSearchTerm] = React.useState('');
+	const [admins, setAdmins] = React.useState([]);
 
 	React.useEffect(() => {
 		const placeholderAdmins = [];
@@ -94,57 +95,32 @@ const Dashboard = () => {
 			.catch(error => console.error('Error fetching admin data:', error));
 	}, []);
 
-	React.useEffect(() => {
-		setDisplayedAdmins(admins);
-		categorizeFilter('all');
-	}, [admins]);
+	const categorizedAdmins = React.useMemo(() => {
+		if (category === 'all') return admins;
+		return admins.filter(admin => admin.role === category);
+	}, [admins, category]);
+	const searchFilteredAdmins = React.useMemo(() => {
+		if (!searchTerm) return categorizedAdmins;
+		const lowerSearchTerm = searchTerm.toLowerCase();
+		return categorizedAdmins.filter(admin =>
+			`${admin.name.first} ${admin.name.middle} ${admin.name.last}`.toLowerCase().includes(lowerSearchTerm) ||
+			admin.email.toLowerCase().includes(lowerSearchTerm) ||
+			admin.id.toLowerCase().includes(lowerSearchTerm)
+		);
+	}, [categorizedAdmins, searchTerm]);
 
 	const signOut = () => {
 		supabase.auth.signOut();
 	};
-	React.useEffect(() => {
-		window.focus();
-	}, []);
 
 	const { mobile } = React.useContext(MobileContext);
 
 	const navigate = useNavigate();
 
-	const categorizeFilter = React.useCallback((value) => {
-		let filteredAdmins = admins;
-
-		if (value !== 'all')
-			filteredAdmins = admins.filter(admin => admin.role === value);
-
-		setDisplayedAdmins([]);
-		setTimeout(() => {
-			setDisplayedAdmins(filteredAdmins);
-		}, remToPx(2));
-	}, [admins]);
-
-	const searchCategorizedAdmins = React.useCallback((searchTerm) => {
-		setCategory('all');
-
-		if (searchTerm.trim() === '') {
-			setDisplayedAdmins(admins);
-			return;
-		};
-
-		const filteredAdmins = admins.filter(admin => {
-			const fullName = `${admin.name.first} ${admin.name.last}`.toLowerCase();
-			return fullName.includes(searchTerm.toLowerCase());
-		});
-
-		setDisplayedAdmins([]);
-		setTimeout(() => {
-			setDisplayedAdmins(filteredAdmins);
-		}, remToPx(2));
-	}, [admins]);
-
 	return (
 		<Card className='scrollable-content page-container' size='small'>
 			{/************************** Header **************************/}
-			<Flex vertical justify='flex-start' align='stretch' gap='small' style={{ height: '100%' }}>
+			<Flex vertical justify='flex-start' align='stretch' gap='small'>
 				<Header
 					icon={<HomeOutlined />}
 					title={<Title level={3}>Dashboard</Title>}
@@ -162,11 +138,6 @@ const Dashboard = () => {
 								onClick={async () => {
 									const admin = await AddNewAdmin(Modal, addingNew, setAddingNew, admins, setAdmins, Notification);
 									if (!admin) return;
-
-									setAdmins([...admins, admin]);
-									setDisplayedAdmins([...displayedAdmins, admin]);
-									FilterForm.current.setFieldsValue({ category: admin.role, search: '' });
-									categorizeFilter(admin.role);
 								}}
 							>Add New</Button>
 							<Button
@@ -181,91 +152,66 @@ const Dashboard = () => {
 				/>
 
 				{/************************** Filter **************************/}
-				<Form
-					id='filter'
-					layout='vertical'
-					ref={FilterForm}
-					style={{ width: '100%' }}
-					initialValues={{ search: '', category: 'all' }}
-				>
-					<Flex justify='space-between' align='center' gap='small'>
-						<Card size='small' {...mobile ? { style: { width: '100%' } } : {}}>
-							<Form.Item
-								name='search'
-								style={{ margin: 0 }}
-							>
-								<Input
-									placeholder='Search'
-									allowClear
-									prefix={<SearchOutlined />}
-									onChange={(e) => searchCategorizedAdmins(e.target.value)}
-								/>
-							</Form.Item>
-						</Card>
-						<Card size='small'>
-							<Form.Item
-								name='category'
-								style={{ margin: 0 }}
-							>
-								{!mobile ?
-									<Segmented
-										options={[
-											{ label: 'All', value: 'all' },
-											{ label: 'Guidance Officer', value: 'guidance' },
-											{ label: 'Prefect of Discipline Officer', value: 'prefect' },
-											{ label: 'Student Affairs Officer', value: 'student-affairs' }
-										]}
-										value={category}
-										onChange={(value) => {
-											setCategory(value);
-											categorizeFilter(value);
-											FilterForm.current.setFieldsValue({ search: '' });
-										}}
-										style={{ width: '100%' }}
+				<Flex justify='space-between' align='center' gap='small'>
+					<Card size='small' {...mobile ? { style: { width: '100%' } } : {}}>
+						<Input
+							placeholder='Search'
+							allowClear
+							value={searchTerm}
+							prefix={<SearchOutlined />}
+							onChange={(e) => setSearchTerm(e.target.value)}
+						/>
+					</Card>
+					<Card size='small'>
+						{!mobile ? (
+							<Segmented
+								options={[
+									{ label: 'All', value: 'all' },
+									{ label: 'Guidance Officer', value: 'guidance' },
+									{ label: 'Prefect of Discipline Officer', value: 'prefect' },
+									{ label: 'Student Affairs Officer', value: 'student-affairs' }
+								]}
+								value={category}
+								onChange={(value) => setCategory(value)}
+								style={{ width: '100%' }}
+							/>
+						) : (
+							<Dropdown
+								trigger={['click']}
+								placement='bottomRight'
+								arrow
+								popupRender={(menu) => (
+									<Card size='small'>
+										<Segmented
+											options={[
+												{ label: 'All', value: 'all' },
+												{ label: 'Guidance Officer', value: 'guidance' },
+												{ label: 'Prefect of Discipline Officer', value: 'prefect' },
+												{ label: 'Student Affairs Officer', value: 'student-affairs' }
+											]}
+											vertical
+											value={category}
+												onChange={(value) => setCategory(value)}
+												style={{ width: '100%' }}
+											/>
+										</Card>
+									)}
+								>
+									<Button
+										icon={<FilterOutlined />}
+										onClick={(e) => e.stopPropagation()}
 									/>
-									:
-									<Dropdown
-										trigger={['click']}
-										placement='bottomRight'
-										arrow
-										popupRender={(menu) => (
-											<Card size='small'>
-												<Segmented
-													options={[
-														{ label: 'All', value: 'all' },
-														{ label: 'Guidance Officer', value: 'guidance' },
-														{ label: 'Prefect of Discipline Officer', value: 'prefect' },
-														{ label: 'Student Affairs Officer', value: 'student-affairs' }
-													]}
-													vertical
-													value={category}
-													onChange={(value) => {
-														setCategory(value);
-														categorizeFilter(value);
-														FilterForm.current.setFieldsValue({ search: '' });
-													}}
-													style={{ width: '100%' }}
-												/>
-											</Card>
-										)}
-									>
-										<Button
-											icon={<FilterOutlined />}
-											onClick={(e) => e.stopPropagation()}
-										/>
-									</Dropdown>
-								}
-							</Form.Item>
-						</Card>
-					</Flex>
-				</Form>
+								</Dropdown>
+						)}
+					</Card>
+				</Flex>
 
 
 				{/************************** Grid of Admins **************************/}
-				{displayedAdmins.length > 0 ?
+				{searchFilteredAdmins.length > 0 ?
 					<Flex vertical justify='flex-start' align='flex-start' gap='small' flex={1}>
 						<Row gutter={[remToPx(1), remToPx(1)]} style={{ width: '100%' }}>
-							{displayedAdmins.map((admin, index) => (
+							{searchFilteredAdmins.map((admin, index) => (
 								<Col key={admin.id} span={!mobile ? 8 : 24}>
 									<AdminCard admin={admin} animationDelay={index * 0.1} loading={admin.placeholder} />
 								</Col>
@@ -273,7 +219,7 @@ const Dashboard = () => {
 						</Row>
 					</Flex>
 					:
-					<Flex vertical justify='center' align='center' flex={1}>
+					<Flex vertical justify='center' align='center' style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0 }}>
 						<Empty description='No admin found' />
 					</Flex>
 				}
