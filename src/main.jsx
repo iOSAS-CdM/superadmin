@@ -2,7 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import supabase from './utils/supabaseClient';
-import { getCurrent, onOpenUrl } from '@tauri-apps/plugin-deep-link';
+import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
+import { Window } from '@tauri-apps/api/window';
+
 
 import { ConfigProvider, App, theme } from 'antd';
 
@@ -18,6 +20,14 @@ import rootToHex from './utils/rootToHex';
 
 import 'antd/dist/reset.css';
 import './styles/index.css';
+
+onOpenUrl((data) => {
+	if (data.includes('osas-superadmin://return'))
+		Window.getByLabel('main').then((window) => {
+			if (window)
+				window.setFocus();
+		});
+});
 
 const OSAS = () => {
 	const [mobile, setMobile] = React.useState(false);

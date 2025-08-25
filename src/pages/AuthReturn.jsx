@@ -7,6 +7,17 @@ const { Text, Title } = Typography;
 import '../styles/pages/SignIn.css';
 
 const AuthReturn = () => {
+	React.useEffect(() => {
+		const returnLink = document.createElement('a');
+		returnLink.href = 'osas-superadmin://return';
+		returnLink.innerText = 'Return to the app';
+		document.body.appendChild(returnLink);
+		returnLink.click();
+
+		return () => {
+			document.body.removeChild(returnLink);
+		};
+	}, []);
 	return (
 		<>
 			<div id='auth-background'></div>
