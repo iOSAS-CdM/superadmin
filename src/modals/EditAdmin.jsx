@@ -159,11 +159,12 @@ const AdminForm = ({ admin }) => {
 	);
 };
 
-const EditAdmin = async (Modal, admin, setThisAdmin, Notification) => {
+const EditAdmin = async (Modal, admin, editing, setEditing, setThisAdmin, Notification) => {
 	await Modal.info({
 		title: 'Edit Admin',
 		centered: true,
 		closable: { 'aria-label': 'Close' },
+		open: editing,
 		content: (
 			<AdminForm admin={admin} onChange={setThisAdmin} />
 		),
@@ -190,41 +191,21 @@ const EditAdmin = async (Modal, admin, setThisAdmin, Notification) => {
 			return new Promise((resolve, reject) => {
 				EditAdminForm.current.validateFields()
 					.then(async (values) => {
-						const newAdmin = {
-							id: null,
-							name: {
-								first: null,
-								middle: null,
-								last: null
-							},
-							email: null,
-							role: null,
-							profilePicture: null
-						};
-
-						if (admin.id !== values.id) newAdmin.id = values.id;
-						if (admin.name.first !== values.name.first) newAdmin.name.first = values.name.first;
-						if (admin.name.middle !== values.name.middle) newAdmin.name.middle = values.name.middle;
-						if (admin.name.last !== values.name.last) newAdmin.name.last = values.name.last;
-						if (admin.email !== values.email) newAdmin.email = values.email;
-						if (admin.role !== values.role) newAdmin.role = values.role;
-						if (admin.profilePicture !== values.profilePicture) newAdmin.profilePicture = values.profilePicture;
-
 						const request = await fetch(`${API_Route}/superadmin/admin/${admin.id}`, {
 							method: 'PUT',
 							headers: {
 								'Content-Type': 'application/json'
 							},
-							body: JSON.stringify(newAdmin)
+							body: JSON.stringify(values)
 						});
 
 						if (!request.ok) {
-							reject(new Error(data.message || 'Failed to update admin'));
+							const errorData = await request.json();
 							Notification.error({
-								message: 'Update Failed',
-								description: data.message || 'Failed to update admin'
+								message: 'Error',
+								description: errorData.message || 'Failed to update admin.'
 							});
-							return;
+							return reject(errorData);
 						};
 
 						const data = await request.json();
@@ -254,6 +235,7 @@ const EditAdmin = async (Modal, admin, setThisAdmin, Notification) => {
 			});
 		}
 	});
+	setEditing(false);
 };
 
 export default EditAdmin;
