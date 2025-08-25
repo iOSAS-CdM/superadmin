@@ -26,8 +26,8 @@ const Unauthorized = () => {
 					<Image width={256} height={256} src='/CDM Logo.png' preview={false} />
 					<Flex vertical align='center' gap={4}>
 						<Title level={3} style={{ textAlign: 'center' }}>Unauthorized Access</Title>
-						<Text style={{ textAlign: 'center' }}>You do not have permission to view this page</Text>
-						<Text style={{ textAlign: 'center' }}>Please contact the system developer if you believe this is an error</Text>
+						<Text style={{ textAlign: 'center' }}>You do not have permission to use this application</Text>
+						<Text style={{ textAlign: 'center' }}>Please contact the <a href='mailto:danieljohnbyns@gmail.com'>system developer</a> if you believe this is an error</Text>
 					</Flex>
 						<Button type='primary' size='large' onClick={() => { window.localStorage.clear(); navigate('/'); }}>Go to Home</Button>
 				</Flex>
