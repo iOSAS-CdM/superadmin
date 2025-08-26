@@ -16,8 +16,8 @@ import {
 	Upload,
 	Avatar,
 	App,
-	Form,
-	Space,
+	Tooltip,
+	Badge,
 	Empty
 } from 'antd';
 
@@ -30,6 +30,7 @@ import {
 	SearchOutlined,
 	EditOutlined,
 	LockOutlined,
+	UnlockOutlined,
 	RightOutlined,
 	FilterOutlined
 } from '@ant-design/icons';
@@ -263,36 +264,71 @@ const AdminCard = ({ admin, animationDelay, loading }) => {
 	const Modal = app.modal;
 	const Notification = app.notification;
 	const [editing, setEditing] = React.useState(false);
+	const [restricting, setRestricting] = React.useState(false);
 
 	const { setRefreshSeed } = React.useContext(RefreshSeedContext);
 
 	return (
-		<Card
-			size='small'
-			hoverable
-			loading={loading}
-			className={mounted ? 'admin-card-mounted' : 'admin-card-unmounted'}
-			actions={[
-				<EditOutlined onClick={() => EditAdmin(Modal, thisAdmin, setRefreshSeed, editing, setEditing, setThisAdmin, Notification)} key='edit' />,
-				<LockOutlined onClick={() => RestrictAdmin(Modal, thisAdmin)} key='restrict' />,
-				<RightOutlined onClick={() => {
-					navigate(`/admin/${thisAdmin.id}`);
-				}} key='view' />
-			]}
+		<Badge.Ribbon
+			text={thisAdmin.status === 'restricted' ? 'Restricted' : null}
+			color='red'
+			style={{ display: thisAdmin.status === 'restricted' ? 'block' : 'none' }}
 		>
-			<Flex justify='flex-start' align='flex-start' gap='small' style={{ width: '100%' }}>
-				<Avatar
-					src={thisAdmin.profilePicture ?? thisAdmin.name.first.charAt(0).toUpperCase()}
-					size='large'
-				/>
-				<Flex vertical justify='flex-start' align='flex-start'>
-					<Title level={4}>{`${thisAdmin.name.first} ${thisAdmin.name.last}`}</Title>
-					<Text>{
-						thisAdmin.role === 'head' ? 'Head' : thisAdmin.role === 'guidance' ? 'Guidance Officer' :
-							thisAdmin.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
-					}</Text>
+			<Card
+				size='small'
+				hoverable
+				loading={loading}
+				className={(mounted ? 'admin-card-mounted' : 'admin-card-unmounted') + (thisAdmin.status === 'restricted' ? ' admin-card-restricted' : '')}
+				actions={[
+					...thisAdmin.status !== 'restricted' ? [
+						<Tooltip title='Edit Staff'><EditOutlined onClick={() => EditAdmin(Modal, thisAdmin, setRefreshSeed, editing, setEditing, setThisAdmin, Notification)} key='edit' /></Tooltip>,
+						<Tooltip title='Restrict Staff'><LockOutlined onClick={() => RestrictAdmin(Modal, thisAdmin, setRefreshSeed, restricting, setRestricting, Notification)} key='restrict' /></Tooltip>,
+					] : [
+						<Tooltip title='Unrestrict Staff'>
+							<UnlockOutlined onClick={() => {
+								fetch(`${API_Route}/superadmin/admin/${thisAdmin.id}/unrestrict`, {
+									method: 'PATCH',
+									headers: {
+										'Content-Type': 'application/json',
+									},
+									body: JSON.stringify({}),
+								})
+									.then((res) => {
+										if (res.ok) {
+											Notification.success({ message: 'Admin unrestricted successfully' });
+											setRefreshSeed((s) => s + 1);
+										} else {
+											Notification.error({ message: 'Failed to unblock admin' });
+										};
+									});
+							}} key='unrestrict' />
+						</Tooltip>
+					],
+					<Tooltip title='View Staff'>
+						<RightOutlined onClick={() => {
+							navigate(`/admin/${thisAdmin.id}`);
+						}} key='view' />
+					</Tooltip>
+				]}
+			>
+				<Flex justify='flex-start' align='flex-start' gap='small' style={{ width: '100%' }}>
+					<Avatar
+						src={thisAdmin.profilePicture ?? thisAdmin.name.first.charAt(0).toUpperCase()}
+						size='large'
+					/>
+					<Flex vertical justify='flex-start' align='flex-start'>
+						<Title level={4}>{`${thisAdmin.name.first} ${thisAdmin.name.last}`}</Title>
+						<Text>{
+							thisAdmin.role === 'head' ? 'Head' : thisAdmin.role === 'guidance' ? 'Guidance Officer' :
+								thisAdmin.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+						}</Text>
+					</Flex>
 				</Flex>
-			</Flex>
-		</Card>
+
+				{thisAdmin.status === 'restricted' && (
+					<Text type='danger'>This admin is restricted</Text>
+				)}
+			</Card>
+		</Badge.Ribbon>
 	);
 };

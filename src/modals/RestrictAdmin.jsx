@@ -13,10 +13,7 @@ import {
 } from 'antd';
 
 import {
-	SwapOutlined,
-	UploadOutlined,
-	EditOutlined,
-	SaveOutlined,
+	WarningOutlined,
 	ClearOutlined
 } from '@ant-design/icons';
 
@@ -24,16 +21,22 @@ const { Title, Text } = Typography;
 
 import remToPx from '../utils/remToPx';
 
+import { API_Route } from '../main';
+
 const RestrictAdminForm = React.createRef();
 
 /**
  * Function to restrict admin member.
  * @param {import('antd/es/modal/useModal').HookAPI} Modal - The Ant Design Modal component.
+ * 
  * @param {Object} admin - The admin member data to be restricted.
  */
-const RestrictAdmin = async (Modal, admin) => {
-	Modal.warning({
+const RestrictAdmin = async (Modal, admin, setRefreshSeed, restricting, setRestricting, Notification) => {
+	await Modal.warning({
 		title: 'Restrict Admin Member',
+		centered: true,
+		closable: { 'aria-label': 'Close' },
+		open: restricting,
 		content: (
 			<Form
 				layout='vertical'
@@ -60,13 +63,34 @@ const RestrictAdmin = async (Modal, admin) => {
 		),
 		okText: 'Restrict',
 		okButtonProps: {
-			icon: <SaveOutlined />
+			icon: <WarningOutlined />,
+			danger: true
 		},
 		onOk: () => {
 			return new Promise((resolve, reject) => {
 				RestrictAdminForm.current.validateFields()
-					.then((values) => {
-						console.log('Admin member restricted:', values);
+					.then(async (values) => {
+						const request = await fetch(`${API_Route}/superadmin/admin/${admin.id}/restrict`, {
+							method: 'PATCH',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({ reason: values.reason })
+						});
+
+						if (!request.ok) {
+							const errorData = await request.json();
+							Notification.error({
+								message: 'Error',
+								description: errorData.message || 'Failed to update admin.'
+							});
+							setRefreshSeed(prev => prev + 1);
+							return reject(errorData);
+						};
+
+						Notification.success({ message: 'Admin restricted successfully' });
+						setRefreshSeed(prev => prev + 1);
+						setRestricting(false);
 						resolve();
 					})
 					.catch((errorInfo) => {

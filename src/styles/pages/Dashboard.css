@@ -14,7 +14,22 @@
 }
 
 .admin-card-mounted {
+	position: relative;
     opacity: 1;
     transform: translateY(0);
     transition: opacity var(--transition), transform var(--transition);
+	overflow: hidden;
+}
+
+.admin-card-restricted::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgb(255, 0, 0);
+	opacity: 0.125;
+	z-index: 1;
+	pointer-events: none;
 }
