@@ -7,13 +7,13 @@
 	z-index: 1;
 }
 
-.admin-card-unmounted {
+.staff-card-unmounted {
     opacity: 0;
     transform: translateY(var(--space-XL));
     transition: opacity var(--transition), transform var(--transition);
 }
 
-.admin-card-mounted {
+.staff-card-mounted {
 	position: relative;
     opacity: 1;
     transform: translateY(0);
@@ -21,7 +21,7 @@
 	overflow: hidden;
 }
 
-.admin-card-restricted::before {
+.staff-card-restricted::before {
 	content: '';
 	position: absolute;
 	top: 0;

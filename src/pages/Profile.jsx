@@ -27,7 +27,7 @@ const { Title, Text } = Typography;
 
 import Header from '../components/Header';
 
-import EditAdmin from '../modals/EditAdmin';
+import EditStaff from '../modals/EditStaff';
 
 import '../styles/pages/Dashboard.css';
 
@@ -71,9 +71,9 @@ const Profile = () => {
 	const location = useLocation();
 
 
-	const { adminId } = useParams();
+	const { staffId } = useParams();
 
-	const [admin, setAdmin] = React.useState({
+	const [staff, setStaff] = React.useState({
 		id: '',
 		name: {
 			first: '',
@@ -87,14 +87,14 @@ const Profile = () => {
 	const [refreshSeed, setRefreshSeed] = React.useState(0);
 
 	React.useEffect(() => {
-		fetch(`${API_Route}/superadmin/admin/${adminId}`)
+		fetch(`${API_Route}/superadmin/staff/${staffId}`)
 			.then(response => response.json())
 			.then(data => {
 				console.log(data);
 				if (data)
-					setAdmin(data);
+					setStaff(data);
 			})
-			.catch(error => console.error('Error fetching admin data:', error));
+			.catch(error => console.error('Error fetching staff data:', error));
 	}, [refreshSeed])
 
 	const app = App.useApp();
@@ -107,7 +107,7 @@ const Profile = () => {
 			<Flex vertical justify='flex-start' align='stretch' gap='small'>
 				<Header
 					icon={<EditOutlined />}
-					title={<Title level={3}>Admin Profile</Title>}
+					title={<Title level={3}>Staff Profile</Title>}
 					actions={
 						<>
 							<Button
@@ -124,7 +124,7 @@ const Profile = () => {
 				{/************************** Profile **************************/}
 				<Flex justify='flex-start' align='stretch' gap='small'>
 					{!mobile && <Avatar
-						src={admin.profilePicture}
+						src={staff.profilePicture}
 						alt='Profile Picture'
 						shape='square'
 						style={{
@@ -142,7 +142,7 @@ const Profile = () => {
 							style={{ height: '100%', ...mobile ? { textAlign: 'center' } : {} }}
 						>
 							{mobile && <Avatar
-								src={admin.profilePicture}
+								src={staff.profilePicture}
 								objectFit='cover'
 								alt='Profile Picture'
 								shape='square'
@@ -153,13 +153,13 @@ const Profile = () => {
 							/>}
 
 							<Title level={2}>
-								{`${admin.name.first} ${admin.name.middle ? `${admin.name.middle} ` : ''}`} {admin.name.last}
+								{`${staff.name.first} ${staff.name.middle ? `${staff.name.middle} ` : ''}`} {staff.name.last}
 							</Title>
 							<Text type='secondary'>
 								{
-									admin.role === 'head' ? 'Head' : admin.role === 'guidance' ? 'Guidance Officer' :
-										admin.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
-								} - {admin.id}
+									staff.role === 'head' ? 'Head' : staff.role === 'guidance' ? 'Guidance Officer' :
+										staff.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+								} - {staff.id}
 							</Text>
 
 							<Flex gap='small' >
@@ -168,16 +168,16 @@ const Profile = () => {
 									icon={<MailOutlined />}
 									style={{ padding: 0 }}
 								>
-									{admin.email}
+									{staff.email}
 								</Button>
 
-								{admin.phone &&
+								{staff.phone &&
 									<Button
 										type='link'
 										icon={<PhoneOutlined />}
 										style={{ padding: 0 }}
 									>
-										{admin.phone}
+										{staff.phone}
 									</Button>
 								}
 							</Flex>
@@ -189,7 +189,10 @@ const Profile = () => {
 									type='primary'
 									icon={<EditOutlined />}
 									onClick={async () => {
-										EditAdmin(Modal, admin, setRefreshSeed, editing, setEditing, setAdmin, Notification);
+										const newStaff = await EditStaff(Modal, staff, setRefreshSeed, editing, setEditing, setStaff, Notification);
+										if (staff.id !== newStaff.id) {
+											navigate(`/dashboard`);
+										};
 									}}
 								>
 									Edit Profile

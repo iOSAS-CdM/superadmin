@@ -45,9 +45,9 @@ import Header from '../components/Header';
 
 import '../styles/pages/Dashboard.css';
 
-import AddNewAdmin from '../modals/AddNewAdmin';
-import EditAdmin from '../modals/EditAdmin';
-import RestrictAdmin from '../modals/RestrictAdmin';
+import AddNewStaff from '../modals/AddNewStaff';
+import EditStaff from '../modals/EditStaff';
+import RestrictStaff from '../modals/RestrictStaff';
 
 import { API_Route } from '../main';
 
@@ -67,53 +67,53 @@ const Dashboard = () => {
 	const [refreshSeed, setRefreshSeed] = React.useState(0);
 	const [category, setCategory] = React.useState('all');
 	const [searchTerm, setSearchTerm] = React.useState('');
-	const [admins, setAdmins] = React.useState([]);
+	const [staffs, setStaffs] = React.useState([]);
 
 	React.useEffect(() => {
-		const placeholderAdmins = [];
+		const placeholderStaffs = [];
 		for (let i = 0; i < 20; i++) {
 			const id = `placeholder-025-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}-${i + 1}`;
-			if (admins.some(admin => admin.id === id)) {
+			if (staffs.some(staff => staff.id === id)) {
 				continue;
 			};
-			placeholderAdmins.push({
+			placeholderStaffs.push({
 				id: id,
 				name: {
 					first: `First ${i + 1}`,
 					middle: `Middle ${i + 1}`,
 					last: `Last ${i + 1}`
 				},
-				email: `admin${i + 1}@example.com`,
+				email: `staff${i + 1}@example.com`,
 				role: i === 0 ? 'head' : ['guidance', 'prefect', 'student-affairs'][i % 3],
 				profilePicture: null,
 				placeholder: true,
 				status: 'active'
 			});
 		};
-		setAdmins(placeholderAdmins);
+		setStaffs(placeholderStaffs);
 
-		fetch(`${API_Route}/superadmin/admins`)
+		fetch(`${API_Route}/superadmin/staffs`)
 			.then(response => response.json())
 			.then(data => {
 				if (Array.isArray(data))
-					setAdmins(data);
+					setStaffs(data);
 			})
-			.catch(error => console.error('Error fetching admin data:', error));
+			.catch(error => console.error('Error fetching staff data:', error));
 	}, [refreshSeed]);
 
-	const categorizedAdmins = React.useMemo(() => {
-		if (category === 'all') return admins;
-		return admins.filter(admin => admin.role === category);
-	}, [admins, category]);
-	const searchFilteredAdmins = React.useMemo(() => {
-		if (!searchTerm) return categorizedAdmins;
+	const categorizedStaffs = React.useMemo(() => {
+		if (category === 'all') return staffs;
+		return staffs.filter(staff => staff.role === category);
+	}, [staffs, category]);
+	const searchFilteredStaffs = React.useMemo(() => {
+		if (!searchTerm) return categorizedStaffs;
 		const lowerSearchTerm = searchTerm.toLowerCase();
-		return categorizedAdmins.filter(admin =>
-			`${admin.name.first} ${admin.name.middle} ${admin.name.last}`.toLowerCase().includes(lowerSearchTerm) ||
-			admin.email.toLowerCase().includes(lowerSearchTerm) ||
-			admin.id.toLowerCase().includes(lowerSearchTerm)
+		return categorizedStaffs.filter(staff =>
+			`${staff.name.first} ${staff.name.middle} ${staff.name.last}`.toLowerCase().includes(lowerSearchTerm) ||
+			staff.email.toLowerCase().includes(lowerSearchTerm) ||
+			staff.id.toLowerCase().includes(lowerSearchTerm)
 		);
-	}, [categorizedAdmins, searchTerm]);
+	}, [categorizedStaffs, searchTerm]);
 
 	const signOut = () => {
 		supabase.auth.signOut();
@@ -143,8 +143,8 @@ const Dashboard = () => {
 									type='primary'
 									icon={addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
 									onClick={async () => {
-										const admin = await AddNewAdmin(Modal, addingNew, setAddingNew, admins, setAdmins, Notification);
-										if (!admin) return;
+										const staff = await AddNewStaff(Modal, addingNew, setAddingNew, staffs, setStaffs, Notification);
+										if (!staff) return;
 										setRefreshSeed(prev => prev + 1);
 									}}
 								>Add New</Button>
@@ -215,20 +215,20 @@ const Dashboard = () => {
 					</Flex>
 
 
-					{/************************** Grid of Admins **************************/}
-					{searchFilteredAdmins.length > 0 ?
+					{/************************** Grid of Staff **************************/}
+					{searchFilteredStaffs.length > 0 ?
 						<Flex vertical justify='flex-start' align='flex-start' gap='small' flex={1}>
 							<Row gutter={[remToPx(1), remToPx(1)]} style={{ width: '100%' }}>
-								{searchFilteredAdmins.map((admin, index) => (
-									<Col key={admin.id} span={!mobile ? 8 : 24}>
-										<AdminCard admin={admin} animationDelay={index * 0.1} loading={admin.placeholder} />
+								{searchFilteredStaffs.map((staff, index) => (
+									<Col key={staff.id} span={!mobile ? 8 : 24}>
+										<StaffCard staff={staff} animationDelay={index * 0.1} loading={staff.placeholder} />
 									</Col>
 								))}
 							</Row>
 						</Flex>
 						:
 						<Flex vertical justify='center' align='center' style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, pointerEvents: 'none' }}>
-							<Empty description='No admin found' />
+							<Empty description='No staff found' />
 						</Flex>
 					}
 				</Flex>
@@ -239,10 +239,10 @@ const Dashboard = () => {
 
 export default Dashboard;
 
-const AdminCard = ({ admin, animationDelay, loading }) => {
+const StaffCard = ({ staff, animationDelay, loading }) => {
 	const [mounted, setMounted] = React.useState(false);
 
-	const [thisAdmin, setThisAdmin] = React.useState(admin);
+	const [thisStaff, setThisStaff] = React.useState(staff);
 
 	const navigate = useNavigate();
 
@@ -255,10 +255,10 @@ const AdminCard = ({ admin, animationDelay, loading }) => {
 	}, [animationDelay]);
 
 	React.useEffect(() => {
-		if (admin) {
-			setThisAdmin(admin);
+		if (staff) {
+			setThisStaff(staff);
 		};
-	}, [admin]);
+	}, [staff]);
 
 	const app = App.useApp();
 	const Modal = app.modal;
@@ -270,23 +270,23 @@ const AdminCard = ({ admin, animationDelay, loading }) => {
 
 	return (
 		<Badge.Ribbon
-			text={thisAdmin.status === 'restricted' ? 'Restricted' : null}
+			text={thisStaff.status === 'restricted' ? 'Restricted' : null}
 			color='red'
-			style={{ display: thisAdmin.status === 'restricted' ? 'block' : 'none' }}
+			style={{ display: thisStaff.status === 'restricted' ? 'block' : 'none' }}
 		>
 			<Card
 				size='small'
 				hoverable
 				loading={loading}
-				className={(mounted ? 'admin-card-mounted' : 'admin-card-unmounted') + (thisAdmin.status === 'restricted' ? ' admin-card-restricted' : '')}
+				className={(mounted ? 'staff-card-mounted' : 'staff-card-unmounted') + (thisStaff.status === 'restricted' ? ' staff-card-restricted' : '')}
 				actions={[
-					...thisAdmin.status !== 'restricted' ? [
-						<Tooltip title='Edit Staff'><EditOutlined onClick={() => EditAdmin(Modal, thisAdmin, setRefreshSeed, editing, setEditing, setThisAdmin, Notification)} key='edit' /></Tooltip>,
-						<Tooltip title='Restrict Staff'><LockOutlined onClick={() => RestrictAdmin(Modal, thisAdmin, setRefreshSeed, restricting, setRestricting, Notification)} key='restrict' /></Tooltip>,
+					...thisStaff.status !== 'restricted' ? [
+						<Tooltip title='Edit Staff'><EditOutlined onClick={() => EditStaff(Modal, thisStaff, setRefreshSeed, editing, setEditing, setThisStaff, Notification)} key='edit' /></Tooltip>,
+						<Tooltip title='Restrict Staff'><LockOutlined onClick={() => RestrictStaff(Modal, thisStaff, setRefreshSeed, restricting, setRestricting, Notification)} key='restrict' /></Tooltip>,
 					] : [
 						<Tooltip title='Unrestrict Staff'>
 							<UnlockOutlined onClick={() => {
-								fetch(`${API_Route}/superadmin/admin/${thisAdmin.id}/unrestrict`, {
+								fetch(`${API_Route}/superadmin/staff/${thisStaff.id}/unrestrict`, {
 									method: 'PATCH',
 									headers: {
 										'Content-Type': 'application/json',
@@ -295,10 +295,10 @@ const AdminCard = ({ admin, animationDelay, loading }) => {
 								})
 									.then((res) => {
 										if (res.ok) {
-											Notification.success({ message: 'Admin unrestricted successfully' });
+											Notification.success({ message: 'Staff unrestricted successfully' });
 											setRefreshSeed((s) => s + 1);
 										} else {
-											Notification.error({ message: 'Failed to unblock admin' });
+											Notification.error({ message: 'Failed to unblock staff' });
 										};
 									});
 							}} key='unrestrict' />
@@ -306,27 +306,27 @@ const AdminCard = ({ admin, animationDelay, loading }) => {
 					],
 					<Tooltip title='View Staff'>
 						<RightOutlined onClick={() => {
-							navigate(`/admin/${thisAdmin.id}`);
+							navigate(`/staff/${thisStaff.id}`);
 						}} key='view' />
 					</Tooltip>
 				]}
 			>
 				<Flex justify='flex-start' align='flex-start' gap='small' style={{ width: '100%' }}>
 					<Avatar
-						src={thisAdmin.profilePicture ?? thisAdmin.name.first.charAt(0).toUpperCase()}
+						src={thisStaff.profilePicture ?? thisStaff.name.first.charAt(0).toUpperCase()}
 						size='large'
 					/>
 					<Flex vertical justify='flex-start' align='flex-start'>
-						<Title level={4}>{`${thisAdmin.name.first} ${thisAdmin.name.last}`}</Title>
+						<Title level={4}>{`${thisStaff.name.first} ${thisStaff.name.last}`}</Title>
 						<Text>{
-							thisAdmin.role === 'head' ? 'Head' : thisAdmin.role === 'guidance' ? 'Guidance Officer' :
-								thisAdmin.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+							thisStaff.role === 'head' ? 'Head' : thisStaff.role === 'guidance' ? 'Guidance Officer' :
+								thisStaff.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
 						}</Text>
 					</Flex>
 				</Flex>
 
-				{thisAdmin.status === 'restricted' && (
-					<Text type='danger'>This admin is restricted</Text>
+				{thisStaff.status === 'restricted' && (
+					<Text type='danger'>This staff is restricted</Text>
 				)}
 			</Card>
 		</Badge.Ribbon>

@@ -5,38 +5,50 @@ import {
 	Input,
 	Button,
 	Select,
-	Upload,
-	Avatar,
 	Flex,
+	Upload,
 	Typography,
-	Space
+	Space,
+	Avatar
 } from 'antd';
 
 import {
-	SwapOutlined,
 	UploadOutlined,
-	EditOutlined,
-	SaveOutlined,
-	ClearOutlined
+	ClearOutlined,
+	SwapOutlined,
+	UserAddOutlined,
+	SaveOutlined
 } from '@ant-design/icons';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 import remToPx from '../utils/remToPx';
 
-const EditAdminForm = React.createRef();
-
 import { API_Route } from '../main';
 
-const AdminForm = ({ admin }) => {
-	const [ProfilePicture, setProfilePicture] = React.useState(admin.profilePicture || '');
+const NewStaffForm = React.createRef();
+
+const InformationForm = () => {
+	const [ProfilePicture, setProfilePicture] = React.useState('');
+
+	const newStaff = {
+		id: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+		name: {
+			first: null,
+			middle: null,
+			last: null
+		},
+		email: null,
+		role: null,
+		profilePicture: null
+	};
 
 	return (
 		<Form
 			layout='vertical'
-			ref={EditAdminForm}
+			ref={NewStaffForm}
 			onFinish={(values) => { }}
-			initialValues={admin}
+			initialValues={newStaff}
 			style={{ width: '100%' }}
 		>
 			<Flex justify='center' align='flex-start' gap='large'>
@@ -55,7 +67,7 @@ const AdminForm = ({ admin }) => {
 								reader.onload = (e) => {
 									file.preview = e.target.result;
 									setProfilePicture(e.target.result);
-									EditAdminForm.current.setFieldsValue({
+									NewStaffForm.current.setFieldsValue({
 										profilePicture: e.target.result
 									});
 								};
@@ -82,7 +94,7 @@ const AdminForm = ({ admin }) => {
 							)}
 						</Upload>
 						<Text type='secondary' style={{ textAlign: 'center' }}>
-							Click to replace profile picture *
+							Click to upload a profile picture *
 						</Text>
 					</Flex>
 				</Form.Item>
@@ -130,7 +142,7 @@ const AdminForm = ({ admin }) => {
 							icon={<SwapOutlined />}
 							style={{ width: 'fit-content' }}
 							onClick={() => {
-								EditAdminForm.current.setFieldsValue({
+								NewStaffForm.current.setFieldsValue({
 									id: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
 								});
 							}}
@@ -159,16 +171,38 @@ const AdminForm = ({ admin }) => {
 	);
 };
 
-const EditAdmin = async (Modal, admin, setRefreshSeed, editing, setEditing, setThisAdmin, Notification) => {
+/**
+ * Function to add a new staff member.
+ * @param {import('antd/es/modal/useModal').HookAPI} Modal - The Ant Design Modal component.
+ * @param {React.Dispatch<React.SetStateAction<boolean>>} setAddingNew - React.Dispatch<React.SetStateAction<boolean>> to set the adding new state.
+ * @param {Array} staffs - The current list of staff members.
+ * @param {React.Dispatch<React.SetStateAction<boolean>>} setStaffs - Function to update the list of staff members.
+ * @param {import('antd/es/notification/useNotification').NotificationInstance} Notification - The Ant Design Notification component.
+ * @return {Promise<Object>} - A promise that resolves to the new staff object.
+ */
+const AddNewStaff = async (Modal, addingNew, setAddingNew, staffs, setStaffs, Notification) => {
+	let newStaff = {
+		id: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+		name: {
+			first: null,
+			middle: null,
+			last: null
+		},
+		email: null,
+		role: null,
+		profilePicture: null
+	};
+
+	setAddingNew(true);
 	await Modal.info({
-		title: 'Edit Admin',
+		title: 'Add New Staff',
 		centered: true,
 		closable: { 'aria-label': 'Close' },
-		open: editing,
+		open: addingNew,
 		content: (
-			<AdminForm admin={admin} onChange={setThisAdmin} />
+			<InformationForm setAddingNew={setAddingNew} onChange={(updatedStaff) => Object.assign(newStaff, updatedStaff)} />
 		),
-		icon: <EditOutlined />,
+		icon: <UserAddOutlined />,
 		width: {
 			xs: '100%',
 			sm: remToPx(50),
@@ -189,38 +223,36 @@ const EditAdmin = async (Modal, admin, setRefreshSeed, editing, setEditing, setT
 		},
 		onOk: () => {
 			return new Promise((resolve, reject) => {
-				EditAdminForm.current.validateFields()
+				NewStaffForm.current.validateFields()
 					.then(async (values) => {
-						const request = await fetch(`${API_Route}/superadmin/admin/${admin.id}`, {
-							method: 'PUT',
+						Object.assign(newStaff, values);
+						newStaff.profilePicture = values.profilePicture || newStaff.profilePicture;
+
+						const request = await fetch(`${API_Route}/superadmin/staff`, {
+							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json'
 							},
-							body: JSON.stringify(values)
+							body: JSON.stringify(newStaff)
 						});
-
 						if (!request.ok) {
 							const errorData = await request.json();
 							Notification.error({
 								message: 'Error',
-								description: errorData.message || 'Failed to update admin.'
+								description: errorData.message || 'Failed to add new staff.'
 							});
-							setRefreshSeed(prev => prev + 1);
 							return reject(errorData);
 						};
-
 						const data = await request.json();
-
 						Notification.success({
-							message: 'Update Successful',
-							description: 'Admin details updated successfully'
+							message: 'Success',
+							description: 'New staff member added successfully.'
 						});
 
-						setRefreshSeed(prev => prev + 1);
-						setThisAdmin(values);
-						resolve();
+						resolve(newStaff);
 					})
 					.catch((errorInfo) => {
+						console.error('Validation Failed:', errorInfo);
 						reject(errorInfo);
 					});
 			});
@@ -231,13 +263,16 @@ const EditAdmin = async (Modal, admin, setRefreshSeed, editing, setEditing, setT
 			hidden: false
 		},
 		onCancel: () => {
+			setAddingNew(false);
 			return new Promise((resolve) => {
-				EditAdminForm.current.resetFields();
+				newStaff = null; // Reset newStaff if cancelled
 				resolve();
 			});
 		}
 	});
-	setEditing(false);
+	setAddingNew(false);
+
+	return newStaff;
 };
 
-export default EditAdmin;
+export default AddNewStaff;

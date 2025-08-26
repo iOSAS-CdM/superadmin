@@ -23,26 +23,26 @@ import remToPx from '../utils/remToPx';
 
 import { API_Route } from '../main';
 
-const RestrictAdminForm = React.createRef();
+const RestrictStaffForm = React.createRef();
 
 /**
- * Function to restrict admin member.
+ * Function to restrict staff member.
  * @param {import('antd/es/modal/useModal').HookAPI} Modal - The Ant Design Modal component.
  * 
- * @param {Object} admin - The admin member data to be restricted.
+ * @param {Object} staff - The staff member data to be restricted.
  */
-const RestrictAdmin = async (Modal, admin, setRefreshSeed, restricting, setRestricting, Notification) => {
+const RestrictStaff = async (Modal, staff, setRefreshSeed, restricting, setRestricting, Notification) => {
 	await Modal.warning({
-		title: 'Restrict Admin Member',
+		title: 'Restrict Staff Member',
 		centered: true,
 		closable: { 'aria-label': 'Close' },
 		open: restricting,
 		content: (
 			<Form
 				layout='vertical'
-				ref={RestrictAdminForm}
+				ref={RestrictStaffForm}
 				initialValues={{
-					adminId: admin.id,
+					staffId: staff.id,
 					reason: ''
 				}}
 			>
@@ -51,7 +51,7 @@ const RestrictAdmin = async (Modal, admin, setRefreshSeed, restricting, setRestr
 					label='Reason for Restriction'
 					rules={[{ required: true, message: 'Please provide a reason for the restriction.' }]}
 				>
-					<Input.TextArea rows={4} placeholder='Enter the reason for restricting this admin member.' />
+					<Input.TextArea rows={4} placeholder='Enter the reason for restricting this staff member.' />
 				</Form.Item>
 			</Form>
 		),
@@ -68,9 +68,9 @@ const RestrictAdmin = async (Modal, admin, setRefreshSeed, restricting, setRestr
 		},
 		onOk: () => {
 			return new Promise((resolve, reject) => {
-				RestrictAdminForm.current.validateFields()
+				RestrictStaffForm.current.validateFields()
 					.then(async (values) => {
-						const request = await fetch(`${API_Route}/superadmin/admin/${admin.id}/restrict`, {
+						const request = await fetch(`${API_Route}/superadmin/staff/${staff.id}/restrict`, {
 							method: 'PATCH',
 							headers: {
 								'Content-Type': 'application/json'
@@ -82,13 +82,13 @@ const RestrictAdmin = async (Modal, admin, setRefreshSeed, restricting, setRestr
 							const errorData = await request.json();
 							Notification.error({
 								message: 'Error',
-								description: errorData.message || 'Failed to update admin.'
+								description: errorData.message || 'Failed to update staff.'
 							});
 							setRefreshSeed(prev => prev + 1);
 							return reject(errorData);
 						};
 
-						Notification.success({ message: 'Admin restricted successfully' });
+						Notification.success({ message: 'Staff restricted successfully' });
 						setRefreshSeed(prev => prev + 1);
 						setRestricting(false);
 						resolve();
@@ -107,11 +107,11 @@ const RestrictAdmin = async (Modal, admin, setRefreshSeed, restricting, setRestr
 		onCancel: () => {
 			setAddingNew(false);
 			return new Promise((resolve) => {
-				newAdmin = null; // Reset newAdmin if cancelled
+				newStaff = null; // Reset newStaff if cancelled
 				resolve();
 			});
 		}
 	});
 };
 
-export default RestrictAdmin;
+export default RestrictStaff;

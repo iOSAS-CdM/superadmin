@@ -126,7 +126,7 @@ const OSAS = () => {
 								<Route path='/signUp' element={session ? <Navigate to='/dashboard' /> : <SignIn />} />
 
 								<Route path='/dashboard' element={session ? <Dashboard /> : <Navigate to='/signUp' />} />
-								<Route path='/admin/:adminId' element={session ? <Profile /> : <Navigate to='/signUp' />} />
+								<Route path='/staff/:staffId' element={session ? <Profile /> : <Navigate to='/signUp' />} />
 								<Route path='/configure' element={session ? <Configure /> : <Navigate to='/signUp' />} />
 
 								<Route path='/auth-return' element={<AuthReturn />} />
