@@ -105,10 +105,9 @@ const RestrictStaff = async (Modal, staff, setRefreshSeed, restricting, setRestr
 			hidden: false
 		},
 		onCancel: () => {
-			setAddingNew(false);
-			return new Promise((resolve) => {
+			return new Promise((resolve, reject) => {
 				newStaff = null; // Reset newStaff if cancelled
-				resolve();
+				reject();
 			});
 		}
 	});

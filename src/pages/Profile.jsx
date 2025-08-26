@@ -5,7 +5,6 @@ import {
 	Flex,
 	Card,
 	Typography,
-	Button,
 	Avatar,
 	Table,
 	Tag,
@@ -21,6 +20,8 @@ import {
 	LockOutlined,
 	UnlockOutlined
 } from '@ant-design/icons';
+
+import Button from '../components/Button';
 
 import { MobileContext } from '../main';
 
@@ -209,7 +210,6 @@ const Profile = () => {
 											onClick={async () => {
 												setRestricting(true);
 												const success = await RestrictStaff(Modal, staff, setRefreshSeed, restricting, setRestricting, Notification);
-												navigate(`/dashboard`);
 												setRestricting(false);
 											}}
 										>
@@ -222,7 +222,7 @@ const Profile = () => {
 											type='primary'
 											icon={<UnlockOutlined />}
 											onClick={async () => {
-												fetch(`${API_Route}/superadmin/staff/${staff.id}/unrestrict`, {
+												await fetch(`${API_Route}/superadmin/staff/${staff.id}/unrestrict`, {
 													method: 'PATCH',
 													headers: {
 														'Content-Type': 'application/json',
