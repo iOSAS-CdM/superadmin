@@ -57,7 +57,6 @@ const OSAS = () => {
 		supabase.auth.onAuthStateChange((_event, session) => {
 			setSession(session);
 		});
-		console.log(session);
 	}, []);
 
 	// Modify `fetch`
