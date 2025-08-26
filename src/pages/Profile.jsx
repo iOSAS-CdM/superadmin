@@ -18,7 +18,8 @@ import {
 	LeftOutlined,
 	MailOutlined,
 	PhoneOutlined,
-	LockOutlined
+	LockOutlined,
+	UnlockOutlined
 } from '@ant-design/icons';
 
 import { MobileContext } from '../main';
@@ -28,6 +29,7 @@ const { Title, Text } = Typography;
 import Header from '../components/Header';
 
 import EditStaff from '../modals/EditStaff';
+import RestrictStaff from '../modals/RestrictStaff';
 
 import '../styles/pages/Dashboard.css';
 
@@ -37,6 +39,7 @@ const Profile = () => {
 	const { mobile } = React.useContext(MobileContext);
 	const [activities, setActivities] = React.useState([]);
 	const [editing, setEditing] = React.useState(false);
+	const [restricting, setRestricting] = React.useState(false);
 
 	React.useEffect(() => {
 		setActivities([
@@ -185,25 +188,61 @@ const Profile = () => {
 							<Divider />
 
 							<Flex justify='flex-start' align='stretch' gap='small'>
-								<Button
-									type='primary'
-									icon={<EditOutlined />}
-									onClick={async () => {
-										const newStaff = await EditStaff(Modal, staff, setRefreshSeed, editing, setEditing, setStaff, Notification);
-										if (staff.id !== newStaff.id) {
-											navigate(`/dashboard`);
-										};
-									}}
-								>
-									Edit Profile
-								</Button>
-								<Button
-									type='primary'
-									danger
-									icon={<LockOutlined />}
-								>
-									Restrict Access
-								</Button>
+								{staff.status !== 'restricted' ? (
+									<>
+										<Button
+											type='primary'
+											icon={<EditOutlined />}
+											onClick={async () => {
+												const newStaff = await EditStaff(Modal, staff, setRefreshSeed, editing, setEditing, setStaff, Notification);
+												if (staff.id !== newStaff.id) {
+													navigate(`/dashboard`);
+												};
+											}}
+										>
+											Edit Profile
+										</Button>
+										<Button
+											type='primary'
+											danger
+											icon={<LockOutlined />}
+											onClick={async () => {
+												setRestricting(true);
+												const success = await RestrictStaff(Modal, staff, setRefreshSeed, restricting, setRestricting, Notification);
+												navigate(`/dashboard`);
+												setRestricting(false);
+											}}
+										>
+											Restrict Access
+										</Button>
+									</>
+								) : (
+									<>
+										<Button
+											type='primary'
+											icon={<UnlockOutlined />}
+											onClick={async () => {
+												fetch(`${API_Route}/superadmin/staff/${staff.id}/unrestrict`, {
+													method: 'PATCH',
+													headers: {
+														'Content-Type': 'application/json',
+													},
+													body: JSON.stringify({}),
+												})
+													.then((res) => {
+														if (res.ok) {
+															Notification.success({ message: 'Staff unrestricted successfully' });
+															setRefreshSeed((s) => s + 1);
+														} else {
+															Notification.error({ message: 'Failed to unblock staff' });
+														};
+													});
+											}}
+										>
+											Unrestrict Access
+										</Button>
+									</>
+								)}
 							</Flex>
 						</Flex>
 					</Card>
