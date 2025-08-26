@@ -32,6 +32,7 @@ onOpenUrl((data) => {
 const OSAS = () => {
 	const [mobile, setMobile] = React.useState(false);
 	const [session, setSession] = React.useState(null);
+	const [sessionChecked, setSessionChecked] = React.useState(false);
 
 	// Handle window resize
 	React.useEffect(() => {
@@ -52,10 +53,12 @@ const OSAS = () => {
 	React.useEffect(() => {
 		supabase.auth.getSession().then(({ data: { session } }) => {
 			setSession(session);
+			setSessionChecked(true);
 		});
 
 		supabase.auth.onAuthStateChange((_event, session) => {
 			setSession(session);
+			setSessionChecked(true);
 		});
 	}, []);
 
@@ -99,6 +102,8 @@ const OSAS = () => {
 			window.fetch = originalFetch;
 		};
 	}, [session]);
+
+	if (!sessionChecked) return null;
 
 	return (
 		<React.StrictMode>
