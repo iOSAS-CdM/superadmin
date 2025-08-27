@@ -326,7 +326,11 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 				</Flex>
 
 				{thisStaff.status === 'restricted' && (
-					<Text type='danger'>This staff is restricted</Text>
+					<>
+						<Text type='danger' style={{ fontSize: 12 }}>Restriction:</Text>
+						<br />
+						<Title type='danger' level={3}>{thisStaff.reason}</Title>
+					</>
 				)}
 			</Card>
 		</Badge.Ribbon>

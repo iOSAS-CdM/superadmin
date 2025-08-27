@@ -9,7 +9,8 @@ import {
 	Table,
 	Tag,
 	Divider,
-	App
+	App,
+	Badge
 } from 'antd';
 
 import {
@@ -126,127 +127,139 @@ const Profile = () => {
 				/>
 
 				{/************************** Profile **************************/}
-				<Flex justify='flex-start' align='stretch' gap='small'>
-					{!mobile && <Avatar
-						src={staff.profilePicture}
-						alt='Profile Picture'
-						shape='square'
-						style={{
-							height: 'calc(var(--space-XL) * 12)',
-							width: 'calc(var(--space-XL) * 12)'
-						}}
-					/>}
-
-					<Card style={{ flex: 1 }}>
-						<Flex
-							vertical
-							gap='small'
-							justify='center'
-							align={!mobile ? 'stretch' : 'center'}
-							style={{ height: '100%', ...mobile ? { textAlign: 'center' } : {} }}
-						>
-							{mobile && <Avatar
-								src={staff.profilePicture}
-								objectFit='cover'
-								alt='Profile Picture'
-								shape='square'
-								style={{
-									height: 'calc(var(--space-XL) * 12)',
-									width: 'calc(var(--space-XL) * 12)'
-								}}
-							/>}
-
-							<Title level={2}>
-								{`${staff.name.first} ${staff.name.middle ? `${staff.name.middle} ` : ''}`} {staff.name.last}
-							</Title>
-							<Text type='secondary'>
-								{
-									staff.role === 'head' ? 'Head' : staff.role === 'guidance' ? 'Guidance Officer' :
-										staff.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
-								} - {staff.id}
-							</Text>
-
-							<Flex gap='small' >
-								<Button
-									type='link'
-									icon={<MailOutlined />}
-									style={{ padding: 0 }}
-								>
-									{staff.email}
-								</Button>
-
-								{staff.phone &&
+				<Badge.Ribbon
+					text={staff.status === 'restricted' ? 'Restricted' : null}
+					color='red'
+					style={{ display: staff.status === 'restricted' ? 'block' : 'none' }}
+				>
+					<Flex justify='flex-start' align='stretch' gap='small'>
+						{!mobile && <Avatar
+							src={staff.profilePicture}
+							alt='Profile Picture'
+							shape='square'
+							className={staff.status === 'restricted' ? 'staff-card-restricted' : ''}
+							style={{
+								height: 'calc(var(--space-XL) * 12)',
+								width: 'calc(var(--space-XL) * 12)',
+								overflow: 'hidden'
+							}}
+						/>}
+						<Card className={staff.status === 'restricted' ? 'staff-card-restricted' : ''} style={{ flex: 1, overflow: 'hidden' }}>
+							<Flex
+								vertical
+								gap='small'
+								justify='center'
+								align={!mobile ? 'stretch' : 'center'}
+								style={{ height: '100%', ...mobile ? { textAlign: 'center' } : {} }}
+							>
+								{mobile && <Avatar
+									src={staff.profilePicture}
+									objectFit='cover'
+									alt='Profile Picture'
+									shape='square'
+									style={{
+										height: 'calc(var(--space-XL) * 12)',
+										width: 'calc(var(--space-XL) * 12)'
+									}}
+								/>}
+								<Flex vertical justify='center' align={!mobile ? 'flex-start' : 'center'}>
+									<Title level={2}>
+										{`${staff.name.first} ${staff.name.middle ? `${staff.name.middle} ` : ''}`} {staff.name.last}
+									</Title>
+									<Text type='secondary'>
+										{
+											staff.role === 'head' ? 'Head' : staff.role === 'guidance' ? 'Guidance Officer' :
+												staff.role === 'prefect' ? 'Prefect of Discipline Officer' : 'Student Affairs Officer'
+										} - {staff.id}
+									</Text>
+								</Flex>
+								<Flex gap='small' >
 									<Button
 										type='link'
-										icon={<PhoneOutlined />}
+										icon={<MailOutlined />}
 										style={{ padding: 0 }}
 									>
-										{staff.phone}
+										{staff.email}
 									</Button>
-								}
+									{staff.phone &&
+										<Button
+											type='link'
+											icon={<PhoneOutlined />}
+											style={{ padding: 0 }}
+										>
+											{staff.phone}
+										</Button>
+									}
+								</Flex>
+								<Divider />
+								<Flex justify='flex-start' align='stretch' gap='small'>
+									{staff.status !== 'restricted' ? (
+										<>
+											<Button
+												type='primary'
+												icon={<EditOutlined />}
+												onClick={async () => {
+													const newStaff = await EditStaff(Modal, staff, setRefreshSeed, editing, setEditing, setStaff, Notification);
+													if (staff.id !== newStaff.id) {
+														navigate(`/dashboard`);
+													};
+												}}
+											>
+												Edit Profile
+											</Button>
+											<Button
+												type='primary'
+												danger
+												icon={<LockOutlined />}
+												onClick={async () => {
+													setRestricting(true);
+													const success = await RestrictStaff(Modal, staff, setRefreshSeed, restricting, setRestricting, Notification);
+													setRestricting(false);
+												}}
+											>
+												Restrict Access
+											</Button>
+										</>
+									) : (
+										<>
+											<Button
+												type='primary'
+												icon={<UnlockOutlined />}
+												onClick={async () => {
+													await fetch(`${API_Route}/superadmin/staff/${staff.id}/unrestrict`, {
+														method: 'PATCH',
+														headers: {
+															'Content-Type': 'application/json',
+														},
+														body: JSON.stringify({}),
+													})
+														.then((res) => {
+															if (res.ok) {
+																Notification.success({ message: 'Staff unrestricted successfully' });
+																setRefreshSeed((s) => s + 1);
+															} else {
+																Notification.error({ message: 'Failed to unblock staff' });
+															};
+														});
+												}}
+											>
+												Unrestrict Access
+											</Button>
+										</>
+									)}
+								</Flex>
 							</Flex>
+						</Card>
+					</Flex>
+				</Badge.Ribbon>
 
-							<Divider />
-
-							<Flex justify='flex-start' align='stretch' gap='small'>
-								{staff.status !== 'restricted' ? (
-									<>
-										<Button
-											type='primary'
-											icon={<EditOutlined />}
-											onClick={async () => {
-												const newStaff = await EditStaff(Modal, staff, setRefreshSeed, editing, setEditing, setStaff, Notification);
-												if (staff.id !== newStaff.id) {
-													navigate(`/dashboard`);
-												};
-											}}
-										>
-											Edit Profile
-										</Button>
-										<Button
-											type='primary'
-											danger
-											icon={<LockOutlined />}
-											onClick={async () => {
-												setRestricting(true);
-												const success = await RestrictStaff(Modal, staff, setRefreshSeed, restricting, setRestricting, Notification);
-												setRestricting(false);
-											}}
-										>
-											Restrict Access
-										</Button>
-									</>
-								) : (
-									<>
-										<Button
-											type='primary'
-											icon={<UnlockOutlined />}
-											onClick={async () => {
-												await fetch(`${API_Route}/superadmin/staff/${staff.id}/unrestrict`, {
-													method: 'PATCH',
-													headers: {
-														'Content-Type': 'application/json',
-													},
-													body: JSON.stringify({}),
-												})
-													.then((res) => {
-														if (res.ok) {
-															Notification.success({ message: 'Staff unrestricted successfully' });
-															setRefreshSeed((s) => s + 1);
-														} else {
-															Notification.error({ message: 'Failed to unblock staff' });
-														};
-													});
-											}}
-										>
-											Unrestrict Access
-										</Button>
-									</>
-								)}
-							</Flex>
-						</Flex>
+				{staff.status === 'restricted' && (
+					<Card size='small' className={staff.status === 'restricted' ? 'staff-card-restricted' : ''}>
+						<Text type='danger' style={{ fontSize: 12 }}>Restriction:</Text>
+						<br />
+						<Title type='danger' level={3}>{staff.reason}</Title>
 					</Card>
-				</Flex>
+				)}
 
 				{/************************** Recent Activities **************************/}
 				<Table
