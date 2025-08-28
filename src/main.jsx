@@ -63,7 +63,8 @@ const OSAS = () => {
 	}, []);
 
 	// Modify `fetch`
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
+		if (!sessionChecked) return;
 		const originalFetch = window.fetch;
 
 		window.fetch = async (...args) => {
@@ -101,7 +102,7 @@ const OSAS = () => {
 		return () => {
 			window.fetch = originalFetch;
 		};
-	}, [session]);
+	}, [session, sessionChecked]);
 
 	if (!sessionChecked) return null;
 
@@ -149,6 +150,6 @@ export const MobileContext = React.createContext({
 	setMobile: () => { }
 });
 
-export const API_Route = import.meta.env.DEV ? 'http://localhost:3001' : 'https://api.example.com';
+export const API_Route = import.meta.env.DEV ? 'http://localhost:3001' : 'http://47.130.158.40';
 
 ReactDOM.createRoot(document.getElementById('root')).render(<OSAS />);
