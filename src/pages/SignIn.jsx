@@ -131,46 +131,12 @@ const SignIn = () => {
 							<Title level={1} style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Super Administrator</Title>
 						</Flex>
 
-						<Form
-							layout='vertical'
-							ref={AuthForm}
-							onFinish={(values) => {
-								signIn(values);
-							}}
-						>
-							<Form.Item
-								name='email'
-								rules={[{ required: true, message: 'Please input your email!' }]}
-							>
-								<Input placeholder='Email' type='email' />
-							</Form.Item>
 
-							<Form.Item
-								name='password'
-								rules={[{ required: true, message: 'Please input your password!' }]}
-							>
-								<Input.Password placeholder='Password' type='password' />
-							</Form.Item>
-
-							<Flex justify='space-between' align='center' gap='small'>
-								<Form.Item name='remember' valuePropName='checked' noStyle>
-									<Checkbox>Remember me</Checkbox>
-								</Form.Item>
-								<Button
-									type='primary'
-									htmlType='submit'
-									icon={signingIn ? <LoadingOutlined /> : <LoginOutlined />}
-									disabled={signingIn}
-								>
-									Sign In
-								</Button>
-							</Flex>
-						</Form>
-
-						<Divider>or</Divider>
 
 						<Button
+							type='primary'
 							icon={signingIn ? <LoadingOutlined /> : <GoogleOutlined />}
+							size='large'
 							onClick={signInWithGoogle}
 						>
 							Sign in with Google
