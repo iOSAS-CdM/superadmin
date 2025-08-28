@@ -50,7 +50,7 @@ const OSAS = () => {
 	}, []);
 
 	// Get initial session
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		supabase.auth.getSession().then(({ data: { session } }) => {
 			setSession(session);
 			setSessionChecked(true);
@@ -64,7 +64,6 @@ const OSAS = () => {
 
 	// Modify `fetch`
 	React.useLayoutEffect(() => {
-		if (!sessionChecked) return;
 		const originalFetch = window.fetch;
 
 		window.fetch = async (...args) => {
@@ -75,14 +74,14 @@ const OSAS = () => {
 					// If headers already exist, add to them
 					args[1].headers = {
 						...args[1].headers,
-						'Authorization': `Bearer ${session.access_token}`
+						'Authorization': `Bearer ${JSON.parse(localStorage.getItem('CustomApp')).access_token}`
 					};
 				} else {
 					// Create headers object if options doesn't exist
 					args[1] = {
 						...(args[1] || {}),
 						headers: {
-							'Authorization': `Bearer ${session.access_token}`
+							'Authorization': `Bearer ${JSON.parse(localStorage.getItem('CustomApp')).access_token}`
 						}
 					};
 				};
