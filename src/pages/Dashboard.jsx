@@ -315,7 +315,7 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 												.then((res) => {
 													if (res.ok) {
 														Notification.success({ message: 'Staff deleted successfully' });
-														navigate('/dashboard');
+														setRefreshSeed((s) => s + 1);
 													} else {
 														Notification.error({ message: 'Failed to delete staff' });
 													};

@@ -260,7 +260,7 @@ const Profile = () => {
 														.then((res) => {
 															if (res.ok) {
 																Notification.success({ message: 'Staff deleted successfully' });
-																setRefreshSeed((s) => s + 1);
+																navigate('/dashboard');
 															} else {
 																Notification.error({ message: 'Failed to delete staff' });
 															};
