@@ -32,7 +32,8 @@ import {
 	LockOutlined,
 	UnlockOutlined,
 	RightOutlined,
-	FilterOutlined
+	FilterOutlined,
+	DeleteOutlined
 } from '@ant-design/icons';
 
 import { MobileContext } from '../main';
@@ -282,7 +283,7 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 				actions={[
 					...thisStaff.status !== 'restricted' ? [
 						<Tooltip title='Edit Staff'><EditOutlined onClick={() => EditStaff(Modal, thisStaff, setRefreshSeed, editing, setEditing, setThisStaff, Notification)} key='edit' /></Tooltip>,
-						<Tooltip title='Restrict Staff'><LockOutlined onClick={() => RestrictStaff(Modal, thisStaff, setRefreshSeed, restricting, setRestricting, Notification)} key='restrict' /></Tooltip>,
+						<Tooltip title='Restrict Staff'><LockOutlined onClick={() => RestrictStaff(Modal, thisStaff, setRefreshSeed, restricting, setRestricting, Notification)} key='restrict' /></Tooltip>
 					] : [
 						<Tooltip title='Unrestrict Staff'>
 							<UnlockOutlined onClick={() => {
@@ -302,6 +303,25 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 										};
 									});
 							}} key='unrestrict' />
+							</Tooltip>,
+							<Tooltip title='Delete Staff'>
+								<DeleteOutlined onClick={() => {
+									Modal.confirm({
+										title: 'Are you sure you want to delete this staff?',
+										onOk: () =>
+											fetch(`${API_Route}/superadmin/staff/${thisStaff.id}`, {
+												method: 'DELETE',
+											})
+												.then((res) => {
+													if (res.ok) {
+														Notification.success({ message: 'Staff deleted successfully' });
+														navigate('/dashboard');
+													} else {
+														Notification.error({ message: 'Failed to delete staff' });
+													};
+												})
+									});
+								}} key='delete' />
 						</Tooltip>
 					],
 					<Tooltip title='View Staff'>

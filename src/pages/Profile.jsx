@@ -19,7 +19,8 @@ import {
 	MailOutlined,
 	PhoneOutlined,
 	LockOutlined,
-	UnlockOutlined
+	UnlockOutlined,
+	DeleteOutlined
 } from '@ant-design/icons';
 
 import Button from '../components/Button';
@@ -244,6 +245,29 @@ const Profile = () => {
 												}}
 											>
 												Unrestrict Access
+											</Button>
+											<Button
+												type='primary'
+												icon={<DeleteOutlined />}
+												danger
+												onClick={async () => {
+													await fetch(`${API_Route}/superadmin/staff/${staff.id}`, {
+														method: 'DELETE',
+														headers: {
+															'Content-Type': 'application/json',
+														},
+													})
+														.then((res) => {
+															if (res.ok) {
+																Notification.success({ message: 'Staff deleted successfully' });
+																setRefreshSeed((s) => s + 1);
+															} else {
+																Notification.error({ message: 'Failed to delete staff' });
+															};
+														});
+												}}
+											>
+												Delete Staff
 											</Button>
 										</>
 									)}
