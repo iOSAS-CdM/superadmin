@@ -251,20 +251,22 @@ const Profile = () => {
 												icon={<DeleteOutlined />}
 												danger
 												onClick={async () => {
-													await fetch(`${API_Route}/superadmin/staff/${staff.id}`, {
-														method: 'DELETE',
-														headers: {
-															'Content-Type': 'application/json',
-														},
-													})
-														.then((res) => {
-															if (res.ok) {
-																Notification.success({ message: 'Staff deleted successfully' });
-																navigate('/dashboard');
-															} else {
-																Notification.error({ message: 'Failed to delete staff' });
-															};
-														});
+													Modal.confirm({
+														title: 'Are you sure you want to delete this staff?',
+														okButtonProps: { danger: true },
+														onOk: () =>
+															fetch(`${API_Route}/superadmin/staff/${thisStaff.id}`, {
+																method: 'DELETE',
+															})
+																.then((res) => {
+																	if (res.ok) {
+																		Notification.success({ message: 'Staff deleted successfully' });
+																		navigate('/dashboard');
+																	} else {
+																		Notification.error({ message: 'Failed to delete staff' });
+																	};
+																})
+													});
 												}}
 											>
 												Delete Staff

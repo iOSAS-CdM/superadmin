@@ -308,6 +308,7 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 								<DeleteOutlined onClick={() => {
 									Modal.confirm({
 										title: 'Are you sure you want to delete this staff?',
+										okButtonProps: { danger: true },
 										onOk: () =>
 											fetch(`${API_Route}/superadmin/staff/${thisStaff.id}`, {
 												method: 'DELETE',
