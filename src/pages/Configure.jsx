@@ -8,16 +8,19 @@ import {
 	Form,
 	Typography,
 	Button,
-	Input
+	Input,
+	Alert,
+	Divider
 } from 'antd';
 
 import {
 	ToolOutlined,
 	LeftOutlined,
 	RightOutlined,
-	KeyOutlined,
+	DeleteOutlined,
 	SaveOutlined,
-	ClearOutlined
+	WarningOutlined,
+	PlusOutlined
 } from '@ant-design/icons';
 
 import { useMobile } from '../contexts/MobileContext';
@@ -35,38 +38,37 @@ const Profile = () => {
 
 	const navigate = useNavigate();
 
-	const { message } = App.useApp();
+	const { message, modal } = App.useApp();
 
 	/**
 	 * @typedef {{
-	 * 	commit: string;
-	 * 	date: string;
-	 * 	message: string;
-	 * }} Tag
-	 */
-
-	/**
-	 * @typedef {{
-	 * 	version: string;
-	 * 	main: Tag;
-	 * 	release: Tag;
+	 * 	main: string;
+	 * 	release: string;
 	 * }} Version
+	 */
+	/**
+	 * @typedef {{ key: string, value: string }[]} secret
 	 */
 
 	/** @type {[Version, React.Dispatch<React.SetStateAction<Version>>]} */
-	const [desktopVersion, setDesktopVersion] = React.useState({});
+	const [desktopVersion, setDesktopVersion] = React.useState();
+	const [secretsForm] = Form.useForm();
+	const [loading, setLoading] = React.useState(false);
 	React.useEffect(() => {
 		const controller = new AbortController();
 
 		// Fetch version info
 		const fetchVersion = async () => {
+			setLoading(true);
 			const responses = await Promise.all([
 				fetch(`${API_Route}/superadmin/version`, { signal: controller.signal }),
+				fetch(`${API_Route}/superadmin/secrets`, { signal: controller.signal })
 			]);
+			setLoading(false);
 
 			const data = await Promise.all(responses.map(res => res.json()));
-
 			setDesktopVersion(data[0]);
+			secretsForm.setFieldsValue({ secrets: data[1] });
 		};
 
 		fetchVersion();
@@ -100,43 +102,18 @@ const Profile = () => {
 					<Flex vertical justify='flex-start' align='stretch' gap='large'>
 						<Flex vertical justify='flex-start' align='stretch' gap='small'>
 							<Title level={5}>Desktop</Title>
-							{/* <Flex justify='flex-start' align='stretch' gap='large'>
-								<Flex vertical justify='flex-start' align='stretch' flex={1}>
-									<Input
-										value='vPr0t0typ3-0s4s'
-									/>
-									<Text type='secondary'>Github Action Build</Text>
-								</Flex>
-
-								<Button
-									type='primary'
-									onClick={() => {
-										// Placeholder for update action
-										console.log('Update action triggered');
-									}}
-									icon={<RightOutlined />}
-									iconPosition='end'
-								>
-									Deploy
-								</Button>
-
-								<Flex vertical justify='flex-start' align='stretch' flex={1}>
-									<Input
-										value='vD3pl0y3d-0s4s'
-									/>
-									<Text type='secondary'>Deployed Software</Text>
-								</Flex>
-							</Flex> */}
 							<Form layout='vertical' component={false}>
 								<Flex justify='space-between' align='center' gap='large'>
 									<Form.Item label='Development Source'>
 										<Input
-											value={desktopVersion?.main?.commit || 'Loading...'}
+											value={desktopVersion?.main || 'Loading...'}
 											readOnly
 										/>
 									</Form.Item>
 									<Button
 										type='primary'
+										loading={loading}
+										disabled={desktopVersion?.main === desktopVersion?.release}
 										onClick={async () => {
 											const apiResponse = await fetch(`${API_Route}/superadmin/version/deploy`, {
 												method: 'POST'
@@ -144,7 +121,7 @@ const Profile = () => {
 											if (!apiResponse?.ok) 
 												return message.error('Failed to deploy the latest version.');
 											const newVersion = await apiResponse.json();
-											setDesktopVersion(prev => ({ ...prev, release: newVersion }));
+											setDesktopVersion(newVersion);
 											message.success('Deployment initiated successfully.');
 										}}
 										icon={<RightOutlined />}
@@ -154,7 +131,7 @@ const Profile = () => {
 									</Button>
 									<Form.Item label='Deployed Software'>
 										<Input
-											value={desktopVersion?.release?.commit || 'Loading...'}
+											value={desktopVersion?.release || 'Loading...'}
 											readOnly
 										/>
 									</Form.Item>
@@ -164,73 +141,119 @@ const Profile = () => {
 					</Flex>
 				</Card>
 
-
 				{/************************** Secret keys **************************/}
+				<Card title={<Title level={2}>Secret Keys</Title>}>
+					<Form
+						form={secretsForm}
+						layout='vertical'
+						component={false}
+					>
+						<Form.List name='secrets'>
+							{(fields, { add, remove }) => (
+								<>
+									{fields.map(({ key, name, ...restField }) => (
+										<Flex key={key} justify='flex-start' align='center' gap='large'>
+											<Form.Item
+												{...restField}
+												name={[name, 'key']}
+												label='Key'
+												rules={[{ required: true, message: 'Missing key' }]}
+											>
+												<Input placeholder='KEY_NAME' />
+											</Form.Item>
+											<Form.Item
+												{...restField}
+												name={[name, 'value']}
+												label='Value'
+												rules={[{ required: true, message: 'Missing value' }]}
+											>
+												<Input placeholder='secret_value' />
+											</Form.Item>
+											<Form.Item>
+												<Button
+													type='primary'
+													danger
+													icon={<DeleteOutlined />}
+													onClick={() => remove(name)}
+												/>
+											</Form.Item>
+										</Flex>
+									))}
+									<Flex justify='center' align='center' gap='large'>
+										<Button
+											type='dashed'
+											onClick={() => add()}
+											block
+										>
+											<PlusOutlined /> Add secret Variable
+										</Button>
+										<Button
+											type='primary'
+											icon={<SaveOutlined />}
+											onClick={async () => secretsForm.validateFields().then(async () => {
+												/** @type {[secret, React.Dispatch<React.SetStateAction<secret>>]} */
+												const values = secretsForm.getFieldsValue();
 
-				<Card
-					title={<Title level={2}>Secret Keys</Title>}
-					extra={
-						<Text type='secondary'>
-							These keys are used to authenticate with various services. Please keep them secure.
-						</Text>
-					}
-				>
-					<Flex vertical justify='flex-start' align='stretch' gap='large'>
-						<Flex justify='flex-start' align='stretch' gap='small'>
-							<Title level={5} style={{ width: 'calc(var(--space-XL) * 14)' }}>Github Personal Access Token</Title>
-							<Input
-								value='AIzaSyD3pl0y3d-0s4s'
-								readOnly
-								suffix={<KeyOutlined />}
-							/>
-						</Flex>
-						<Flex justify='flex-start' align='stretch' gap='small'>
-							<Title level={5} style={{ width: 'calc(var(--space-XL) * 14)' }}>EAS App Token</Title>
-							<Input
-								value='AIzaSyD3pl0y3d-0s4s'
-								readOnly
-								suffix={<KeyOutlined />}
-							/>
-						</Flex>
-						<Flex justify='flex-start' align='stretch' gap='small'>
-							<Title level={5} style={{ width: 'calc(var(--space-XL) * 14)' }}>OpenAI API Key</Title>
-							<Input
-								value='AIzaSyD3pl0y3d-0s4s'
-								readOnly
-								suffix={<KeyOutlined />}
-							/>
-						</Flex>
-						<Flex justify='flex-start' align='stretch' gap='small'>
-							<Title level={5} style={{ width: 'calc(var(--space-XL) * 14)' }}>Firebase Super Administrator Credentials</Title>
-							<Input.TextArea
-								value='AIzaSyD3pl0y3d-0s4s'
-								readOnly
-								suffix={<KeyOutlined />}
-							/>
-						</Flex>
+												setLoading(true);
+												const response = await fetch(`${API_Route}/superadmin/secrets`, {
+													method: 'POST',
+													headers: {
+														'Content-Type': 'application/json'
+													},
+													body: JSON.stringify(values)
+												}).catch(() => null);
+												setLoading(false);
+												if (!response?.ok)
+													return message.error('Failed to save secret keys.');
+												message.success('Secret keys saved successfully.');
+											})}
+											loading={loading}
+										>
+											Save Changes
+										</Button>
+									</Flex>
+								</>
+							)}
+						</Form.List>
+					</Form>
+				</Card>
 
-						<Flex justify='flex-end' gap='small'>
+				<Alert
+					type='warning'
+					showIcon
+					icon={<WarningOutlined />}
+					description={(
+						<Flex vertical gap='small'>
+							<Text>Changes to secret keys may require a system restart to take effect. Please ensure to restart the application after making modifications.</Text>
+							<Text>It is recommended to backup current configurations before proceeding.</Text>
+							<Divider />
 							<Button
 								type='default'
+								icon={<WarningOutlined />}
+								danger
 								onClick={() => {
-									console.log('Discard action triggered');
+									modal.confirm({
+										title: 'Are you sure you want restart the system server?',
+										content: 'This will temporarily disconnect all connected clients.',
+										okButtonProps: { danger: true },
+										onOk: async () => {
+											setLoading(true);
+											const response = await fetch(`${API_Route}/superadmin/restart`, {
+												method: 'POST'
+											}).catch(() => null);
+											setLoading(false);
+											if (!response?.ok)
+												return message.error('Failed to restart the server.');
+											message.success('Server restart initiated successfully.');
+										}
+									});
 								}}
-								icon={<ClearOutlined />}
 							>
-								Discard Changes
-							</Button>
-							<Button
-								type='primary'
-								onClick={() => {
-									console.log('Save action triggered');
-								}}
-								icon={<SaveOutlined />}
-							>
-								Save and Restart
+								Restart Server
 							</Button>
 						</Flex>
-					</Flex>
-				</Card>
+					)}
+				/>
 			</Flex>
 		</Card>
 	);
