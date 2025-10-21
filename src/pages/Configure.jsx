@@ -167,7 +167,7 @@ const Profile = () => {
 												label='Value'
 												rules={[{ required: true, message: 'Missing value' }]}
 											>
-												<Input placeholder='secret_value' />
+												<Input.Password placeholder='secret_value' />
 											</Form.Item>
 											<Form.Item>
 												<Button
