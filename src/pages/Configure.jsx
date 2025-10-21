@@ -110,25 +110,27 @@ const Profile = () => {
 											readOnly
 										/>
 									</Form.Item>
-									<Button
-										type='primary'
-										loading={loading}
-										disabled={desktopVersion?.main === desktopVersion?.release}
-										onClick={async () => {
-											const apiResponse = await fetch(`${API_Route}/superadmin/version/deploy`, {
-												method: 'POST'
-											}).catch(() => null);
-											if (!apiResponse?.ok) 
-												return message.error('Failed to deploy the latest version.');
-											const newVersion = await apiResponse.json();
-											setDesktopVersion(newVersion);
-											message.success('Deployment initiated successfully.');
-										}}
-										icon={<RightOutlined />}
-										iconPosition='end'
-									>
-										Deploy
-									</Button>
+									<Form.Item>
+										<Button
+											type='primary'
+											loading={loading}
+											disabled={desktopVersion?.main === desktopVersion?.release}
+											onClick={async () => {
+												const apiResponse = await fetch(`${API_Route}/superadmin/version/deploy`, {
+													method: 'POST'
+												}).catch(() => null);
+												if (!apiResponse?.ok) 
+													return message.error('Failed to deploy the latest version.');
+												const newVersion = await apiResponse.json();
+												setDesktopVersion(newVersion);
+												message.success('Deployment initiated successfully.');
+											}}
+											icon={<RightOutlined />}
+											iconPosition='end'
+										>
+											Deploy
+										</Button>
+									</Form.Item>
 									<Form.Item label='Deployed Software'>
 										<Input
 											value={desktopVersion?.release || 'Loading...'}
@@ -152,11 +154,12 @@ const Profile = () => {
 							{(fields, { add, remove }) => (
 								<>
 									{fields.map(({ key, name, ...restField }) => (
-										<Flex key={key} justify='flex-start' align='center' gap='large'>
+										<Flex key={key} justify='flex-start' align='center' gap='large' style={{ width: '100%' }}>
 											<Form.Item
 												{...restField}
 												name={[name, 'key']}
 												label='Key'
+												style={{ width: '100%' }}
 												rules={[{ required: true, message: 'Missing key' }]}
 											>
 												<Input placeholder='KEY_NAME' />
@@ -165,6 +168,7 @@ const Profile = () => {
 												{...restField}
 												name={[name, 'value']}
 												label='Value'
+												style={{ width: '100%' }}
 												rules={[{ required: true, message: 'Missing value' }]}
 											>
 												<Input.Password placeholder='secret_value' />
