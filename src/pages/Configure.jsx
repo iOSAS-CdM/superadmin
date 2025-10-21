@@ -18,7 +18,7 @@ import {
 	ClearOutlined
 } from '@ant-design/icons';
 
-import { MobileContext } from '../main';
+import { useMobile } from '../contexts/MobileContext';
 
 const { Title, Text } = Typography;
 
@@ -27,7 +27,7 @@ import Header from '../components/Header';
 import '../styles/pages/Dashboard.css';
 
 const Profile = () => {
-	const { mobile } = React.useContext(MobileContext);
+	const isMobile = useMobile();
 
 	const navigate = useNavigate();
 

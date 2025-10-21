@@ -20,7 +20,7 @@ import {
 
 import { LoginOutlined, GoogleOutlined, LoadingOutlined } from '@ant-design/icons';
 
-import { MobileContext } from '../main';
+import { useMobile } from '../contexts/MobileContext';
 
 const { Text, Title } = Typography;
 
@@ -28,7 +28,7 @@ import '../styles/pages/SignIn.css';
 
 const SignIn = () => {
 	const [signingIn, setSigningIn] = React.useState(false);
-	const { mobile, setMobile } = React.useContext(MobileContext);
+	const isMobile = useMobile();
 
 	const navigate = useNavigate();
 	const AuthForm = React.useRef(null);
@@ -123,7 +123,7 @@ const SignIn = () => {
 		<>
 			<div id='auth-background'></div>
 
-			<Card id='sign-in' className={`page-container${mobile ? ' mobile' : ''}`}>
+			<Card id='sign-in' className={`page-container${isMobile ? ' mobile' : ''}`}>
 				<Flex vertical justify='space-between' align='center' gap='large' style={{ height: '100%' }}>
 					<Flex vertical justify='center' align='center' gap='large' style={{ height: '100%' }}>
 						<Image

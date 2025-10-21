@@ -25,7 +25,7 @@ import {
 
 import Button from '../components/Button';
 
-import { MobileContext } from '../main';
+import { useMobile } from '../contexts/MobileContext';
 
 const { Title, Text } = Typography;
 
@@ -39,7 +39,7 @@ import '../styles/pages/Dashboard.css';
 import { API_Route } from '../main';
 
 const Profile = () => {
-	const { mobile } = React.useContext(MobileContext);
+	const isMobile = useMobile();
 	const [activities, setActivities] = React.useState([]);
 	const [editing, setEditing] = React.useState(false);
 	const [restricting, setRestricting] = React.useState(false);
@@ -134,7 +134,7 @@ const Profile = () => {
 					style={{ display: staff.status === 'restricted' ? 'block' : 'none' }}
 				>
 					<Flex justify='flex-start' align='stretch' gap='small'>
-						{!mobile && <Avatar
+						{!isMobile && <Avatar
 							src={staff.profilePicture}
 							alt='Profile Picture'
 							shape='square'
@@ -150,10 +150,10 @@ const Profile = () => {
 								vertical
 								gap='small'
 								justify='center'
-								align={!mobile ? 'stretch' : 'center'}
-								style={{ height: '100%', ...mobile ? { textAlign: 'center' } : {} }}
+								align={!isMobile ? 'stretch' : 'center'}
+								style={{ height: '100%', ...isMobile ? { textAlign: 'center' } : {} }}
 							>
-								{mobile && <Avatar
+								{isMobile && <Avatar
 									src={staff.profilePicture}
 									objectFit='cover'
 									alt='Profile Picture'
@@ -163,7 +163,7 @@ const Profile = () => {
 										width: 'calc(var(--space-XL) * 12)'
 									}}
 								/>}
-								<Flex vertical justify='center' align={!mobile ? 'flex-start' : 'center'}>
+								<Flex vertical justify='center' align={!isMobile ? 'flex-start' : 'center'}>
 									<Title level={2}>
 										{`${staff.name.first} ${staff.name.middle ? `${staff.name.middle} ` : ''}`} {staff.name.last}
 									</Title>

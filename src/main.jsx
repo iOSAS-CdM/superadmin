@@ -21,6 +21,10 @@ import rootToHex from './utils/rootToHex';
 import 'antd/dist/reset.css';
 import './styles/index.css';
 
+import { MobileProvider } from './contexts/MobileContext';
+import { CacheProvider } from './contexts/CacheContext';
+import { RefreshProvider } from './contexts/RefreshContext';
+
 onOpenUrl((data) => {
 	if (data.includes('osas-superadmin://return'))
 		Window.getByLabel('main').then((window) => {
@@ -30,24 +34,8 @@ onOpenUrl((data) => {
 });
 
 const OSAS = () => {
-	const [mobile, setMobile] = React.useState(false);
 	const [session, setSession] = React.useState(null);
 	const [sessionChecked, setSessionChecked] = React.useState(false);
-
-	// Handle window resize
-	React.useEffect(() => {
-		const handleResize = () => {
-			setMobile(window.innerWidth < remToPx(80));
-			console.log(`Mobile mode: ${window.innerWidth < remToPx(80)}`);
-		};
-
-		handleResize();
-		window.addEventListener('resize', handleResize);
-
-		return () => {
-			window.removeEventListener('resize', handleResize);
-		};
-	}, []);
 
 	// Get initial session
 	React.useLayoutEffect(() => {
@@ -124,30 +112,31 @@ const OSAS = () => {
 			>
 				<App>
 					<BrowserRouter>
-						<MobileContext.Provider value={{ mobile, setMobile }}>
+						<MobileProvider>
 							<Routes>
 								<Route path='/' element={session ? <Navigate to='/signUp' /> : <SignIn />} />
 								<Route path='/signUp' element={session ? <Navigate to='/dashboard' /> : <SignIn />} />
 
-								<Route path='/dashboard' element={session ? <Dashboard /> : <Navigate to='/signUp' />} />
+								<Route path='/dashboard' element={session ? (
+									<CacheProvider>
+										<RefreshProvider>
+											<Dashboard />
+										</RefreshProvider>
+									</CacheProvider>
+								) : <Navigate to='/signUp' />} />
 								<Route path='/staff/:staffId' element={session ? <Profile /> : <Navigate to='/signUp' />} />
 								<Route path='/configure' element={session ? <Configure /> : <Navigate to='/signUp' />} />
 
 								<Route path='/auth-return' element={<AuthReturn />} />
 								<Route path='/unauthorized' element={<Unauthorized />} />
 							</Routes>
-						</MobileContext.Provider>
+						</MobileProvider>
 					</BrowserRouter>
 				</App>
 			</ConfigProvider>
 		</React.StrictMode>
 	);
 };
-
-export const MobileContext = React.createContext({
-	mobile: false,
-	setMobile: () => { }
-});
 
 export const API_Route = import.meta.env.DEV ? 'http://localhost:3001' : 'http://47.130.158.40';
 

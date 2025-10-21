@@ -4,12 +4,12 @@ import { Card, Flex, Button, Dropdown } from 'antd';
 
 import { MenuOutlined } from '@ant-design/icons';
 
-import { MobileContext } from '../main';
+import { useMobile } from '../contexts/MobileContext';
 
 import '../styles/components/Header.css';
 
 const Header = ({ icon, title, actions }) => {
-	const { mobile, setMobile } = React.useContext(MobileContext);
+	const isMobile = useMobile();
 
 	return (
 		<Card id='header' size='small'>
@@ -18,7 +18,7 @@ const Header = ({ icon, title, actions }) => {
 					{icon}
 					{title}
 				</Flex>
-				{!mobile ?
+				{!isMobile ?
 					<Flex justify='flex-end' align='center' gap='small'>
 						{actions}
 					</Flex>

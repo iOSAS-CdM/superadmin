@@ -36,7 +36,7 @@ import {
 	DeleteOutlined
 } from '@ant-design/icons';
 
-import { MobileContext } from '../main';
+import { useMobile } from '../contexts/MobileContext';
 
 const { Title, Text } = Typography;
 
@@ -120,7 +120,7 @@ const Dashboard = () => {
 		supabase.auth.signOut();
 	};
 
-	const { mobile } = React.useContext(MobileContext);
+	const isMobile = useMobile();
 
 	const navigate = useNavigate();
 
@@ -162,7 +162,7 @@ const Dashboard = () => {
 
 					{/************************** Filter **************************/}
 					<Flex justify='space-between' align='center' gap='small'>
-						<Card size='small' {...mobile ? { style: { width: '100%' } } : {}}>
+						<Card size='small' {...isMobile ? { style: { width: '100%' } } : {}}>
 							<Input
 								placeholder='Search'
 								allowClear
@@ -172,7 +172,7 @@ const Dashboard = () => {
 							/>
 						</Card>
 						<Card size='small'>
-							{!mobile ? (
+							{!isMobile ? (
 								<Segmented
 									options={[
 										{ label: 'All', value: 'all' },
@@ -221,7 +221,7 @@ const Dashboard = () => {
 						<Flex vertical justify='flex-start' align='flex-start' gap='small' flex={1}>
 							<Row gutter={[remToPx(1), remToPx(1)]} style={{ width: '100%' }}>
 								{searchFilteredStaffs.map((staff, index) => (
-									<Col key={staff.id} span={!mobile ? 8 : 24}>
+									<Col key={staff.id} span={!isMobile ? 8 : 24}>
 										<StaffCard staff={staff} animationDelay={index * 0.1} loading={staff.placeholder} />
 									</Col>
 								))}
