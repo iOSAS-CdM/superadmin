@@ -2,8 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router';
 
 import {
+	App,
 	Flex,
 	Card,
+	Form,
 	Typography,
 	Button,
 	Input
@@ -26,10 +28,50 @@ import Header from '../components/Header';
 
 import '../styles/pages/Dashboard.css';
 
+import { API_Route } from '../main';
+
 const Profile = () => {
 	const isMobile = useMobile();
 
 	const navigate = useNavigate();
+
+	const { message } = App.useApp();
+
+	/**
+	 * @typedef {{
+	 * 	commit: string;
+	 * 	date: string;
+	 * 	message: string;
+	 * }} Tag
+	 */
+
+	/**
+	 * @typedef {{
+	 * 	version: string;
+	 * 	main: Tag;
+	 * 	release: Tag;
+	 * }} Version
+	 */
+
+	/** @type {[Version, React.Dispatch<React.SetStateAction<Version>>]} */
+	const [desktopVersion, setDesktopVersion] = React.useState({});
+	React.useEffect(() => {
+		const controller = new AbortController();
+
+		// Fetch version info
+		const fetchVersion = async () => {
+			const responses = await Promise.all([
+				fetch(`${API_Route}/superadmin/version`, { signal: controller.signal }),
+			]);
+
+			const data = await Promise.all(responses.map(res => res.json()));
+
+			setDesktopVersion(data[0]);
+		};
+
+		fetchVersion();
+		return () => controller.abort();
+	}, []);
 
 	return (
 		<Card className='scrollable-content page-container' size='small'>
@@ -58,7 +100,7 @@ const Profile = () => {
 					<Flex vertical justify='flex-start' align='stretch' gap='large'>
 						<Flex vertical justify='flex-start' align='stretch' gap='small'>
 							<Title level={5}>Desktop</Title>
-							<Flex justify='flex-start' align='stretch' gap='large'>
+							{/* <Flex justify='flex-start' align='stretch' gap='large'>
 								<Flex vertical justify='flex-start' align='stretch' flex={1}>
 									<Input
 										value='vPr0t0typ3-0s4s'
@@ -84,71 +126,40 @@ const Profile = () => {
 									/>
 									<Text type='secondary'>Deployed Software</Text>
 								</Flex>
-							</Flex>
-						</Flex>
-						<Flex vertical justify='flex-start' align='stretch' gap='small'>
-							<Title level={5}>Mobile</Title>
-							<Flex justify='flex-start' align='stretch' gap='large'>
-								<Flex vertical justify='flex-start' align='stretch' flex={1}>
-									<Input
-										value='vPr0t0typ3-0s4s'
-										readOnly
-									/>
-									<Text type='secondary'>EAS App Build</Text>
+							</Flex> */}
+							<Form layout='vertical' component={false}>
+								<Flex justify='space-between' align='center' gap='large'>
+									<Form.Item label='Development Source'>
+										<Input
+											value={desktopVersion?.main?.commit || 'Loading...'}
+											readOnly
+										/>
+									</Form.Item>
+									<Button
+										type='primary'
+										onClick={async () => {
+											const apiResponse = await fetch(`${API_Route}/superadmin/version/deploy`, {
+												method: 'POST'
+											}).catch(() => null);
+											if (!apiResponse?.ok) 
+												return message.error('Failed to deploy the latest version.');
+											const newVersion = await apiResponse.json();
+											setDesktopVersion(prev => ({ ...prev, release: newVersion }));
+											message.success('Deployment initiated successfully.');
+										}}
+										icon={<RightOutlined />}
+										iconPosition='end'
+									>
+										Deploy
+									</Button>
+									<Form.Item label='Deployed Software'>
+										<Input
+											value={desktopVersion?.release?.commit || 'Loading...'}
+											readOnly
+										/>
+									</Form.Item>
 								</Flex>
-
-								<Button
-									type='primary'
-									onClick={() => {
-										// Placeholder for update action
-										console.log('Update action triggered');
-									}}
-									icon={<RightOutlined />}
-									iconPosition='end'
-								>
-									Deploy
-								</Button>
-
-								<Flex vertical justify='flex-start' align='stretch' flex={1}>
-									<Input
-										value='vD3pl0y3d-0s4s'
-										readOnly
-									/>
-									<Text type='secondary'>Deployed Application</Text>
-								</Flex>
-							</Flex>
-						</Flex>
-
-						<Flex vertical justify='flex-start' align='stretch' gap='small'>
-							<Title level={5}>Website</Title>
-							<Flex justify='flex-start' align='stretch' gap='large'>
-								<Flex vertical justify='flex-start' align='stretch' flex={1}>
-									<Input
-										value='vPr0t0typ3-0s4s'
-										readOnly
-									/>
-									<Text type='secondary'>Github Action Build</Text>
-								</Flex>
-
-								<Button
-									type='primary'
-									onClick={() => {
-										// Placeholder for update action
-										console.log('Update action triggered');
-									}}
-									icon={<RightOutlined />}
-									iconPosition='end'
-								>
-									Deploy
-								</Button>
-
-								<Flex vertical justify='flex-start' align='stretch' flex={1}>
-									<Input
-										value='vD3pl0y3d-0s4s'
-									/>
-									<Text type='secondary'>Deployed Website</Text>
-								</Flex>
-							</Flex>
+							</Form>
 						</Flex>
 					</Flex>
 				</Card>

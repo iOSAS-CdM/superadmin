@@ -2,7 +2,6 @@ import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Row, Col, Empty, Spin, Flex, Pagination } from 'antd';
 import { useMobile } from '../contexts/MobileContext';
-import authFetch from '../utils/authFetch';
 import { useCache } from '../contexts/CacheContext';
 import { useRefresh } from '../contexts/RefreshContext';
 
@@ -47,7 +46,7 @@ const ContentPage = ({
 			const paginatedUrl = fetchUrl + (fetchUrl.includes('?') ? '&' : '?') +
 				`limit=${pageSize}&offset=${page * pageSize}`;
 
-			const request = await authFetch(paginatedUrl, { signal: controller.signal });
+			const request = await fetch(paginatedUrl, { signal: controller.signal });
 			if (!request?.ok) return setLoading(false);
 
 			const data = await request.json();
