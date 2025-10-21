@@ -12,8 +12,6 @@ import {
 	Button,
 	Input,
 	Segmented,
-	Select,
-	Upload,
 	Avatar,
 	App,
 	Tooltip,
