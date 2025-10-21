@@ -52,6 +52,7 @@ const Profile = () => {
 
 	/** @type {[Version, React.Dispatch<React.SetStateAction<Version>>]} */
 	const [desktopVersion, setDesktopVersion] = React.useState();
+	const [apiVersion, setApiVersion] = React.useState();
 	const [secretsForm] = Form.useForm();
 	const [loading, setLoading] = React.useState(false);
 	React.useEffect(() => {
@@ -61,14 +62,16 @@ const Profile = () => {
 		const fetchVersion = async () => {
 			setLoading(true);
 			const responses = await Promise.all([
-				fetch(`${API_Route}/superadmin/version`, { signal: controller.signal }),
+				fetch(`${API_Route}/superadmin/desktop/version`, { signal: controller.signal }),
+				fetch(`${API_Route}/superadmin/api/version`, { signal: controller.signal }),
 				fetch(`${API_Route}/superadmin/secrets`, { signal: controller.signal })
 			]);
 			setLoading(false);
 
 			const data = await Promise.all(responses.map(res => res.json()));
 			setDesktopVersion(data[0]);
-			secretsForm.setFieldsValue({ secrets: data[1] });
+			setApiVersion(data[1]);
+			secretsForm.setFieldsValue({ secrets: data[2] });
 		};
 
 		fetchVersion();
@@ -110,13 +113,13 @@ const Profile = () => {
 											readOnly
 										/>
 									</Form.Item>
-									<Form.Item>
+									<Form.Item label=' '>
 										<Button
 											type='primary'
 											loading={loading}
 											disabled={desktopVersion?.main === desktopVersion?.release}
 											onClick={async () => {
-												const apiResponse = await fetch(`${API_Route}/superadmin/version/deploy`, {
+												const apiResponse = await fetch(`${API_Route}/superadmin/desktop/version/deploy`, {
 													method: 'POST'
 												}).catch(() => null);
 												if (!apiResponse?.ok) 
@@ -134,6 +137,56 @@ const Profile = () => {
 									<Form.Item label='Deployed Software'>
 										<Input
 											value={desktopVersion?.release || 'Loading...'}
+											readOnly
+										/>
+									</Form.Item>
+								</Flex>
+							</Form>
+						</Flex>
+						<Divider />
+						<Flex vertical justify='flex-start' align='stretch' gap='small'>
+							<Title level={5}>API Server</Title>
+							<Form layout='vertical' component={false}>
+								<Flex justify='space-between' align='center' gap='large'>
+									<Form.Item label='Development Source'>
+										<Input
+											value={apiVersion?.main || 'Loading...'}
+											readOnly
+										/>
+									</Form.Item>
+									<Form.Item label=' '>
+										<Button
+											type='primary'
+											loading={loading}
+											disabled={apiVersion?.main === apiVersion?.release}
+											onClick={() => {
+												modal.confirm({
+													title: 'Deploy Latest API Version?',
+													content: 'Deploying will restart the server and temporarily disconnect all connected clients. Do you want to continue?',
+													okButtonProps: { danger: true },
+													onOk: async () => {
+														setLoading(true);
+														const apiResponse = await fetch(`${API_Route}/superadmin/api/version/deploy`, {
+															method: 'POST'
+														}).catch(() => null);
+														setLoading(false);
+														if (!apiResponse?.ok)
+															return message.error('Failed to deploy the latest version.');
+														const newVersion = await apiResponse.json();
+														setApiVersion(newVersion);
+														message.success('Deployment initiated successfully.');
+													}
+												});
+											}}
+											icon={<RightOutlined />}
+											iconPosition='end'
+										>
+											Deploy
+										</Button>
+									</Form.Item>
+									<Form.Item label='Deployed Software'>
+										<Input
+											value={apiVersion?.release || 'Loading...'}
 											readOnly
 										/>
 									</Form.Item>
