@@ -138,6 +138,6 @@ const OSAS = () => {
 	);
 };
 
-export const API_Route = import.meta.env.DEV ? 'http://localhost:3001' : 'http://47.130.158.40';
+export const API_Route = import.meta.env.DEV ? 'http://localhost:3001' : 'https://iosas.online/api';
 
 ReactDOM.createRoot(document.getElementById('root')).render(<OSAS />);
