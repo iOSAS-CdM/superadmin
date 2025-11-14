@@ -22,6 +22,7 @@ const { Title, Text } = Typography;
 import remToPx from '../utils/remToPx';
 
 import { API_Route } from '../main';
+import authFetch from '../utils/authFetch';
 
 const RestrictStaffForm = React.createRef();
 
@@ -70,7 +71,7 @@ const RestrictStaff = async (Modal, staff, setRefreshSeed, restricting, setRestr
 			return new Promise((resolve, reject) => {
 				RestrictStaffForm.current.validateFields()
 					.then(async (values) => {
-						const request = await fetch(`${API_Route}/superadmin/staff/${staff.id}/restrict`, {
+						const request = await authFetch(`${API_Route}/superadmin/staff/${staff.id}/restrict`, {
 							method: 'PATCH',
 							headers: {
 								'Content-Type': 'application/json'

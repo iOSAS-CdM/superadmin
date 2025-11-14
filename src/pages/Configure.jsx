@@ -32,6 +32,7 @@ import Header from '../components/Header';
 import '../styles/pages/Dashboard.css';
 
 import { API_Route } from '../main';
+import authFetch from '../utils/authFetch';
 
 const Profile = () => {
 	const isMobile = useMobile();
@@ -62,9 +63,9 @@ const Profile = () => {
 		const fetchVersion = async () => {
 			setLoading(true);
 			const responses = await Promise.all([
-				fetch(`${API_Route}/superadmin/desktop/version`, { signal: controller.signal }),
-				fetch(`${API_Route}/superadmin/api/version`, { signal: controller.signal }),
-				fetch(`${API_Route}/superadmin/secrets`, { signal: controller.signal })
+				authFetch(`${API_Route}/superadmin/desktop/version`, { signal: controller.signal }),
+				authFetch(`${API_Route}/superadmin/api/version`, { signal: controller.signal }),
+				authFetch(`${API_Route}/superadmin/secrets`, { signal: controller.signal })
 			]);
 			setLoading(false);
 
@@ -119,7 +120,7 @@ const Profile = () => {
 											loading={loading}
 											disabled={desktopVersion?.main === desktopVersion?.release}
 											onClick={async () => {
-												const apiResponse = await fetch(`${API_Route}/superadmin/desktop/version/deploy`, {
+												const apiResponse = await authFetch(`${API_Route}/superadmin/desktop/version/deploy`, {
 													method: 'POST'
 												}).catch(() => null);
 												if (!apiResponse?.ok) 
@@ -166,7 +167,7 @@ const Profile = () => {
 													okButtonProps: { danger: true },
 													onOk: async () => {
 														setLoading(true);
-														const apiResponse = await fetch(`${API_Route}/superadmin/api/version/deploy`, {
+														const apiResponse = await authFetch(`${API_Route}/superadmin/api/version/deploy`, {
 															method: 'POST'
 														}).catch(() => null);
 														setLoading(false);
@@ -252,7 +253,7 @@ const Profile = () => {
 												const values = secretsForm.getFieldsValue();
 
 												setLoading(true);
-												const response = await fetch(`${API_Route}/superadmin/secrets`, {
+												const response = await authFetch(`${API_Route}/superadmin/secrets`, {
 													method: 'POST',
 													headers: {
 														'Content-Type': 'application/json'
@@ -295,7 +296,7 @@ const Profile = () => {
 										okButtonProps: { danger: true },
 										onOk: async () => {
 											setLoading(true);
-											const response = await fetch(`${API_Route}/superadmin/restart`, {
+											const response = await authFetch(`${API_Route}/superadmin/restart`, {
 												method: 'POST'
 											}).catch(() => null);
 											setLoading(false);

@@ -26,6 +26,7 @@ import {
 import Button from '../components/Button';
 
 import { useMobile } from '../contexts/MobileContext';
+import authFetch from '../utils/authFetch';
 
 const { Title, Text } = Typography;
 
@@ -93,7 +94,7 @@ const Profile = () => {
 	const [refreshSeed, setRefreshSeed] = React.useState(0);
 
 	React.useEffect(() => {
-		fetch(`${API_Route}/superadmin/staff/${staffId}`)
+		authFetch(`${API_Route}/superadmin/staff/${staffId}`)
 			.then(response => response.json())
 			.then(data => {
 				console.log(data);
@@ -227,7 +228,7 @@ const Profile = () => {
 												type='primary'
 												icon={<UnlockOutlined />}
 												onClick={async () => {
-													await fetch(`${API_Route}/superadmin/staff/${staff.id}/unrestrict`, {
+													await authFetch(`${API_Route}/superadmin/staff/${staff.id}/unrestrict`, {
 														method: 'PATCH',
 														headers: {
 															'Content-Type': 'application/json',
@@ -255,7 +256,7 @@ const Profile = () => {
 														title: 'Are you sure you want to delete this staff?',
 														okButtonProps: { danger: true },
 														onOk: () =>
-															fetch(`${API_Route}/superadmin/staff/${thisStaff.id}`, {
+															authFetch(`${API_Route}/superadmin/staff/${thisStaff.id}`, {
 																method: 'DELETE',
 															})
 																.then((res) => {

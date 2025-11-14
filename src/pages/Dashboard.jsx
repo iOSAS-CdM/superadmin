@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
 import supabase from '../utils/supabaseClient';
+import authFetch from '../utils/authFetch';
 
 import {
 	Flex,
@@ -91,7 +92,7 @@ const Dashboard = () => {
 		};
 		setStaffs(placeholderStaffs);
 
-		fetch(`${API_Route}/superadmin/staffs`)
+		authFetch(`${API_Route}/superadmin/staffs`)
 			.then(response => response.json())
 			.then(data => {
 				if (Array.isArray(data))
@@ -285,7 +286,7 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 					] : [
 						<Tooltip title='Unrestrict Staff'>
 							<UnlockOutlined onClick={() => {
-								fetch(`${API_Route}/superadmin/staff/${thisStaff.id}/unrestrict`, {
+								authFetch(`${API_Route}/superadmin/staff/${thisStaff.id}/unrestrict`, {
 									method: 'PATCH',
 									headers: {
 										'Content-Type': 'application/json',
@@ -308,7 +309,7 @@ const StaffCard = ({ staff, animationDelay, loading }) => {
 										title: 'Are you sure you want to delete this staff?',
 										okButtonProps: { danger: true },
 										onOk: () =>
-											fetch(`${API_Route}/superadmin/staff/${thisStaff.id}`, {
+											authFetch(`${API_Route}/superadmin/staff/${thisStaff.id}`, {
 												method: 'DELETE',
 											})
 												.then((res) => {

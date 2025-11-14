@@ -27,6 +27,7 @@ import remToPx from '../utils/remToPx';
 const EditStaffForm = React.createRef();
 
 import { API_Route } from '../main';
+import authFetch from '../utils/authFetch';
 
 const StaffForm = ({ staff }) => {
 	const [ProfilePicture, setProfilePicture] = React.useState(staff.profilePicture || '');
@@ -192,7 +193,7 @@ const EditStaff = async (Modal, staff, setRefreshSeed, editing, setEditing, setT
 			return new Promise((resolve, reject) => {
 				EditStaffForm.current.validateFields()
 					.then(async (values) => {
-						const request = await fetch(`${API_Route}/superadmin/staff/${staff.id}`, {
+						const request = await authFetch(`${API_Route}/superadmin/staff/${staff.id}`, {
 							method: 'PUT',
 							headers: {
 								'Content-Type': 'application/json'

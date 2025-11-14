@@ -25,6 +25,7 @@ const { Text } = Typography;
 import remToPx from '../utils/remToPx';
 
 import { API_Route } from '../main';
+import authFetch from '../utils/authFetch';
 
 const NewStaffForm = React.createRef();
 
@@ -228,7 +229,7 @@ const AddNewStaff = async (Modal, addingNew, setAddingNew, staffs, setStaffs, No
 						Object.assign(newStaff, values);
 						newStaff.profilePicture = values.profilePicture || newStaff.profilePicture;
 
-						const request = await fetch(`${API_Route}/superadmin/staff`, {
+						const request = await authFetch(`${API_Route}/superadmin/staff`, {
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json'

@@ -4,6 +4,7 @@ import { Row, Col, Empty, Spin, Flex, Pagination } from 'antd';
 import { useMobile } from '../contexts/MobileContext';
 import { useCache } from '../contexts/CacheContext';
 import { useRefresh } from '../contexts/RefreshContext';
+import authFetch from '../utils/authFetch';
 
 /**
  * A reusable component for displaying items in a grid layout with animations and pagination
@@ -46,7 +47,7 @@ const ContentPage = ({
 			const paginatedUrl = fetchUrl + (fetchUrl.includes('?') ? '&' : '?') +
 				`limit=${pageSize}&offset=${page * pageSize}`;
 
-			const request = await fetch(paginatedUrl, { signal: controller.signal });
+			const request = await authFetch(paginatedUrl, { signal: controller.signal });
 			if (!request?.ok) return setLoading(false);
 
 			const data = await request.json();
