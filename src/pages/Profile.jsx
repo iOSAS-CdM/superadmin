@@ -287,53 +287,6 @@ const Profile = () => {
 						<Title type='danger' level={3}>{staff.reason}</Title>
 					</Card>
 				)}
-
-				{/************************** Recent Activities **************************/}
-				<Table
-					dataSource={activities}
-					rowKey='id'
-					pagination={false}
-					bordered
-					size='small'
-					showHeader={true}
-					title={() => (
-						<Title level={4} style={{ margin: 0 }}>Recent Activities</Title>
-					)}
-				>
-					<Table.Column
-						title='Timestamp'
-						dataIndex='timestamp'
-						key='timestamp'
-						render={(timestamp) => {
-							// Day (word) - Month (word) - Year, Hour:Minute:Second
-							const date = new Date(timestamp);
-							return date.toLocaleString('en-US', {
-								weekday: 'long',
-								year: 'numeric',
-								month: 'long',
-								day: 'numeric',
-								hour: '2-digit',
-								minute: '2-digit',
-								second: '2-digit'
-							});
-						}}
-					/>
-					<Table.Column
-						title='Type'
-						dataIndex='type'
-						key='type'
-						render={(type) => (
-							<Tag color={type === 'login' ? 'green' : 'blue'}>
-								{type.charAt(0).toUpperCase() + type.slice(1)}
-							</Tag>
-						)}
-					/>
-					<Table.Column
-						title='Description'
-						dataIndex='description'
-						key='description'
-					/>
-				</Table>
 			</Flex>
 		</Card>
 	);
