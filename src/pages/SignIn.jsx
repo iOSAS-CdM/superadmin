@@ -33,29 +33,6 @@ const SignIn = () => {
 	const navigate = useNavigate();
 	const AuthForm = React.useRef(null);
 
-	const signIn = async (values) => {
-		if (!AuthForm.current) return;
-		setSigningIn(true);
-		const { error } = await supabase.auth.signInWithPassword({
-			email: values.email,
-			password: values.password
-		});
-
-		if (error) {
-			AuthForm.current.setFields([{
-				name: 'email',
-				errors: ['']
-			}]);
-			AuthForm.current.setFields([{
-				name: 'password',
-				errors: [error.message]
-			}]);
-		} else {
-			navigate('/dashboard');
-		};
-		setSigningIn(false);
-	};
-
 	const signInWithGoogle = React.useCallback(async () => {
 		let port;
 
