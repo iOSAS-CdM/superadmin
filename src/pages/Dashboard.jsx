@@ -32,7 +32,8 @@ import {
 	UnlockOutlined,
 	RightOutlined,
 	FilterOutlined,
-	DeleteOutlined
+	DeleteOutlined,
+	BugOutlined
 } from '@ant-design/icons';
 
 import { useMobile } from '../contexts/MobileContext';
@@ -133,6 +134,12 @@ const Dashboard = () => {
 						title={<Title level={3}>Dashboard</Title>}
 						actions={
 							<>
+								<Button
+									icon={<BugOutlined />}
+									onClick={() => {
+										navigate('/bugs');
+									}}
+								>Bug Reports</Button>
 								<Button
 									icon={<ToolOutlined />}
 									onClick={() => {
