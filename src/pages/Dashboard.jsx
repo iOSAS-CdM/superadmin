@@ -155,15 +155,6 @@ const Dashboard = () => {
 								>System Vitals</Button>
 								<Button
 									type='primary'
-									icon={addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
-									onClick={async () => {
-										const staff = await AddNewStaff(Modal, addingNew, setAddingNew, staffs, setStaffs, Notification);
-										if (!staff) return;
-										setRefreshSeed(prev => prev + 1);
-									}}
-								>Add New</Button>
-								<Button
-									type='primary'
 									icon={signingOut ? <LoadingOutlined /> : <LogoutOutlined />}
 									disabled={signingOut}
 									onClick={signOut}
@@ -176,13 +167,25 @@ const Dashboard = () => {
 					{/************************** Filter **************************/}
 					<Flex justify='space-between' align='center' gap='small'>
 						<Card size='small' {...isMobile ? { style: { width: '100%' } } : {}}>
-							<Input
-								placeholder='Search'
-								allowClear
-								value={searchTerm}
-								prefix={<SearchOutlined />}
-								onChange={(e) => setSearchTerm(e.target.value)}
-							/>
+							<Flex justify='space-between' align='center' gap='small'>
+								<Input
+									placeholder='Search'
+									allowClear
+									value={searchTerm}
+									prefix={<SearchOutlined />}
+									onChange={(e) => setSearchTerm(e.target.value)}
+								/>
+
+								<Button
+									type='primary'
+									icon={addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
+									onClick={async () => {
+										const staff = await AddNewStaff(Modal, addingNew, setAddingNew, staffs, setStaffs, Notification);
+										if (!staff) return;
+										setRefreshSeed(prev => prev + 1);
+									}}
+								>Add New</Button>
+							</Flex>
 						</Card>
 						<Card size='small'>
 							{!isMobile ? (
