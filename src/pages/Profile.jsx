@@ -118,12 +118,11 @@ const Profile = () => {
 					actions={
 						<>
 							<Button
-								type='primary'
 								icon={<LeftOutlined />}
-								onClick={() => {
-									navigate('/dashboard');
-								}}
-							>Back</Button>
+								onClick={() => navigate('/dashboard')}
+							>
+								Back to Dashboard
+							</Button>
 						</>
 					}
 				/>

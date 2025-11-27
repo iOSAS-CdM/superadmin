@@ -13,6 +13,7 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Configure from './pages/Configure';
 import Bugs from './pages/Bugs';
+import SystemVitals from './pages/SystemVitals';
 import AuthReturn from './pages/AuthReturn';
 import Unauthorized from './pages/Unauthorized';
 
@@ -128,6 +129,7 @@ const OSAS = () => {
 								<Route path='/staff/:staffId' element={session ? <Profile /> : <Navigate to='/signUp' />} />
 								<Route path='/configure' element={session ? <Configure /> : <Navigate to='/signUp' />} />
 								<Route path='/bugs' element={session ? <Bugs /> : <Navigate to='/signUp' />} />
+								<Route path='/system-vitals' element={session ? <SystemVitals /> : <Navigate to='/signUp' />} />
 
 								<Route path='/auth-return' element={<AuthReturn />} />
 								<Route path='/unauthorized' element={<Unauthorized />} />

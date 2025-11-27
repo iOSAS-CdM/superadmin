@@ -17,7 +17,7 @@ import {
 
 import {
 	BugOutlined,
-	ArrowLeftOutlined,
+	LeftOutlined,
 	ReloadOutlined
 } from '@ant-design/icons';
 
@@ -85,7 +85,7 @@ const Bugs = () => {
 							Refresh
 						</Button>
 						<Button
-							icon={<ArrowLeftOutlined />}
+							icon={<LeftOutlined />}
 							onClick={() => navigate('/dashboard')}
 						>
 							Back to Dashboard

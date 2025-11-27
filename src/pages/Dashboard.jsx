@@ -33,7 +33,8 @@ import {
 	RightOutlined,
 	FilterOutlined,
 	DeleteOutlined,
-	BugOutlined
+	BugOutlined,
+	DashboardOutlined
 } from '@ant-design/icons';
 
 import { useMobile } from '../contexts/MobileContext';
@@ -146,6 +147,12 @@ const Dashboard = () => {
 										navigate('/configure');
 									}}
 								>Configure System</Button>
+								<Button
+									icon={<DashboardOutlined />}
+									onClick={() => {
+										navigate('/system-vitals');
+									}}
+								>System Vitals</Button>
 								<Button
 									type='primary'
 									icon={addingNew ? <LoadingOutlined /> : <UserAddOutlined />}
