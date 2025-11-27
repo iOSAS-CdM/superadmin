@@ -76,9 +76,11 @@ const SystemVitals = () => {
 	React.useEffect(() => {
 		if (!useWebSocket) return;
 
-		// Properly convert HTTP/HTTPS to WS/WSS
-		const wsUrl = API_Route.replace(/^http(s)?:/, 'ws$1:');
-		console.log('Connecting to WebSocket:', wsUrl);
+		// Convert HTTP(S) URL to WS(S) URL properly
+		let wsUrl = API_Route.replace(/^http/, 'ws');
+
+		// Log the WebSocket URL for debugging
+		console.log('Attempting WebSocket connection to:', wsUrl);
 
 		let ws;
 		try {
@@ -87,26 +89,32 @@ const SystemVitals = () => {
 		} catch (error) {
 			console.error('Failed to create WebSocket:', error);
 			notification.error({
-				message: 'WebSocket Error',
-				description: 'Failed to create WebSocket connection. Using HTTP mode.'
+				message: 'WebSocket Creation Failed',
+				description: `Could not create WebSocket connection: ${error.message}`
 			});
 			setUseWebSocket(false);
 			return;
-		};
+		}
 
 		ws.onopen = () => {
-			console.log('WebSocket connected to:', wsUrl);
+			console.log('WebSocket connected successfully to:', wsUrl);
 			setWsConnected(true);
 
 			// Subscribe to vitals updates
-			ws.send(JSON.stringify({
-				type: 'subscribe_vitals'
-			}));
+			try {
+				ws.send(JSON.stringify({
+					type: 'subscribe_vitals'
+				}));
+				console.log('Sent subscribe_vitals message');
+			} catch (error) {
+				console.error('Failed to send subscribe message:', error);
+			}
 		};
 
 		ws.onmessage = (event) => {
 			try {
 				const message = JSON.parse(event.data);
+				console.log('Received WebSocket message:', message.type);
 
 				if (message.type === 'vitals') {
 					setVitals(message.payload);
@@ -118,35 +126,44 @@ const SystemVitals = () => {
 		};
 
 		ws.onerror = (error) => {
-			console.error('WebSocket error:', error, 'URL:', wsUrl);
+			console.error('WebSocket error occurred:', error);
+			console.error('WebSocket URL was:', wsUrl);
+			console.error('WebSocket readyState:', ws?.readyState);
 			setWsConnected(false);
-
-			// Automatically fall back to HTTP mode
 			notification.warning({
-				message: 'WebSocket Connection Failed',
-				description: 'Switching to HTTP mode automatically.'
+				message: 'WebSocket Connection Error',
+				description: 'Failed to connect via WebSocket. Falling back to HTTP polling. Check console for details.',
+				duration: 6
 			});
-			setUseWebSocket(false);
 		};
 
 		ws.onclose = (event) => {
 			console.log('WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
 			setWsConnected(false);
 
-			// If closed unexpectedly (not a clean close), switch to HTTP
-			if (event.code !== 1000 && event.code !== 1001) {
-				console.warn('Unexpected WebSocket close. Switching to HTTP mode.');
-				setUseWebSocket(false);
+			// If closed unexpectedly and we're still trying to use WebSocket, notify user
+			if (useWebSocket && event.code !== 1000) {
+				notification.info({
+					message: 'WebSocket Disconnected',
+					description: `Connection closed (Code: ${event.code}). ${event.reason || 'No reason provided.'}`,
+					duration: 4
+				});
 			}
 		};
 
 		return () => {
-			if (ws.readyState === WebSocket.OPEN) {
-				ws.send(JSON.stringify({
-					type: 'unsubscribe_vitals'
-				}));
+			if (ws && ws.readyState === WebSocket.OPEN) {
+				try {
+					ws.send(JSON.stringify({
+						type: 'unsubscribe_vitals'
+					}));
+				} catch (error) {
+					console.error('Failed to send unsubscribe message:', error);
+				}
 			}
-			ws.close();
+			if (ws) {
+				ws.close(1000, 'Component unmounting');
+			}
 		};
 	}, [useWebSocket]);
 
@@ -214,32 +231,6 @@ const SystemVitals = () => {
 			>
 				{vitals ? (
 					<Flex vertical gap='large'>
-						{/* Connection Status Info */}
-						<Card size='small' style={{ backgroundColor: wsConnected ? '#f6ffed' : '#fff7e6' }}>
-							<Flex justify='space-between' align='center'>
-								<Space>
-									{useWebSocket ? (
-										wsConnected ? (
-											<Tag color='success' icon={<LinkOutlined />}>WebSocket Connected</Tag>
-										) : (
-											<Tag color='warning' icon={<DisconnectOutlined />}>WebSocket Connecting...</Tag>
-										)
-									) : (
-										<Tag color='default'>HTTP Polling Mode</Tag>
-									)}
-									<Text type='secondary'>
-										API: {API_Route}
-										{useWebSocket && ` → ${API_Route.replace(/^http(s)?:/, 'ws$1:')}`}
-									</Text>
-								</Space>
-								{vitals.timestamp && (
-									<Text type='secondary' style={{ fontSize: '0.85rem' }}>
-										Last updated: {new Date(vitals.timestamp).toLocaleTimeString()}
-									</Text>
-								)}
-							</Flex>
-						</Card>
-
 						{/* System Overview */}
 						<div>
 							<Title level={4}>
