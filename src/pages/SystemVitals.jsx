@@ -228,6 +228,7 @@ const SystemVitals = () => {
 										<Statistic
 											title='Process ID'
 											value={vitals.node.pid}
+											formatter={(value) => value}
 										/>
 									</Card>
 								</Col>
