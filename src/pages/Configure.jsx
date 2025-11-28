@@ -311,6 +311,65 @@ const Profile = () => {
 						</Flex>
 					)}
 				/>
+
+				{/************************** Migration **************************/}
+				<Card title={<Title level={2}>Academic Year Migration</Title>}>
+					<Flex vertical gap='middle'>
+						<Alert
+							message="Warning: Destructive Operation"
+							description="This will archive all records, cases, and requests to a new schema, then clear them from the active system. All students below year 4 will be set to 'unverified', and year 4 students will be removed."
+							type="warning"
+							showIcon
+							icon={<WarningOutlined />}
+						/>
+						<Form layout='vertical' onFinish={(values) => {
+							modal.confirm({
+								title: 'Confirm Academic Year Migration',
+								content: (
+									<Flex vertical gap='small'>
+										<Text>You are about to migrate to the new academic year with archive schema: <Text strong>{values.schemaName}</Text></Text>
+										<Text type="danger">This action cannot be easily undone.</Text>
+										<Text>Please ensure you have a database backup before proceeding.</Text>
+									</Flex>
+								),
+								okText: 'Migrate & Reset',
+								okButtonProps: { danger: true },
+								onOk: async () => {
+									setLoading(true);
+									try {
+										const res = await authFetch(`${API_Route}/superadmin/migrate`, {
+											method: 'POST',
+											headers: { 'Content-Type': 'application/json' },
+											body: JSON.stringify({ schemaName: values.schemaName })
+										});
+										const data = await res.json();
+										if (!res.ok) throw new Error(data.message || 'Migration failed');
+										message.success('Academic year migration completed successfully!');
+									} catch (err) {
+										message.error('Migration failed: ' + err.message);
+									} finally {
+										setLoading(false);
+									}
+								}
+							});
+						}}>
+							<Form.Item
+								label="Archive Schema Name"
+								name="schemaName"
+								rules={[
+									{ required: true, message: 'Please enter a schema name' },
+									{ pattern: /^[a-zA-Z0-9_]+$/, message: 'Only letters, numbers, and underscores allowed' }
+								]}
+								help="Example: ay_2024_2025"
+							>
+								<Input placeholder="ay_2024_2025" />
+							</Form.Item>
+							<Button type="primary" danger htmlType="submit" loading={loading}>
+								Start Migration
+							</Button>
+						</Form>
+					</Flex>
+				</Card>
 			</Flex>
 		</Card>
 	);
