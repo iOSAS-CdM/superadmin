@@ -61,7 +61,7 @@ const SignIn = () => {
 
 		await start({
 			ports: [8000, 8001, 8002, 8003, 8004],
-			response: `<script>window.location.href = 'http://${window.location.hostname}:${window.location.port}/auth-return';</script>`,
+			response: `<script>window.location.href = 'https://iosas.online/auth-complete';</script>`,
 		})
 			.then(async (p) => {
 				console.log(`OAuth listener started on port ${p}`);
