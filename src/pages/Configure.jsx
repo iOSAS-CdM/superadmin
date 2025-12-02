@@ -54,6 +54,7 @@ const Profile = () => {
 	/** @type {[Version, React.Dispatch<React.SetStateAction<Version>>]} */
 	const [desktopVersion, setDesktopVersion] = React.useState();
 	const [apiVersion, setApiVersion] = React.useState();
+	const [mobileVersion, setMobileVersion] = React.useState();
 	const [secretsForm] = Form.useForm();
 	const [loading, setLoading] = React.useState(false);
 	React.useEffect(() => {
@@ -65,6 +66,7 @@ const Profile = () => {
 			const responses = await Promise.all([
 				authFetch(`${API_Route}/superadmin/desktop/version`, { signal: controller.signal }),
 				authFetch(`${API_Route}/superadmin/api/version`, { signal: controller.signal }),
+				authFetch(`${API_Route}/superadmin/mobile/version`, { signal: controller.signal }),
 				authFetch(`${API_Route}/superadmin/secrets`, { signal: controller.signal })
 			]);
 			setLoading(false);
@@ -72,7 +74,8 @@ const Profile = () => {
 			const data = await Promise.all(responses.map(res => res.json()));
 			setDesktopVersion(data[0]);
 			setApiVersion(data[1]);
-			secretsForm.setFieldsValue({ secrets: data[2] });
+			setMobileVersion(data[2]);
+			secretsForm.setFieldsValue({ secrets: data[3] });
 		};
 
 		fetchVersion();
@@ -187,6 +190,62 @@ const Profile = () => {
 									<Form.Item label='Deployed Software'>
 										<Input
 											value={apiVersion?.release || 'Loading...'}
+											readOnly
+										/>
+									</Form.Item>
+								</Flex>
+							</Form>
+						</Flex>
+						<Divider />
+						<Flex vertical justify='flex-start' align='stretch' gap='small'>
+							<Title level={5}>Mobile Application</Title>
+							<Form layout='vertical' component={false}>
+								<Flex justify='space-between' align='center' gap='large'>
+									<Form.Item label='Development Source'>
+										<Input
+											value={mobileVersion?.main || 'Loading...'}
+											readOnly
+										/>
+									</Form.Item>
+									<Form.Item label=' '>
+										<Button
+											type='primary'
+											loading={loading}
+											disabled={mobileVersion?.main === mobileVersion?.release}
+											onClick={() => {
+												modal.confirm({
+													title: 'Deploy Latest Mobile Version?',
+													content: (
+														<Flex vertical gap='small'>
+															<Text>This will trigger a new mobile app build and OTA update.</Text>
+															<Text>Students will be notified about the available update.</Text>
+															<Text type="secondary">The build process may take 10-15 minutes to complete.</Text>
+														</Flex>
+													),
+													okText: 'Deploy Update',
+													onOk: async () => {
+														setLoading(true);
+														const apiResponse = await authFetch(`${API_Route}/superadmin/mobile/version/deploy`, {
+															method: 'POST'
+														}).catch(() => null);
+														setLoading(false);
+														if (!apiResponse?.ok)
+															return message.error('Failed to deploy the latest version.');
+														const newVersion = await apiResponse.json();
+														setMobileVersion(newVersion);
+														message.success('Mobile deployment initiated! Build in progress...');
+													}
+												});
+											}}
+											icon={<RightOutlined />}
+											iconPosition='end'
+										>
+											Deploy
+										</Button>
+									</Form.Item>
+									<Form.Item label='Deployed Software'>
+										<Input
+											value={mobileVersion?.release || 'Loading...'}
 											readOnly
 										/>
 									</Form.Item>
