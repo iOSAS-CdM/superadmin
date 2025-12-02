@@ -121,23 +121,12 @@ const StaffForm = ({ staff }) => {
 					<Space.Compact style={{ width: '100%' }}>
 						<Form.Item
 							name='id'
+							disabled
 							rules={[{ required: true, message: 'Please input the employee ID!' }]}
 							style={{ width: '100%' }}
 						>
-							<Input placeholder='Employee ID *' />
+							<Input placeholder='Employee ID *' disabled />
 						</Form.Item>
-						<Button
-							type='primary'
-							icon={<SwapOutlined />}
-							style={{ width: 'fit-content' }}
-							onClick={() => {
-								EditStaffForm.current.setFieldsValue({
-									id: `${String((new Date()).getFullYear()).slice(1)}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
-								});
-							}}
-						>
-							Generate ID
-						</Button>
 					</Space.Compact>
 					<Form.Item
 						name='role'
